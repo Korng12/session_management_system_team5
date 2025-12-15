@@ -1,0 +1,28 @@
+# Gradle build files
+/build/
+/out/
+/bin/
+
+# Gradle wrapper caches
+.gradle/
+/gradle/
+
+# Logs
+*.log
+
+# IDE files
+/.idea/
+/*.iml
+/.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven (if any)
+target/
+
+# Spring Boot / temporary files
+*.class
+*.jar
+*.war
