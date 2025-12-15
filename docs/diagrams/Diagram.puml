@@ -1,0 +1,85 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+' --- ACTORS ---
+actor "Visitor" as visitor
+actor "Registered User" as user
+actor "Researcher / Author" as researcher
+actor "Session Chair" as chair
+actor "Admin" as admin
+
+' --- INHERITANCE (Roles) ---
+visitor <|-- user
+user <|-- researcher
+user <|-- chair
+user <|-- admin
+
+' --- SYSTEM BOUNDARY ---
+rectangle "ConfManage System" {
+
+    ' Group 1: Security & Auth (Member 1)
+    package "Security Module" {
+        usecase "Sign Up (Create Account)" as UC_SignUp
+        usecase "Login" as UC_Login
+        usecase "Manage Profile" as UC_Profile
+    }
+
+    ' Group 2: Main Module (Member 2)
+    package "Paper & Session Management" {
+        usecase "Submit Research Paper" as UC_SubmitPaper
+        usecase "View My Submissions" as UC_ViewSubs
+        usecase "View Assigned Session" as UC_ViewSession
+        usecase "Mark Paper as Presented" as UC_MarkPresented
+    }
+
+    ' Group 3: Logistics & Registration (Member 3)
+    package "Conference Logistics" {
+        usecase "View Conference Schedule" as UC_ViewSchedule
+        usecase "Register for Conference (Buy Ticket)" as UC_RegisterConf
+        usecase "Filter Sessions (by Room/Time)" as UC_Filter
+    }
+
+    ' Group 4: Administration (Member 5 & All)
+    package "Admin Dashboard" {
+        usecase "Manage Users & Roles" as UC_ManageUsers
+        usecase "Create Sessions" as UC_CreateSession
+        usecase "Manage Rooms & TimeSlots" as UC_ManageRooms
+        usecase "Assign Chair to Session" as UC_AssignChair
+        usecase "Accept/Reject Papers" as UC_ReviewPapers
+    }
+}
+
+' --- RELATIONSHIPS ---
+
+' Visitor Actions
+visitor --> UC_SignUp
+visitor --> UC_ViewSchedule
+
+' User Actions (All Logged in)
+user --> UC_Login
+user --> UC_Profile
+user --> UC_RegisterConf
+user --> UC_Filter
+
+' Researcher Actions
+researcher --> UC_SubmitPaper
+researcher --> UC_ViewSubs
+
+' Session Chair Actions
+chair --> UC_ViewSession
+chair --> UC_MarkPresented
+
+' Admin Actions
+admin --> UC_ManageUsers
+admin --> UC_CreateSession
+admin --> UC_ManageRooms
+admin --> UC_AssignChair
+admin --> UC_ReviewPapers
+
+' Dependencies
+UC_RegisterConf ..> UC_Login : <<include>>
+UC_SubmitPaper ..> UC_Login : <<include>>
+UC_CreateSession ..> UC_ManageRooms : <<include>>
+
+@enduml
