@@ -25,7 +25,15 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
-implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.5.7'
+	// https://mvnrepository.com/artifact/com.h2database/h2
+	implementation 'com.h2database:h2'
+	
+	
+	
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 }
 
