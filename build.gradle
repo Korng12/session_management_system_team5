@@ -27,12 +27,23 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
+<<<<<<< HEAD
    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
 	
 	
 	
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+=======
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	// https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
+	implementation 'org.springframework.data:spring-data-jpa:3.5.7'
+	implementation 'com.mysql:mysql-connector-j:9.5.0'
+	  // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
+  implementation 'org.flywaydb:flyway-core:11.17.0'
+  // https://mvnrepository.com/artifact/org.flywaydb/flyway-mysql
+  implementation 'org.flywaydb:flyway-mysql:11.17.0'
+>>>>>>> b902c0a (design database schema,write sql script,structure project folders)
 
 }
 

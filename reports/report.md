@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!-----
 
 
@@ -159,3 +160,7 @@ Since you are required to show commit logs from all members, follow this workflo
 2. **Branching:** Each member creates a branch for their feature (e.g., `feature/security-setup`, `feature/session-crud`).
 3. **Pull Requests:** Do **not** merge directly to main. Open Pull Requests (PRs) so other members can review the code.
 4. **Flyway:** If a member changes the DB, they must add a new V# SQL file. Do not modify existing SQL files after they have been run.
+=======
+### Team5
+
+>>>>>>> b902c0a (design database schema,write sql script,structure project folders)
