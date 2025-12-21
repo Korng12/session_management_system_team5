@@ -3,54 +3,41 @@ package com.team5.demo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-
-
-
 
 @Controller
 public class UserController {
 
+    // User Homepage - Index
     @GetMapping("/")
-    public String showHomePage() {
-        return "user/index";
+    public String showHomepage(Model model) {
+        return "public/index"; // Main landing page
     }
 
-    @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        return "user/UserRegister";
-    }
-
-    @GetMapping("/schedule")
-    public String showSchedule(Model model) {
-        return "schedule";
-    }
-
+    // Login Page
     @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        return "user/login";
+    public String showLoginPage(Model model) {
+        return "public/login"; // User login view
     }
 
-    @GetMapping("/profile")
-    public String showProfile(Model model) {
-        return "user/profile";
+    // Registration Page
+    @GetMapping("/register")
+    public String showRegistrationPage(Model model) {
+        return "public/register"; // User registration view
     }
 
-    @GetMapping("/my-schedule")
-    public String showMySchedule(Model model) {
-        return "schedule";
+    // Conferences Page
+    @GetMapping("/user/conferences")
+    public String showConferencesPage(Model model) {
+        return "user/conferences"; // View available conferences
     }
 
-    @GetMapping("/user/dashboard")
-    public String showUserDashboard(Model model) {
-        return "user/dashboard";
+    // User Schedule Page
+    @GetMapping("/user/user-schedule")
+    public String showUserSchedule(Model model) {
+        return "user/user-schedule"; // User's schedule view
     }
-
-    @PostMapping("/register")
-    public String registerUser(Model model) {
-        // Just return the form for UI display
-        return "user/UserRegister";
+    @GetMapping("/user/profile")
+    public String showUserProfile(Model model) {
+        return "user/profile"; // User's profile view
     }
-
 }
-
