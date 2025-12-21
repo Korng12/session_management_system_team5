@@ -29,6 +29,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
 <<<<<<< HEAD
+<<<<<<< HEAD
    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
 	
@@ -57,7 +58,31 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 >>>>>>> 7bc1749 (update grandle)
+=======
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+>>>>>>> 55a6064 (Implement Secondary module lead-Logistics and Registration)
 
+    // dependencies
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    
+    // Flyway for database migrations
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+    
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+    
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// Lombok dependencies
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    // Also ensure you have this plugin if using Gradle 5+
+    annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
