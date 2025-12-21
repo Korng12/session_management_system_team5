@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View User Registrations - Research Conference</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 0;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header}"></div>
+
+    <!-- Admin Header -->
+    <section class="admin-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-5 fw-bold mb-3">User Registrations</h1>
+                    <p class="lead mb-0">View all registered users for the conference</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- User Registrations Table -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-4">Registered Users</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email Address</th>
+                        <th>Telegram Number</th>
+                        <th>Conference</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="registration : ${registrations}">
+                        <td th:text="${registration.firstName}"></td>
+                        <td th:text="${registration.lastName}"></td>
+                        <td th:text="${registration.email}"></td>
+                        <td th:text="${registration.telegramNumber}"></td>
+                        <td th:text="${registration.conferenceSession}"></td>
+                        <td>
+                            <!-- Action buttons for editing or deleting a registration -->
+                            <a th:href="@{/admin/registrations/edit/{id}(id=${registration.id})}" class="btn btn-warning btn-sm">Edit</a>
+                            <form th:action="@{/admin/registrations/{id}(id=${registration.id})}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_method" value="DELETE" />
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div th:replace="~{fragments/footer}"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
