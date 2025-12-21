@@ -20,6 +20,7 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+<<<<<<< HEAD
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.h2database:h2:2.1.214'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -44,6 +45,18 @@ dependencies {
   // https://mvnrepository.com/artifact/org.flywaydb/flyway-mysql
   implementation 'org.flywaydb:flyway-mysql:11.17.0'
 >>>>>>> b902c0a (design database schema,write sql script,structure project folders)
+=======
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.h2database:h2:2.1.214' // For in-memory testing
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'com.mysql:mysql-connector-j:9.5.0' // Connection to MySQL
+    implementation 'org.flywaydb:flyway-core:11.17.0' // Flyway core
+    implementation 'org.flywaydb:flyway-mysql:11.17.0' // Flyway MySQL support
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+>>>>>>> 7bc1749 (update grandle)
 
 }
 

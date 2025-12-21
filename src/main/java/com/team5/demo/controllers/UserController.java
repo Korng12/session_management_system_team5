@@ -1,4 +1,4 @@
-package com.team5.demo;
+package com.team5.demo.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
