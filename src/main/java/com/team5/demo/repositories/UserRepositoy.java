@@ -1,5 +1,10 @@
 package com.team5.demo.repositories;
 
-public class UserRepositoy {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.team5.demo.entities.User;
+
+public interface UserRepositoy extends JpaRepository<User, Integer> {
+
+	
 }
