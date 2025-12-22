@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import com.team5.demo.entities.Registration;
 
 @Service
@@ -24,7 +23,7 @@ public class RegistrationService {
     private final SessionRepository sessionRepository;
     
     @Transactional
-    public RegistrationDTO registerForConference(Long userId, Long conferenceId) {
+    public RegistrationDTO registerForConference(@org.springframework.lang.NonNull Long userId, @org.springframework.lang.NonNull Long conferenceId) {
         // Check if already registered
         if (registrationRepository.existsByParticipantIdAndConferenceId(userId, conferenceId)) {
             throw new RuntimeException("User is already registered for this conference");
@@ -45,20 +44,20 @@ public class RegistrationService {
         return mapToDTO(savedRegistration);
     }
     
-    public RegistrationDTO getRegistration(Long registrationId) {
+    public RegistrationDTO getRegistration(@org.springframework.lang.NonNull Long registrationId) {
         return registrationRepository.findById(registrationId)
                 .map(this::mapToDTO)
                 .orElseThrow(() -> new RuntimeException("Registration not found"));
     }
     
-    public List<RegistrationDTO> getUserRegistrations(Long userId) {
+public List<RegistrationDTO> getUserRegistrations(@org.springframework.lang.NonNull Long userId) {
         return registrationRepository.findByParticipantId(userId).stream()
                 .map(this::mapToDTO)
                 .collect(java.util.stream.Collectors.toList());
     }
     
     @Transactional
-    public void cancelRegistration(Long registrationId) {
+    public void cancelRegistration(@org.springframework.lang.NonNull Long registrationId) {
         Registration registration = registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new RuntimeException("Registration not found"));
         registration.setStatus("CANCELLED");
