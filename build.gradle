@@ -30,7 +30,26 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql:11.17.0' // Flyway MySQL support
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot starters (keep these)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // ... your other starters
 
+    // Explicit Spring Security modules (required for advanced features)
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
+
+    // JWT (JJWT) - required for JwtUtil and JwtFilter
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'  // Latest stable
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'  // JSON parser (or use jjwt-gson)
+
+    // Lombok (ensure annotation processing)
+    compileOnly 'org.projectlombok:lombok:1.18.34'  // Latest
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 tasks.named('test') {
