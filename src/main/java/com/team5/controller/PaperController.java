@@ -1,4 +1,4 @@
-package com.team5.controller;
+package com.team5.demo.controller;
 
 import com.team5.entity.Paper;
 import com.team5.entity.Paper.PaperStatus;

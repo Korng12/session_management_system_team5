@@ -1,90 +1,84 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.5.8'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'org.springframework.boot' version '3.5.8'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'io.freefair.lombok' version '8.4'
 }
 
-group = 'com.team5'
+group = 'com.team5.demo'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
-
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
-	}
-}
+sourceCompatibility = '23'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-<<<<<<< HEAD
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.h2database:h2:2.1.214'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf
-<<<<<<< HEAD
-<<<<<<< HEAD
-   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
-	
-	
-	
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-=======
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	// https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.mysql:mysql-connector-j:9.5.0'
-	  // https://mvnrepository.com/artifact/org.flywaydb/flyway-core
-  implementation 'org.flywaydb:flyway-core:11.17.0'
-  // https://mvnrepository.com/artifact/org.flywaydb/flyway-mysql
-  implementation 'org.flywaydb:flyway-mysql:11.17.0'
->>>>>>> b902c0a (design database schema,write sql script,structure project folders)
-=======
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.h2database:h2:2.1.214' // For in-memory testing
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'com.mysql:mysql-connector-j:9.5.0' // Connection to MySQL
-    implementation 'org.flywaydb:flyway-core:11.17.0' // Flyway core
-    implementation 'org.flywaydb:flyway-mysql:11.17.0' // Flyway MySQL support
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
->>>>>>> 7bc1749 (update grandle)
-=======
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
->>>>>>> 55a6064 (Implement Secondary module lead-Logistics and Registration)
-
-    // dependencies
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     
-    // Flyway for database migrations
-    implementation 'org.flywaydb:flyway-core'
-    implementation 'org.flywaydb:flyway-mysql'
+    // Database
+    runtimeOnly 'com.mysql:mysql-connector-j:8.0.33'
+    runtimeOnly 'com.h2database:h2:2.1.214'
     
-    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+    // Database Migration
+    implementation 'org.flywaydb:flyway-core:11.17.0'
+    implementation 'org.flywaydb:flyway-mysql:11.17.0'
     
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    // Development Tools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     
+    // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-	// Lombok dependencies
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    // Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
-    
-    // Also ensure you have this plugin if using Gradle 5+
-    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        showStandardStreams = true
+    }
+}
+
+// Configure JAR
+bootJar {
+    enabled = true
+    archiveFileName = '${project.name}.jar'
+}
+
+jar {
+    enabled = false
+}
+
+// Configure JavaCompile
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-parameters']
+}
+
+// Configure Spring Boot
+springBoot {
+    buildInfo()
+}
+
+// Configure dependency management
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.8"
+    }
 }
