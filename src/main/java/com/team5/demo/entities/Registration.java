@@ -2,30 +2,37 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "registrations")
+@Table(name = "participants")
 public class Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "participant_id", nullable = false)
-    private Long participantId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "participant_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    private User participant;
     
-    @Column(name = "conference_id", nullable = false)
-    private Long conferenceId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conference_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    private Session conference;
     
     @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
     
     @Column(nullable = false)
-    private String status;
+    private String status = "CONFIRMED";
     
     @PrePersist
     protected void onCreate() {
-        registeredAt = LocalDateTime.now();
+        if (registeredAt == null) {
+            registeredAt = LocalDateTime.now();
+        }
     }
 }
