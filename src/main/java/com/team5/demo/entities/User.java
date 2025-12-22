@@ -1,30 +1,50 @@
 package com.team5.demo.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-@Entity // Tells Hibernate this is a table
-@Table(name = "users") // Optional: Custom table name
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "users")
+@Getter
+@Setter
 public class User {
-    @Id // Primary Key
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // Auto-increment
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
-    // IMPORTANT: Required empty constructor
-    protected User() {}
+    @Column(nullable = false)
+    private String password;
 
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUsers().add(this);
     }
-    // Getters and Setters...
 }
