@@ -28,17 +28,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     @Autowired
-    private  CustomUserDetailsService userDetailsService;
+    private CustomUserDetailsService userDetailsService;
     @Autowired
-    private  JwtFilter jwtFilter;
-
+    private JwtFilter jwtFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         SecureRandom secureRandom;
-        try{
+        try {
             secureRandom = SecureRandom.getInstanceStrong();
-        }catch(Exception e){
+        } catch (Exception e) {
             secureRandom = new SecureRandom();
         }
         return new BCryptPasswordEncoder(12, secureRandom);
@@ -79,10 +78,18 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form
                         .disable()
-                        // .loginPage("/login")
-                        // .permitAll()
+                // .loginPage("/login")
+                // .permitAll()
                 )
                 .logout(logout -> logout.permitAll())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
