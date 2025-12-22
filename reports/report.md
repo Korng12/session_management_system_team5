@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <!-----
 
 
@@ -264,3 +265,7 @@ Since you are required to show commit logs from all members, follow this workflo
         This module enhances system reliability, improves user experience, and supports smooth conference operations.
 ```
 >>>>>>> 55a6064 (Implement Secondary module lead-Logistics and Registration)
+=======
+### Team5
+
+>>>>>>> 0b0d10bcd0bb2bccf4da22007dbf612f34bda259

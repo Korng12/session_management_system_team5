@@ -1,4 +1,4 @@
-package com.team5.demo.config;
+package com.team5.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;

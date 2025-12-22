@@ -1,4 +1,4 @@
-package com.team5.demo.config;
+package com.team5.config;
 
 public class Testing {
     
