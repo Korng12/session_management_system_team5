@@ -9,14 +9,14 @@ public class UserController {
 
     // User Homepage - Index
     @GetMapping("/")
-    public String showHomepage(Model model) {
-        return "public/index"; // Main landing page
+    public String showLoginPage(Model model) {
+        return "public/login"; // Main landing page
     }
 
     // Login Page
-    @GetMapping("/login")
-    public String showLoginPage(Model model) {
-        return "public/login"; // User login view
+    @GetMapping("/index")
+    public String showindexPage(Model model) {
+        return "public/index"; // User login view
     }
 
     // Registration Page
