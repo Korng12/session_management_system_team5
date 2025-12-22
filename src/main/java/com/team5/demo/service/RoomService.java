@@ -1,7 +1,7 @@
 package com.team5.demo.service;
 
-import com.team5.demo.model.Room;  // FIXED: Changed from com.conference
-import com.team5.demo.model.Session;  // ADDED: Need this for overlapping sessions check
+import com.team5.demo.entities.Room;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Session;  // ADDED: Need this for overlapping sessions check
 import com.team5.demo.repositories.RoomRepository;  // FIXED: Changed from com.conference
 import com.team5.demo.repositories.SessionRepository;  // FIXED: Changed package name to repositories
 import lombok.RequiredArgsConstructor;

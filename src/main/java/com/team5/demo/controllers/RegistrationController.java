@@ -1,6 +1,6 @@
 package com.team5.demo.controllers;
 
-import com.team5.demo.model.Registration;  
+import com.team5.demo.dto.RegistrationDTO;  
 import com.team5.demo.service.RegistrationService; 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,16 +15,16 @@ public class RegistrationController {
     private final RegistrationService registrationService;
     
     @PostMapping("/register")
-    public ResponseEntity<Registration> registerForConference(
+    public ResponseEntity<RegistrationDTO> registerForConference(
             @RequestParam Long userId,
             @RequestParam Long conferenceId) {
-        Registration registration = registrationService.registerForConference(userId, conferenceId);
+        RegistrationDTO registration = registrationService.registerForConference(userId, conferenceId);
         return ResponseEntity.ok(registration);
     }
     
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Registration>> getUserRegistrations(@PathVariable Long userId) {
-        List<Registration> registrations = registrationService.getUserRegistrations(userId);
+    public ResponseEntity<List<RegistrationDTO>> getUserRegistrations(@PathVariable Long userId) {
+        List<RegistrationDTO> registrations = registrationService.getUserRegistrations(userId);
         return ResponseEntity.ok(registrations);
     }
     

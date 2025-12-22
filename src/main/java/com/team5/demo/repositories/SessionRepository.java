@@ -1,6 +1,6 @@
 package com.team5.demo.repositories;
 
-import com.team5.demo.model.Session;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Session;  // FIXED: Changed from com.conference
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +12,7 @@ import java.util.List;
 
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
+    boolean existsByTitleAndStartTime(String title, LocalDateTime startTime);
     List<Session> findByRoomId(Long roomId);
     
     @Query("SELECT s FROM Session s WHERE s.room.id = :roomId AND " +

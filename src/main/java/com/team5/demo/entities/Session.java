@@ -2,6 +2,8 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -40,6 +42,12 @@ public class Session {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Room room;
+
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -71,7 +79,12 @@ public class Session {
     public LocalDateTime getDeletedAt() { return deletedAt; }
     public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
 
-    public enum SessionStatus {
-        SCHEDULED, COMPLETED, CANCELLED, DELAYED
+    public Room getRoom() {
+        return room;
     }
+
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+
 }

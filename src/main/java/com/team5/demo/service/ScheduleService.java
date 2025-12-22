@@ -1,7 +1,7 @@
 package com.team5.demo.service;
 
 import com.team5.demo.dto.ScheduleDTO;  // FIXED: Changed from com.conference
-import com.team5.demo.model.Session;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Session;  // FIXED: Changed from com.conference
 import com.team5.demo.repositories.SessionRepository;  // FIXED: Changed from com.conference
 import com.team5.demo.repositories.RegistrationRepository;  // FIXED: Changed from com.conference
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class ScheduleService {
         ScheduleDTO dto = new ScheduleDTO();
         dto.setSessionId(session.getId());
         dto.setTitle(session.getTitle());
-        dto.setLocation(session.getLocation());
+        dto.setLocation(session.getRoom() != null ? session.getRoom().getName() : "TBD");
         dto.setStartTime(session.getStartTime());
         dto.setEndTime(session.getEndTime());
         dto.setRoomName(session.getRoom() != null ? session.getRoom().getName() : "TBD");

@@ -1,14 +1,14 @@
 package com.team5.demo.service;
 
 import com.team5.demo.entities.Session;
-import com.team5.demo.entities.Session.SessionStatus;
+import com.team5.demo.entities.SessionStatus;
 import com.team5.demo.entities.User;
 import com.team5.demo.exception.ResourceNotFoundException;
 import com.team5.demo.repositories.SessionRepository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,8 +90,8 @@ public class SessionService {
         sessionRepository.delete(session);
     }
     
-    public List<Session> getDeletedSessions() {
-        return sessionRepository.findDeletedSessions();
+    public Page<Session> getDeletedSessions(Pageable pageable) {
+        return sessionRepository.findDeletedSessions(pageable);
     }
     
     public Page<Session> getDeletedSessionsPaginated(int page, int size) {
@@ -126,8 +126,9 @@ public class SessionService {
         return sessionRepository.save(session);
     }
     
+    @Deprecated
     public List<Session> getSessionsByChair(Long chairId) {
-        return sessionRepository.findByChairId(chairId);
+        return sessionRepository.findByChairId(chairId, PageRequest.of(0, Integer.MAX_VALUE, Sort.by("startTime").ascending())).getContent();
     }
     
     // Pagination methods

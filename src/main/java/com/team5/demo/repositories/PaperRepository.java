@@ -3,14 +3,18 @@ package com.team5.demo.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.team5.demo.entities.Paper;
-import com.team5.demo.entities.PaperStatus;
+import com.team5.demo.entities.Paper.PaperStatus; // <--- FIXED IMPORT
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface PaperRepository extends JpaRepository<Paper, Long> {
+    
+    // Uses the nested PaperStatus enum
     List<Paper> findByStatus(PaperStatus status);
     
     List<Paper> findBySessionId(Long sessionId);

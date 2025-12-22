@@ -1,6 +1,6 @@
 package com.team5.demo.repositories;
 
-import com.team5.demo.model.Registration; 
+import com.team5.demo.entities.Registration; 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

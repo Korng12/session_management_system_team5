@@ -1,7 +1,8 @@
 package com.team5.demo.controllers;
 
-import com.team5.demo.model.Session;
+import com.team5.demo.entities.Session;
 import com.team5.demo.service.SessionService;
+import com.team5.demo.entities.SessionStatus;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -57,8 +58,10 @@ public class SessionController {
     }
     
     @GetMapping("/deleted")
-    public List<Session> getDeletedSessions() {
-        return sessionService.getDeletedSessions();
+    public Page<Session> getDeletedSessions(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return sessionService.getDeletedSessionsPaginated(page, size);
     }
     
     @GetMapping("/deleted/paginated")
@@ -75,7 +78,7 @@ public class SessionController {
 
     @GetMapping("/status/{status}")
     public List<Session> getSessionsByStatus(@PathVariable String status) {
-        return sessionService.getSessionsByStatus(Session.SessionStatus.valueOf(status.toUpperCase()));
+        return sessionService.getSessionsByStatus(SessionStatus.valueOf(status.toUpperCase()));
     }
     
     // Session Chair Assignment Endpoints
@@ -109,7 +112,7 @@ public class SessionController {
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return sessionService.getSessionsByStatusPaginated(Session.SessionStatus.valueOf(status.toUpperCase()), page, size);
+        return sessionService.getSessionsByStatusPaginated(SessionStatus.valueOf(status.toUpperCase()), page, size);
     }
     
     @GetMapping("/chair/{chairId}/paginated")
@@ -143,6 +146,6 @@ public class SessionController {
             @PathVariable String status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return sessionService.getSessionsByChairAndStatus(chairId, Session.SessionStatus.valueOf(status.toUpperCase()), page, size);
+        return sessionService.getSessionsByChairAndStatus(chairId, SessionStatus.valueOf(status.toUpperCase()), page, size);
     }
 }

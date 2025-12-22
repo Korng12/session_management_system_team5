@@ -2,13 +2,14 @@ package com.team5.demo.service;
 
 import com.team5.demo.entities.Paper;
 import com.team5.demo.entities.Session;
-import com.team5.demo.entities.Paper.PaperStatus;
+import com.team5.demo.entities.PaperStatus;
 import com.team5.demo.exception.DuplicateResourceException;
 import com.team5.demo.exception.ResourceNotFoundException;
 import com.team5.demo.repositories.PaperRepository;
 import com.team5.demo.repositories.SessionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public class PaperService {
         return paperRepository.findAll();
     }
     
-    public Paper getPaperById(Long id) {
+    public Paper getPaperById(@NonNull Long id) {
         return paperRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Paper not found with id: " + id));
     }

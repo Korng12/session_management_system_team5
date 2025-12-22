@@ -2,7 +2,6 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -75,11 +74,12 @@ public class Paper {
 
     public Integer getPresentationOrder() { return presentationOrder; }
     public void setPresentationOrder(Integer presentationOrder) { this.presentationOrder = presentationOrder; }
-
+    
     public enum PaperStatus {
-        PENDING,
+        SUBMITTED,
+        UNDER_REVIEW,
         ACCEPTED,
         REJECTED,
-        UNDER_REVIEW
+        PRESENTED
     }
 }

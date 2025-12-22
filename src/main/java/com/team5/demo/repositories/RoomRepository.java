@@ -1,6 +1,6 @@
 package com.team5.demo.repositories;
 
-import com.team5.demo.model.Room;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Room;  // FIXED: Changed from com.conference
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
