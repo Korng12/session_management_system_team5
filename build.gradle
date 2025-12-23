@@ -1,89 +1,57 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.5.8'
-    id 'io.spring.dependency-management' version '1.1.7'
-    id 'io.freefair.lombok' version '8.4'
+	id 'java'
+	id 'org.springframework.boot' version '3.5.8'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'com.team5.demo'
+group = 'com.team5'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(23)
+	}
+}
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    // Spring Boot Starters
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.h2database:h2:2.1.214' // For in-memory testing
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.5.7'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'com.mysql:mysql-connector-j:9.5.0' // Connection to MySQL
+    implementation 'org.flywaydb:flyway-core:11.17.0' // Flyway core
+    implementation 'org.flywaydb:flyway-mysql:11.17.0' // Flyway MySQL support
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring Boot starters (keep these)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    
-    // Database
-    implementation 'com.mysql:mysql-connector-j:8.3.0'
-    runtimeOnly 'com.h2database:h2:2.2.224'
-    
-    // Database Migration
-    implementation 'org.flywaydb:flyway-core:10.10.0'
-    implementation 'org.flywaydb:flyway-mysql:10.10.0'
-    
-    // Security
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
-    implementation 'org.springframework.security:spring-security-oauth2-jose:6.2.0'
-    
-    // UI Dependencies
-    implementation 'org.webjars:bootstrap:5.3.2'
-    implementation 'org.webjars:jquery:3.7.1'
-    implementation 'org.webjars:font-awesome:6.4.2'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.3.0'
-    
-    // Development Tools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    
-    // Testing
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // ... your other starters
 
+    // Explicit Spring Security modules (required for advanced features)
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
+
+    // JWT (JJWT) - required for JwtUtil and JwtFilter
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'  // Latest stable
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'  // JSON parser (or use jjwt-gson)
+
+    // Lombok (ensure annotation processing)
+    compileOnly 'org.projectlombok:lombok:1.18.34'  // Latest
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        showStandardStreams = true
-    }
-}
-
-// Configure JAR
-bootJar {
-    enabled = true
-    archiveFileName = '${project.name}.jar'
-}
-
-jar {
-    enabled = false
-}
-
-// Configure JavaCompile
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-    options.compilerArgs += ['-parameters']
-}
-
-// Configure Spring Boot
-springBoot {
-    buildInfo()
-    mainClass = 'com.team5.demo.DemoApplication'
-}
-
-// Configure dependency management
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.8"
-    }
+	useJUnitPlatform()
 }
