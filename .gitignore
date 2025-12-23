@@ -26,4 +26,3 @@ target/
 *.class
 *.jar
 *.war
-node_modules
