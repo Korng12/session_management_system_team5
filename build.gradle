@@ -41,13 +41,8 @@ implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     annotationProcessor 'org.projectlombok:lombok'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Lombok dependencies
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    
-    // Also ensure you have this plugin if using Gradle 5+
-    annotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {
