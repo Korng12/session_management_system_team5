@@ -1,9 +1,10 @@
-package com.team5.demo.service;
+package com.team5.demo.services;
 
 import com.team5.demo.dto.ScheduleDTO;  // FIXED: Changed from com.conference
-import com.team5.demo.model.Session;  // FIXED: Changed from com.conference
-import com.team5.demo.repository.SessionRepository;  // FIXED: Changed from com.conference
-import com.team5.demo.repository.RegistrationRepository;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Session;
+import com.team5.demo.repositories.RegistrationRepository;
+import com.team5.demo.repositories.SessionRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;

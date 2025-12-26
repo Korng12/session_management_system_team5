@@ -1,9 +1,10 @@
-package com.team5.demo.service;
+package com.team5.demo.services;
 
-import com.team5.demo.model.Room;  // FIXED: Changed from com.conference
-import com.team5.demo.model.Session;  // ADDED: Need this for overlapping sessions check
-import com.team5.demo.repository.RoomRepository;  // FIXED: Changed from com.conference
-import com.team5.demo.repository.SessionRepository;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Room;
+import com.team5.demo.entities.Session;
+import com.team5.demo.repositories.RoomRepository;
+import com.team5.demo.repositories.SessionRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

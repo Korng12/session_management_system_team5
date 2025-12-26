@@ -1,7 +1,8 @@
-package com.team5.demo.controller;
+package com.team5.demo.controllers;
 
-import com.team5.demo.model.Registration;  
-import com.team5.demo.service.RegistrationService;  
+import com.team5.demo.entities.Registration;
+import com.team5.demo.services.RegistrationService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/registrations")
 @RequiredArgsConstructor
-public class RoomController {
+public class RegistrationController {
     
     private final RegistrationService registrationService;
     

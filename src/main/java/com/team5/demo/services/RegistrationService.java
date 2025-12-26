@@ -1,7 +1,8 @@
-package com.team5.demo.service;
+package com.team5.demo.services;
 
-import com.team5.demo.model.Registration;  // FIXED: Changed from com.conference
-import com.team5.demo.repository.RegistrationRepository;  // FIXED: Changed from com.conference
+import com.team5.demo.entities.Registration;
+import com.team5.demo.repositories.RegistrationRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

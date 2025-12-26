@@ -1,7 +1,8 @@
-package com.team5.demo.controller;
+package com.team5.demo.controllers;
 
-import com.team5.demo.dto.ScheduleDTO;  
-import com.team5.demo.service.ScheduleService;  
+import com.team5.demo.dto.ScheduleDTO;
+import com.team5.demo.services.ScheduleService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

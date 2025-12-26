@@ -1,4 +1,4 @@
-package com.team5.demo.model;
+package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;

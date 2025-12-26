@@ -1,9 +1,11 @@
-package com.team5.demo.model;
+package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.team5.demo.model.User;
 
 @Entity
 @Table(name = "sessions")
