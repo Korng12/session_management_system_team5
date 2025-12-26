@@ -1,6 +1,5 @@
 package com.team5.demo.entities;
 
-import com.team5.demo.model.User;
 
 import jakarta.persistence.*;
 import lombok.Data;

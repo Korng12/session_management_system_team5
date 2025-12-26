@@ -5,7 +5,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.team5.demo.model.User;
 
 @Entity
 @Table(name = "sessions")
