@@ -1,417 +1,181 @@
+### Team5
+### Week 2 project Report
+#### Member	Focus	Week 2 Accomplishment
+#### 1. Security	Authentication	Defined Role hierarchy (Admin, Chair, User).
+#### 2. Main Entity	Conference CRUD	Designed Admin forms for event creation.
+#### 3. Secondary	Participant Module	Separated Account Sign-up from Event Enrollment.
+#### 4. Frontend	Thymeleaf/UI	Implemented Master Layout and Fragment system.
+#### 5. Database	Schema & JPA	Finished SQL Schema and started JPA Entity mappin
+#### But all of these are not working well for now , we need to improve and config more
+#### to ensure that between 3 core layers of the project conected well.
+
+
+### Chantha Mengkong
+#### Design Database schema
+#### Structure folders of the project
+#### config database
+#### write sql script
+#### merge members branche with main 
+
+### Chheang Kakda
+#### 1. Create login page 
+#### 2. Homepage (user) 
+#### 3. Schedule(user) 
+#### 4. Register( user register) 
+#### 5. Profile (user) 
+#### 6. Admin dashboard 
+#### 7. manage room (Admin can manage room)  
+#### 8. View user ( admin can view user register ) 
+#### 9. Schedule ( Admin manage schedule depent on user registered) (schedule.html)                       
+
+
+**Name**: Hak Sengkea
+
+![alt text](image.png)
+![alt text](image-1.png)
+---
+
+## Project Overview
+
+This project implements a secure session management system using Spring Boot 3.3.5 with Spring Security and JWT (JSON Web Token) authentication. The system manages user roles (Admin, Chair, Attendee) with role-based access control.
+
+---
+
+## Implementation Progress
 
 
-ព្រះរាជាណាចក្រកម្ពុជា
+**Implementation Details:**
+- Configured JWT-based stateless authentication
+- Implemented role-based authorization for three user types:
+  - `ADMIN` - Access to `/admin/**` endpoints
+  - `CHAIR` - Access to `/chair/**` endpoints
+  - `ATTENDEE` - Access to `/attendee/**` endpoints
+- Disabled session management (STATELESS mode)
+- Configured CORS to allow all origins
+- Set up custom authentication entry point for unauthorized access
+- Integrated JWT filter before UsernamePasswordAuthenticationFilter
+
+---
+
+## Security Features Implemented
 
-
-
-
-
-ជាតិ សាសនា ព្រះមហាក្សត្រ
-
-
-
-
-
-Software Engineering
-
-
-
-
-
-Project: Research Conference and Session Management System
-
-
-
-
-
-Group: I4-GIC-B5
-
-
-
-
-
-**Team Member’s Name					ID**
-
-
-
-
-
-1. DAVIN VATANAK							e20220234	
-
-
-
-
-
-2. CHEANG KAKDA							e20221438
-
-
-
-
-
-3. CHANTHA MENGKONG					e20221526	
-
-
-
-
-
-4. HONG DYHENGMESA					e20220997
-
-
-
-
-
-5. HAK SENGKEA							e20220175	
-
-
-
-
-
-Lecturer: Mr. Roeun Pacharoth
-
-
-
-
-
-Academic year: 2025-2026
-
-
-
-
-
-
-
-
-### **Project Overview**
-
-
-
-
-
-
-
-
-
-
-
-* **System Name:** ConfManage
-
-
-* **Goal:** A centralized platform where researchers can register, submit papers, and sign up for sessions, while admins manage the schedule and session chairs oversee presentation slots.
-
-
-* **Core Tech Stack:** Java 21/17, Spring Boot 3.x, Spring Security, Thymeleaf, MySQL/PostgreSQL, Flyway, Git.
-
-
-
-
-
-
-
-
-### **Team Roles & Responsibilities**
-
-
-
-
-
-
-
-
-#### **1. Security & Authentication Lead**
-
-
-
-
-
-
-
-
-
-
-
-* **Focus:** User Identity and Access Control.
-
-
-* **Entities:** `User`, `Role`, `Privilege`.
-
-
-* **Key Tasks:**
-
-
-    * **Spring Security Setup:** Configure `SecurityFilterChain`, Password Encoding (BCrypt), and Custom Login/Logout success handlers.
-
-
-    * **Registration Logic:** Create the sign-up service for new researchers/attendees.
-
-
-    * **Method Security:** Implement `@PreAuthorize` annotations on Service methods (e.g., only 'ADMIN' can delete users).
-
-
-    * **Profile Management:** Allow users to update their passwords and bio.
-
-
-
-
-
-
-
-
-#### **2. Main Entity Lead (Sessions & Papers)**
-
-
-
-
-
-
-
-
-
-
-
-* **Focus:** The core content of the conference.
-
-
-* **Entities:** `Session` (e.g., "AI in Healthcare"), `Paper` (Abstracts/Submissions).
-
-
-* **Key Tasks:**
-
-
-    * **CRUD Operations:** Create, Read, Update, Delete for Sessions and Papers.
-
-
-    * **Validation:** Ensure Papers have titles, authors, and non-empty abstracts.
-
-
-    * **Business Logic:**
-
-
-        * Logic to assign a **Session Chair** to a specific Session.
-
-
-        * Logic to link accepted **Papers** to a **Session**.
-
-
-    * **Search/Filter:** Allow filtering sessions by topic or speaker.
-
-
-
-
-
-
-
-
-#### **3. Secondary Module Lead (Logistics & Registration)**
-
-
-
-
-
-
-
-
-
-
-
-* **Focus:** The logistics of attending and scheduling.
-
-
-* **Entities:** `ConferenceRegistration` (Ticket purchase), `Room` (Venue), `TimeSlot`.
-
-
-* **Key Tasks:**
-
-
-    * **CRUD Operations:** Manage physical Rooms and available Time Slots to prevent double-booking.
-
-
-    * **Registration Flow:** Logic for a User to "Register" for the conference (creates a `ConferenceRegistration` record).
-
-
-    * **Validation:** Ensure a user cannot register for the same conference twice; ensure a Room isn't booked for two sessions at the same time.
-
-
-    * **Dashboard Logic:** Generate a "My Schedule" view data for the logged-in user.
-
-
-
-
-
-
-
-
-#### **4. Frontend & UI/UX Lead (Thymeleaf)**
-
-
-
-
-
-
-
-
-
-
-
-* **Focus:** User Interface, Accessibility, and Dynamic Content.nn,
-
-
-* **Key Tasks:**
-
-
-    * **Layout System:** Create the `layout.html` (header, footer, sidebar) using Thymeleaf Fragments (`th:replace`).
-
-
-    * **Security Integration in UI:** Use `sec:authorize` attributes to hide "Admin" buttons from regular users.
-
-
-    * **Form Handling:** Design reusable forms for Login, Registration, and CRUD inputs with visible error messages (`th:errors`).
-
-
-    * **Styling:** Integrate Bootstrap or Tailwind CSS to make the dashboard responsive.
-
-
-    * **Controller Advice:** Create global exception handling pages (e.g., custom 403 Access Denied or 404 Not Found pages).
-
-
-
-
-
-
-
-
-#### **5. Database & DevOps Lead**
-
-
-
-
-
-
-
-
-
-
-
-* **Focus:** Data Integrity, Migrations, and Repository Layer.
-
-
-* **Key Tasks:**
-
-
-    * **ER Diagram:** Design the database schema and relationships (One-to-Many, Many-to-Many).
-
-
-    * **Flyway Migrations:** Write SQL scripts (`V1__init.sql`, `V2__seed_data.sql`) to version control the database structure.
-
-
-    * **Data Seeding:** Create a script to populate the DB with a default Admin, dummy Sessions, and Rooms on startup.
-
-
-    * **Repository Optimization:** Write complex JPQL or Native Queries (e.g., "Find all sessions where the room capacity is > 50").
-
-
-    * **Git Management:** Manage the repository `main` branch and resolve merge conflicts.
-
-
-
-
-
-
-
-
-### **Entity Relationship Strategy (Database Design)**
-
-
-
-
-
-To meet the "Entity Relationships" requirement, the group should implement the following:
-
-
-
-
-
-
-
-
-
-
-
-1. **User 1:N Registration** (One user can have one registration record per conference).
-
-
-2. **Session 1:N Paper** (One session includes multiple papers).
-
-
-3. **Session N:1 Room** (Many sessions can happen in one room, but at different times).
-
-
-4. **User N:M Role** (A user can be both a SPEAKER and an ATTENDEE).
-
-
-    * *Note for Member 5:* This requires a Join Table (`user_roles`).
-
-
-
-
-
-
-
-
-### **Security Roles Breakdown**
-
-
-
-
-
-
-
-
-
-
-
-* **ADMIN:** Can create Rooms, schedule Sessions, manage Users.
-
-
-* **CHAIR:** Can view papers in their assigned Session, mark papers as "Presented."
-
-
-* **SPEAKER:** Can submit Papers, view their own submission status.
-
-
-* **ATTENDEE:** Can view the schedule, register for the conference.
-
-
-
-
-
-
-
-
-### **Proposed Development Workflow (Git)**
-
-
-
-
-
-Since you are required to show commit logs from all members, follow this workflow:
-
-
-
-
-
-
-
-
-
-
-
-1. **Initialize:** Member 5 sets up the Spring Boot Project and pushes to GitHub.
-
-
-2. **Branching:** Each member creates a branch for their feature (e.g., `feature/security-setup`, `feature/session-crud`).
-
-
-3. **Pull Requests:** Do **not** merge directly to main. Open Pull Requests (PRs) so other members can review the code.
-
-
-4. **Flyway:** If a member changes the DB, they must add a new V# SQL file. Do not modify existing SQL files after they have been run.
+### Authentication
+- JWT-based authentication
+- Stateless session management
+- BCrypt password hashing
+- Email-based user identification
+
+### Authorization
+- Role-based access control (RBAC)
+- Method-level security annotations
+- Endpoint protection by role
+- Custom authentication entry point
+
+### API Security
+- CORS configuration
+- CSRF protection (disabled for REST API)
+- Custom error responses
+- Token expiration handling
+
+---
+
+## API Endpoints
+
+### Public Endpoints
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+
+### Protected Endpoints
+- `/admin/**` - Requires ADMIN role
+- `/chair/**` - Requires CHAIR role
+- `/attendee/**` - Requires ATTENDEE role
+
+---
+
+
+## Testing Progress
+
+**Completed:**
+- ✅ Manual API testing using REST client
+- ✅ Login endpoint tested successfully
+- ✅ JWT token generation verified
+- ✅ Token format: Bearer token in Authorization header
+
+**Tested Scenarios:**
+- User login with valid credentials
+- JWT token generation and return
+- Response format validation
+
+**Pending:**
+- Role-based endpoint access testing
+- Registration endpoint testing
+- Token expiration testing
+- Invalid credentials handling
+- Automated unit tests
+- Integration tests
+
+---
+## Learning Outcomes
+
+Through this project, the following concepts were learned and applied:
+
+### Spring Security Concepts
+1. **Authentication vs Authorization**
+   - Understanding the difference between verifying identity and granting permissions
+
+2. **JWT Token-Based Authentication**
+   - Stateless authentication mechanism
+   - Token generation, validation, and expiration
+   - Bearer token format and transmission
+
+3. **Password Security**
+   - BCrypt hashing algorithm
+   - Salt generation with SecureRandom
+   - Password strength configuration
+
+4. **Role-Based Access Control (RBAC)**
+   - Defining user roles and authorities
+   - Protecting endpoints based on roles
+   - Method-level security annotations
+
+---
+
+## Next Steps
+
+
+
+### Future Enhancements
+1. ⏳ Implement refresh token mechanism
+2. ⏳ Add password reset functionality
+3. ⏳ Implement email verification
+4. ⏳ Add account activation/deactivation
+5. ⏳ Integrate Thymeleaf for UI
+6. ⏳ Write comprehensive unit tests
+7. ⏳ Add API documentation (Swagger/OpenAPI)
+8. ⏳ Implement rate limiting
+9. ⏳ Add logging and monitoring
+
+---
+
+my dependency
+```    // Spring Boot starters (keep these)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // ... your other starters
+
+    // Explicit Spring Security modules (required for advanced features)
+    implementation 'org.springframework.security:spring-security-config'
+    implementation 'org.springframework.security:spring-security-web'
+
+    // JWT (JJWT) - required for JwtUtil and JwtFilter
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'  // Latest stable
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'  // JSON parser (or use jjwt-gson)
+
+    // Lombok (ensure annotation processing)
+    compileOnly 'org.projectlombok:lombok:1.18.34'  // Latest
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+   ```
