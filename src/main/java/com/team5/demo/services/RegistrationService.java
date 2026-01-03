@@ -1,8 +1,7 @@
 package com.team5.demo.services;
 
-import com.team5.demo.entities.Registration;
-import com.team5.demo.repositories.RegistrationRepository;
-
+import com.team5.demo.entities.*;
+import com.team5.demo.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,17 +13,31 @@ import java.util.List;
 public class RegistrationService {
     
     private final RegistrationRepository registrationRepository;
+    private final UserRepository userRepository;        // ✅ ADD THIS
+    private final ConferenceRepository conferenceRepository;  // ✅ ADD THIS
     
     @Transactional
     public Registration registerForConference(Long userId, Long conferenceId) {
-        // Check if already registered
-        if (registrationRepository.existsByParticipantIdAndConferenceId(userId, conferenceId)) {
-            throw new RuntimeException("User is already registered for this conference");  // Simplified
+        // ✅ Find User and Conference entities (REQUIRED for JPA)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        // ✅ Check if already registered using JPA entities
+        boolean alreadyRegistered = registrationRepository
+                .findByParticipantAndConference(user, conference)
+                .isPresent();
+        
+        if (alreadyRegistered) {
+            throw new RuntimeException("User is already registered for this conference");
         }
         
+        // ✅ Create registration with JPA entities
         Registration registration = new Registration();
-        registration.setParticipantId(userId);  // Simplified - just set ID
-        registration.setConferenceId(conferenceId);
+        registration.setParticipant(user);        // ✅ Set User entity (not ID)
+        registration.setConference(conference);   // ✅ Set Conference entity (not ID)
         registration.setRegisteredAt(LocalDateTime.now());
         registration.setStatus("CONFIRMED");
         
@@ -33,11 +46,16 @@ public class RegistrationService {
     
     public Registration getRegistration(Long registrationId) {
         return registrationRepository.findById(registrationId)
-                .orElseThrow(() -> new RuntimeException("Registration not found"));  // Simplified
+                .orElseThrow(() -> new RuntimeException("Registration not found with id: " + registrationId));
     }
     
     public List<Registration> getUserRegistrations(Long userId) {
-        return registrationRepository.findByParticipantId(userId);
+        // ✅ Find user first (REQUIRED for JPA)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        // ✅ Find registrations by user entity
+        return registrationRepository.findByParticipant(user);
     }
     
     @Transactional
@@ -45,5 +63,31 @@ public class RegistrationService {
         Registration registration = getRegistration(registrationId);
         registration.setStatus("CANCELLED");
         registrationRepository.save(registration);
+    }
+    
+    // ✅ Additional useful methods
+    public List<Registration> getConferenceRegistrations(Long conferenceId) {
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.findByConference(conference);
+    }
+    
+    public long countRegistrationsForConference(Long conferenceId) {
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.countByConference(conference);
+    }
+    
+    public boolean isUserRegisteredForConference(Long userId, Long conferenceId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.findByParticipantAndConference(user, conference)
+                .isPresent();
     }
 }

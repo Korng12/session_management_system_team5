@@ -1,4 +1,4 @@
-package com.team5.demo.exception;
+package com.team5.demo.entities.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

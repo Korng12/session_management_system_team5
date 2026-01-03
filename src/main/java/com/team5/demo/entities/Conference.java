@@ -9,6 +9,7 @@ import java.util.List;
 @Table(name = "conference")
 @Data
 public class Conference {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,10 +26,11 @@ public class Conference {
     @Column(name = "end_date")
     private LocalDate endDate;
     
-    @OneToMany(mappedBy = "conference")
+    // Relation with Session
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Session> sessions;
     
-    @OneToMany(mappedBy = "conference")
+    // Relation with Registration
+    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Registration> registrations;
 }
-
