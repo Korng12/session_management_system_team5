@@ -3,41 +3,29 @@ package com.team5.demo.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
+ @RequestMapping("/user")
 public class UserController {
-
-    // User Homepage - Index
-    @GetMapping("/")
-    public String showLoginPage(Model model) {
-        return "public/login"; // Main landing page
+      @GetMapping("/homepage") // Adjusted endpoint
+    public String homePageUser() {
+        return "user/homepage"; // Ensure this points to the correct Thymeleaf template
     }
 
-    // Login Page
-    @GetMapping("/index")
-    public String showindexPage(Model model) {
-        return "public/index"; // User login view
+    @GetMapping("/my_schedule")
+    public String mySchedule() {
+        return "user/user-schedule";
     }
 
-    // Registration Page
     @GetMapping("/register")
-    public String showRegistrationPage(Model model) {
-        return "public/register"; // User registration view
+    public String register() {
+        return "public/register";
     }
 
-    // Conferences Page
-    @GetMapping("/user/conferences")
-    public String showConferencesPage(Model model) {
-        return "user/conferences"; // View available conferences
+    @GetMapping("/login")
+    public String login() {
+        return "public/login";
     }
-
-    // User Schedule Page
-    @GetMapping("/user/user-schedule")
-    public String showUserSchedule(Model model) {
-        return "user/user-schedule"; // User's schedule view
-    }
-    @GetMapping("/user/profile")
-    public String showUserProfile(Model model) {
-        return "user/profile"; // User's profile view
-    }
+  
 }
