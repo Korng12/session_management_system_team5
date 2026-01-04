@@ -58,9 +58,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/register","/login").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/chair/**").hasAuthority("CHAIR")
+                        .requestMatchers("/attendee/**").hasAuthority("ATTENDEE")
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    }))
+                .httpBasic(basic -> basic.disable())
+                // .formLogin(form -> form
+                //         .disable()
+                // // .loginPage("/login")
+                // // .permitAll()
+                // )
+                // .logout(logout -> logout.permitAll())
+                // .sessionManagement(session -> session
+                //         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // .exceptionHandling(ex -> ex
+                //         .authenticationEntryPoint((request, response, authException) -> {
+                //             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                //             response.setContentType("application/json");
+                //             response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                //         }))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         .authorizeHttpRequests(auth -> auth
             .anyRequest().permitAll()   // ✅ allow all pages
