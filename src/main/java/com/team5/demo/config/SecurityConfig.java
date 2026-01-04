@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register","/login").permitAll()
+                        .requestMatchers("/",  "/about", "/contact",("/admin"),("/admin/manage-rooms"),("/admin/manage-sessions"),("/admin/view-attendance"),("/admin/view-registeredUsers"),("/admin/schedule"),"/register", "/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
@@ -93,13 +93,6 @@ public class SecurityConfig {
                 //         }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        .authorizeHttpRequests(auth -> auth
-            .anyRequest().permitAll()   // ✅ allow all pages
-        )
-
-        .httpBasic(basic -> basic.disable())
-        .formLogin(form -> form.disable())
-        .logout(logout -> logout.disable());
         return http.build();
     }
 

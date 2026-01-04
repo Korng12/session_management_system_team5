@@ -16,6 +16,10 @@ public class UserController {
     public String getRegisterPage() {
         return "public/register";
     }
+    @GetMapping("/registeration")
+    public String getRegisterationPage() {
+        return "public/registeration";
+    }
     @GetMapping("/login")
     public String getLoginPage() {
         return "public/login";
