@@ -8,7 +8,6 @@ import ch.qos.logback.core.model.Model;
 
 
 @Controller
- @RequestMapping("/user")
 public class UserController {
     
     @GetMapping("/")
@@ -43,7 +42,12 @@ public class UserController {
     }
     @GetMapping("/about")
     public String getAboutPage() {
-        return "public/about";
+        return "public/aboutPage";
     }
+       @GetMapping("/contact")
+    public String getContactPage() {
+        return "public/contact";
+    }
+    
     
 }

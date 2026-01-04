@@ -9,29 +9,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/registrations")
+@RequestMapping("/api/rooms")
 @RequiredArgsConstructor
 public class RoomController {
-    
+
     private final RegistrationService registrationService;
-    
-    @PostMapping("/register")
-    public ResponseEntity<Registration> registerForConference(
-            @RequestParam Long userId,
-            @RequestParam Long conferenceId) {
-        Registration registration = registrationService.registerForConference(userId, conferenceId);
+
+    @PostMapping("/{roomId}/register")
+    public ResponseEntity<Registration> registerRoom(
+            @PathVariable Long roomId,
+            @RequestParam Long userId) {
+
+        Registration registration =
+                registrationService.registerForConference(userId, roomId);
+
         return ResponseEntity.ok(registration);
-    }
-    
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Registration>> getUserRegistrations(@PathVariable Long userId) {
-        List<Registration> registrations = registrationService.getUserRegistrations(userId);
-        return ResponseEntity.ok(registrations);
-    }
-    
-    @DeleteMapping("/{registrationId}/cancel")
-    public ResponseEntity<Void> cancelRegistration(@PathVariable Long registrationId) {
-        registrationService.cancelRegistration(registrationId);
-        return ResponseEntity.noContent().build();
     }
 }

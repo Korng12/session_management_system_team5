@@ -4,38 +4,41 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
- @GetMapping("/dashboard")
-    public String dashboard() {
-        return "admin/dashboard";
+
+    // Admin Dashboard
+    @GetMapping("/admin")
+    public String showAdminHomepage(Model model) {
+        return "admin/dashboard"; 
     }
 
-    @GetMapping("/manage_rooms")
-    public String manageRooms() {
+    // Manage Users
+    @GetMapping("/admin/manage-users")
+    public String manageUsers(Model model) {
+        return "admin/manage_users"; 
+    }
+
+    // Manage Rooms
+    @GetMapping("/admin/manage-rooms")
+    public String manageRooms(Model model) {
         return "admin/manage-rooms";
     }
-
-    @GetMapping("/manage_sessions")
-    public String manageSessions() {
-        return "admin/manage-sessions";
+    @GetMapping("/admin/manage-sessions")
+    public String manageSessions(Model model) {
+        return "admin/manage-sessions"; 
     }
 
-    @GetMapping("/view_registrations")
-    public String viewRegistrations() {
-        return "admin/view-registrations";
+    // Manage Schedule
+    @GetMapping("/admin/schedule")
+    public String manageSchedule(Model model) {
+        return "admin/schedule"; // Manage schedule view
     }
 
-    @GetMapping("/manage_schedule")
-    public String manageSchedule() {
-        return "admin/manage-schedule";
-    }
-
-    @GetMapping("/view_attendance")
-    public String viewAttendance() {
-        return "admin/view-attendance";
+    // List Registered Users (if applicable, assuming manage-users covers this)
+    @GetMapping("/admin/view-registeredUsers")
+    public String listRegisteredUsers(Model model) {
+        return "admin/view-registrations"; 
     }
 }
