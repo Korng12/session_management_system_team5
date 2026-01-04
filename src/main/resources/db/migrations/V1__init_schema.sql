@@ -1,5 +1,4 @@
 
-
 -- 1. ROLES (Create this first)
 CREATE TABLE roles (
     id INT PRIMARY KEY AUTO_INCREMENT,
