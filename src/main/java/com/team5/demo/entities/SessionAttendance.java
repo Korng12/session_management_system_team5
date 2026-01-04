@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "session_attendance")
 @Data
-@IdClass(SessionAttendanceId.class)  // ✅ Now it can find the class
+@IdClass(SessionAttendanceId.class) 
 public class SessionAttendance {
     
     @Id

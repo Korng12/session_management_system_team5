@@ -12,12 +12,12 @@ public class Registration {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    // ✅ JPA Relationship with User
+    //JPA Relationship with User
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User participant;  // Must be named 'participant'
     
-    // ✅ JPA Relationship with Conference
+    //  JPA Relationship with Conference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference_id", nullable = false)
     private Conference conference;  // Must be named 'conference'
@@ -46,10 +46,6 @@ public class Registration {
         this.status = status;
     }
     
-    // Helper methods (optional)
-    public boolean isConfirmed() {
-        return "CONFIRMED".equals(status);
-    }
     
     public boolean isCancelled() {
         return "CANCELLED".equals(status);

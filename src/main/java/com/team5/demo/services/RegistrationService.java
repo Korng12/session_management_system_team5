@@ -13,19 +13,19 @@ import java.util.List;
 public class RegistrationService {
     
     private final RegistrationRepository registrationRepository;
-    private final UserRepository userRepository;        // ✅ ADD THIS
-    private final ConferenceRepository conferenceRepository;  // ✅ ADD THIS
+    private final UserRepository userRepository;       
+    private final ConferenceRepository conferenceRepository; 
     
     @Transactional
     public Registration registerForConference(Long userId, Long conferenceId) {
-        // ✅ Find User and Conference entities (REQUIRED for JPA)
+        // Find User and Conference entities (REQUIRED for JPA)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
         Conference conference = conferenceRepository.findById(conferenceId)
                 .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
         
-        // ✅ Check if already registered using JPA entities
+        // Check if already registered using JPA entities
         boolean alreadyRegistered = registrationRepository
                 .findByParticipantAndConference(user, conference)
                 .isPresent();
@@ -34,10 +34,10 @@ public class RegistrationService {
             throw new RuntimeException("User is already registered for this conference");
         }
         
-        // ✅ Create registration with JPA entities
+        // Create registration with JPA entities
         Registration registration = new Registration();
-        registration.setParticipant(user);        // ✅ Set User entity (not ID)
-        registration.setConference(conference);   // ✅ Set Conference entity (not ID)
+        registration.setParticipant(user);        // Set User entity (not ID)
+        registration.setConference(conference);   // Set Conference entity (not ID)
         registration.setRegisteredAt(LocalDateTime.now());
         registration.setStatus("CONFIRMED");
         
@@ -50,11 +50,11 @@ public class RegistrationService {
     }
     
     public List<Registration> getUserRegistrations(Long userId) {
-        // ✅ Find user first (REQUIRED for JPA)
+        // Find user first (REQUIRED for JPA)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
         
-        // ✅ Find registrations by user entity
+        //Find registrations by user entity
         return registrationRepository.findByParticipant(user);
     }
     
@@ -65,7 +65,7 @@ public class RegistrationService {
         registrationRepository.save(registration);
     }
     
-    // ✅ Additional useful methods
+    // Additional useful methods
     public List<Registration> getConferenceRegistrations(Long conferenceId) {
         Conference conference = conferenceRepository.findById(conferenceId)
                 .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
