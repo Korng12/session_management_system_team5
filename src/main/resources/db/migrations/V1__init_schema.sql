@@ -63,6 +63,7 @@ CREATE TABLE registrations (
     conference_id INT NOT NULL,
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'CONFIRMED',
+    UNIQUE (participant_id, conference_id),
     FOREIGN KEY (participant_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
 );
