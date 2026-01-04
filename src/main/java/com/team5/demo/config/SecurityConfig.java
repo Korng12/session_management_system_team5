@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register","/login","/home","/conferences","/schedule").permitAll()
+                        .requestMatchers("/", "/register","/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
@@ -77,20 +77,20 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Unauthorized\"}");
                     }))
                 .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form
-                        .disable()
-                // .loginPage("/login")
-                // .permitAll()
-                )
-                .logout(logout -> logout.permitAll())
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                        }))
+                // .formLogin(form -> form
+                //         .disable()
+                // // .loginPage("/login")
+                // // .permitAll()
+                // )
+                // .logout(logout -> logout.permitAll())
+                // .sessionManagement(session -> session
+                //         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // .exceptionHandling(ex -> ex
+                //         .authenticationEntryPoint((request, response, authException) -> {
+                //             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                //             response.setContentType("application/json");
+                //             response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                //         }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

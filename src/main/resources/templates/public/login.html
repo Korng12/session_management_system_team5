@@ -27,8 +27,8 @@
                                 </div>
                                 
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="username" name="username" placeholder="Enter your email" required>
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control"  name="email" placeholder="Enter your email" required>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -40,7 +40,9 @@
                                     <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me">
                                     <label class="form-check-label" for="rememberMe">Remember me</label>
                                 </div>
-
+                                <input type="hidden"
+                                th:name="${_csrf.parameterName}"
+                                th:value="${_csrf.token}" />
                                 <button type="submit" class="btn btn-primary w-100 mb-3 py-2">Sign In</button>
                             </form>
 
