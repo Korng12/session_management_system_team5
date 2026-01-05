@@ -62,7 +62,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/",  "/about", "/contact",("/admin"),("/admin/manage-rooms"),("/admin/manage-sessions"),("/admin/view-attendance"),("/admin/view-registeredUsers"),("/admin/schedule"),("/chair-dashboard"),"/register", "/login").permitAll()
+                        .requestMatchers("/", "/register","/login").permitAll()
+                            // ===== Static resources =====
+                        .requestMatchers(
+                            "/favicon.ico",
+                            "/css/**",
+                            "/js/**",
+                            "/images/**",
+                            "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
