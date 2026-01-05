@@ -121,7 +121,7 @@ public class SessionService {
      * Get all sessions for a specific conference
      */
     public List<SessionResponse> getSessionsByConference(Long conferenceId) {
-        return sessionRepository.findByConferenceId(conferenceId)
+        return sessionRepository.findByConferenceIdAndDeletedFalse(conferenceId)
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -131,7 +131,7 @@ public class SessionService {
      * Get all sessions
      */
     public List<SessionResponse> getAllSessions() {
-        return sessionRepository.findAll()
+        return sessionRepository.findByDeletedFalse()
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -141,7 +141,7 @@ public class SessionService {
      * Get sessions with pagination
      */
     public Page<SessionResponse> getSessionsPage(Pageable pageable) {
-        Page<Session> sessionPage = sessionRepository.findAll(pageable);
+        Page<Session> sessionPage = sessionRepository.findByDeletedFalse(pageable);
         List<SessionResponse> responses = sessionPage.getContent()
                 .stream()
                 .map(this::convertToResponse)
@@ -154,6 +154,7 @@ public class SessionService {
      */
     public SessionResponse getSessionById(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
+                .filter(s -> !s.isDeleted())
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
         return convertToResponse(session);
     }
@@ -280,18 +281,24 @@ public class SessionService {
         String roomName = session.getRoom() != null ? session.getRoom().getName() : "N/A";
         String conferenceName = session.getConference() != null ? session.getConference().getTitle() : "N/A";
 
-        return new SessionResponse(
-                session.getId(),
-                session.getTitle(),
-                chairName,
-                roomName,
-                conferenceName,
-                session.getStartTime(),
-                session.getEndTime(),
-                session.getCreatedAt(),
-                session.getStatus(),
-                null // version field not implemented
+        SessionResponse response = new SessionResponse(
+            session.getId(),
+            session.getTitle(),
+            chairName,
+            roomName,
+            conferenceName,
+            session.getStartTime(),
+            session.getEndTime(),
+            session.getCreatedAt(),
+            session.getStatus(),
+            null // version field not implemented
         );
+
+        response.setChairId(session.getChair() != null ? session.getChair().getId() : null);
+        response.setRoomId(session.getRoom() != null ? session.getRoom().getId() : null);
+        response.setConferenceId(session.getConference() != null ? session.getConference().getId() : null);
+
+        return response;
     }
 
     /**
@@ -511,7 +518,7 @@ public class SessionService {
      * @return Page of SessionResponse where user is chair
      */
     public Page<SessionResponse> getSessionsByChairPaginated(Long chairId, Pageable pageable) {
-        Page<Session> sessions = sessionRepository.findByChairId(chairId, pageable);
+        Page<Session> sessions = sessionRepository.findByChairIdAndDeletedFalse(chairId, pageable);
         return sessions.map(this::convertToResponse);
     }
 
@@ -521,7 +528,7 @@ public class SessionService {
      * @return List of SessionResponse where user is chair
      */
     public List<SessionResponse> getSessionsByChair(Long chairId) {
-        List<Session> sessions = sessionRepository.findByChairId(chairId);
+        List<Session> sessions = sessionRepository.findByChairIdAndDeletedFalse(chairId);
         return sessions.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
