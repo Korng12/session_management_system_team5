@@ -363,10 +363,13 @@
         document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
             const sessionId = document.getElementById('editSessionId').value;
             const payload = {
+                title: document.getElementById('editTitle').value.trim(),
+                startTime: document.getElementById('editStartTime').value,
+                endTime: document.getElementById('editEndTime').value,
                 status: document.getElementById('editStatus').value
             };
             try {
-                const res = await fetch(`${api.createSession}/${sessionId}/status`, {
+                const res = await fetch(`${api.createSession}/${sessionId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
