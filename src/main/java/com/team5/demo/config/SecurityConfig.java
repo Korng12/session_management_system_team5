@@ -63,6 +63,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register","/login").permitAll()
+                            // ===== Static resources =====
+                        .requestMatchers(
+                            "/favicon.ico",
+                             
+                            "/css/**",
+                            "/js/**",
+                            "/images/**",
+                            "/webjars/**"
+                        ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")

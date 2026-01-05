@@ -1,6 +1,9 @@
 package com.team5.demo.controllers;
 
+
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,6 +25,10 @@ public class UserController {
     }
     @GetMapping("/home")
     public String getHome() {
+    //         boolean isAdmin = authentication.getAuthorities().stream()
+    //     .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+
+    // model.addAttribute("isAdmin", isAdmin);
         return "user/home";
     }
     @GetMapping("/schedule")

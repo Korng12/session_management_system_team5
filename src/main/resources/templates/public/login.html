@@ -20,7 +20,7 @@
                                 <p class="text-muted">Sign in to your conference account</p>
                             </div>
 
-                            <form th:action="@{/login}" method="post">
+                            <form id="loginForm"  method="post">
                                 
                                 <div th:if="${param.error}" class="alert alert-danger">
                                     Invalid email or password.
@@ -28,7 +28,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control"  name="email" placeholder="Enter your email" required>
+                                    <input id="email" type="email" class="form-control"  name="email" placeholder="Enter your email" required>
                                 </div>
                                 
                                 <div class="mb-3">
@@ -40,9 +40,9 @@
                                     <input type="checkbox" class="form-check-input" id="rememberMe" name="remember-me">
                                     <label class="form-check-label" for="rememberMe">Remember me</label>
                                 </div>
-                                <input type="hidden"
+                                <!-- <input type="hidden"
                                 th:name="${_csrf.parameterName}"
-                                th:value="${_csrf.token}" />
+                                th:value="${_csrf.token}" /> -->
                                 <button type="submit" class="btn btn-primary w-100 mb-3 py-2">Sign In</button>
                             </form>
 
@@ -59,3 +59,30 @@
         </div>
     </section>
 </div>
+
+<script>
+    // jwt is stateless, so we handle login via API and store the token in localStorage
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        })
+    });
+
+    if (!res.ok) {
+        alert("Login failed");
+        return;
+    }
+
+    window.location.href = "/home";
+
+    // Redirect to home
+});
+</script>

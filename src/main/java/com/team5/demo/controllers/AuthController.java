@@ -9,11 +9,18 @@ import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.security.JwtUtil;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,13 +67,48 @@ private final AuthenticationManager authenticationManager;
         return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
     }
 
+    // @PostMapping("/login")
+    // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    //     Authentication authentication = authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    //     );
+
+    //     String token = jwtUtil.generateToken(request.getEmail());
+    //     return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
+    // }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+    public ResponseEntity<?> login(
+            @RequestBody LoginRequest request,
+            HttpServletResponse response) {
+
+        Authentication auth = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                request.getEmail(),
+                request.getPassword()
+            )
         );
 
         String token = jwtUtil.generateToken(request.getEmail());
-        return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
+
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60); // 1 hour
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok().build();
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("jwt", "");
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+        return ResponseEntity.ok().build();
+    }
+
+
 }
