@@ -150,17 +150,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
+        const text = await res.text();
+        let errorData;
 
-        if (errorData) {
-          if (errorData.name) showError("nameError", errorData.name);
-          if (errorData.email) showError("emailError", errorData.email);
-          if (errorData.password)
-            showError("passwordError", errorData.password);
-          if (errorData.message) alert(errorData.message);
-        } else {
-          alert("Registration failed");
+        try {
+          errorData = JSON.parse(text);
+        } catch {
+          errorData = { message: text };
         }
+
+        if (errorData.name) showError("nameError", errorData.name);
+        if (errorData.email) showError("emailError", errorData.email);
+        if (errorData.password) showError("passwordError", errorData.password);
+
+        alert(errorData.message || "Registration failed");
         return;
       }
 
