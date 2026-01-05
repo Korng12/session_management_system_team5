@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,7 +120,7 @@ public class SessionService {
     /**
      * Get all sessions for a specific conference
      */
-    public List<SessionResponse> getSessionsByConference(Integer conferenceId) {
+    public List<SessionResponse> getSessionsByConference(Long conferenceId) {
         return sessionRepository.findByConferenceId(conferenceId)
                 .stream()
                 .map(this::convertToResponse)
@@ -151,7 +152,7 @@ public class SessionService {
     /**
      * Get session by ID
      */
-    public SessionResponse getSessionById(Integer sessionId) {
+    public SessionResponse getSessionById(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
         return convertToResponse(session);
@@ -160,7 +161,7 @@ public class SessionService {
     /**
      * Update session
      */
-    public SessionResponse updateSession(Integer sessionId, CreateSessionRequest request) {
+    public SessionResponse updateSession(Long sessionId, CreateSessionRequest request) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
 
@@ -223,19 +224,19 @@ public class SessionService {
     /**
      * Delete session (soft delete)
      */
-    public void deleteSession(Integer sessionId) {
+    public void deleteSession(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
         
-        session.setDeletedAt(new Date());
-        session.setUpdatedAt(new Date());
+        session.setDeleted(true);
+        session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
     }
 
     /**
      * Permanently delete session (hard delete - admin only)
      */
-    public void permanentlyDeleteSession(Integer sessionId) {
+    public void permanentlyDeleteSession(Long sessionId) {
         if (!sessionRepository.existsById(sessionId)) {
             throw new IllegalArgumentException("Session not found with ID: " + sessionId);
         }
@@ -245,14 +246,14 @@ public class SessionService {
     /**
      * Restore deleted session
      */
-    public SessionResponse restoreSession(Integer sessionId) {
+    public SessionResponse restoreSession(Long sessionId) {
         Session session = sessionRepository.findAllIncludingDeleted().stream()
                 .filter(s -> s.getId().equals(sessionId) && s.isDeleted())
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Deleted session not found with ID: " + sessionId));
         
-        session.setDeletedAt(null);
-        session.setUpdatedAt(new Date());
+        session.setDeleted(false);
+        session.setUpdatedAt(LocalDateTime.now());
         Session restoredSession = sessionRepository.save(session);
         return convertToResponse(restoredSession);
     }
@@ -260,12 +261,12 @@ public class SessionService {
     /**
      * Update session status
      */
-    public SessionResponse updateSessionStatus(Integer sessionId, UpdateSessionStatusRequest request) {
+    public SessionResponse updateSessionStatus(Long sessionId, UpdateSessionStatusRequest request) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
         
         session.setStatus(request.getStatus());
-        session.setUpdatedAt(new Date());
+        session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
         
         return convertToResponse(session);
@@ -289,7 +290,7 @@ public class SessionService {
                 session.getEndTime(),
                 session.getCreatedAt(),
                 session.getStatus(),
-                session.getVersion()
+                null // version field not implemented
         );
     }
 
@@ -298,7 +299,7 @@ public class SessionService {
      * @param sessionId the session ID to check
      * @return SessionDependenciesResponse with dependency information
      */
-    public SessionDependenciesResponse checkSessionDependencies(Integer sessionId) {
+    public SessionDependenciesResponse checkSessionDependencies(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found with id: " + sessionId));
 
@@ -331,8 +332,8 @@ public class SessionService {
      * @param excludeSessionId optional session ID to exclude (for updates)
      * @return RoomAvailabilityResponse with availability status and conflicting sessions
      */
-    public RoomAvailabilityResponse checkRoomAvailability(Integer roomId, LocalDateTime startTime, 
-                                                         LocalDateTime endTime, Integer excludeSessionId) {
+    public RoomAvailabilityResponse checkRoomAvailability(Long roomId, LocalDateTime startTime, 
+                                                         LocalDateTime endTime, Long excludeSessionId) {
         if (roomId == null) {
             return new RoomAvailabilityResponse(true, "No room specified");
         }
@@ -381,8 +382,8 @@ public class SessionService {
      * @param excludeSessionId optional session ID to exclude (for updates)
      * @return TimeConflictResponse with availability status and conflicting sessions
      */
-    public TimeConflictResponse checkChairAvailability(Integer chairId, LocalDateTime startTime, 
-                                                       LocalDateTime endTime, Integer excludeSessionId) {
+    public TimeConflictResponse checkChairAvailability(Long chairId, LocalDateTime startTime, 
+                                                       LocalDateTime endTime, Long excludeSessionId) {
         if (chairId == null) {
             return new TimeConflictResponse(true, "No chair specified", "CHAIR");
         }
@@ -434,7 +435,7 @@ public class SessionService {
      * @return TimeConflictResponse indicating success or conflicts
      * @throws IllegalArgumentException if session or chair not found
      */
-    public TimeConflictResponse assignChairToSession(Integer sessionId, Integer chairId) {
+    public TimeConflictResponse assignChairToSession(Long sessionId, Long chairId) {
         // Get the session
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
@@ -475,7 +476,7 @@ public class SessionService {
 
         // No conflicts - assign the chair
         session.setChair(chair);
-        session.setUpdatedAt(new Date());
+        session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
 
         return new TimeConflictResponse(
@@ -491,7 +492,7 @@ public class SessionService {
      * @return SessionResponse with the updated session (no chair assigned)
      * @throws IllegalArgumentException if session not found
      */
-    public SessionResponse removeChairFromSession(Integer sessionId) {
+    public SessionResponse removeChairFromSession(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
 
@@ -499,7 +500,7 @@ public class SessionService {
         
         // Remove the chair assignment
         session.setChair(null);
-        session.setUpdatedAt(new Date());
+        session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
 
         return convertToResponse(session);
@@ -511,7 +512,7 @@ public class SessionService {
      * @param pageable pagination info
      * @return Page of SessionResponse where user is chair
      */
-    public Page<SessionResponse> getSessionsByChairPaginated(Integer chairId, Pageable pageable) {
+    public Page<SessionResponse> getSessionsByChairPaginated(Long chairId, Pageable pageable) {
         Page<Session> sessions = sessionRepository.findByChairId(chairId, pageable);
         return sessions.map(this::convertToResponse);
     }
@@ -521,7 +522,7 @@ public class SessionService {
      * @param chairId the chair user ID
      * @return List of SessionResponse where user is chair
      */
-    public List<SessionResponse> getSessionsByChair(Integer chairId) {
+    public List<SessionResponse> getSessionsByChair(Long chairId) {
         List<Session> sessions = sessionRepository.findByChairId(chairId);
         return sessions.stream()
                 .map(this::convertToResponse)
@@ -537,8 +538,6 @@ public class SessionService {
         if (session.getStartTime() == null) {
             return false;
         }
-        LocalDateTime sessionStart = LocalDateTime.from(session.getStartTime().toInstant()
-                .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-        return sessionStart.isAfter(LocalDateTime.now());
+        return session.getStartTime().isAfter(LocalDateTime.now());
     }
 }

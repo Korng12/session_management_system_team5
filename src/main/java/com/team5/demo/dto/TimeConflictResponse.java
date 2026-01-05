@@ -70,7 +70,7 @@ public class TimeConflictResponse {
         public ConflictingSession() {
         }
 
-        public ConflictingSession(Integer id, String title, String chair, String room, LocalDateTime startTime, LocalDateTime endTime) {
+        public ConflictingSession(Long id, String title, String chair, String room, LocalDateTime startTime, LocalDateTime endTime) {
             this.id = id;
             this.title = title;
             this.chair = chair;
@@ -84,7 +84,7 @@ public class TimeConflictResponse {
             return id;
         }
 
-        public void setId(Integer id) {
+        public void setId(Long id) {
             this.id = id;
         }
 

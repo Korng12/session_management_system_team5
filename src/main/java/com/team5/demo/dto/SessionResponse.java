@@ -18,7 +18,7 @@ public class SessionResponse {
     public SessionResponse() {
     }
 
-    public SessionResponse(Integer id, String title, String chairName, String roomName, 
+    public SessionResponse(Long id, String title, String chairName, String roomName, 
                          String conferenceName, LocalDateTime startTime, LocalDateTime endTime, 
                          LocalDateTime createdAt) {
         this.id = id;
@@ -31,7 +31,7 @@ public class SessionResponse {
         this.createdAt = createdAt;
     }
 
-    public SessionResponse(Integer id, String title, String chairName, String roomName, 
+    public SessionResponse(Long id, String title, String chairName, String roomName, 
                          String conferenceName, LocalDateTime startTime, LocalDateTime endTime, 
                          LocalDateTime createdAt, SessionStatus status) {
         this(id, title, chairName, roomName, conferenceName, startTime, endTime, createdAt);
@@ -43,7 +43,7 @@ public class SessionResponse {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

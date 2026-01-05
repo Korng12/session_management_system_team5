@@ -1,7 +1,7 @@
 package com.team5.demo.dto;
 
 public class ConferenceDTO {
-    private Integer id;
+    private Long id;
     private String title;
     private String description;
 
@@ -9,7 +9,7 @@ public class ConferenceDTO {
     public ConferenceDTO() {
     }
 
-    public ConferenceDTO(Integer id, String title, String description) {
+    public ConferenceDTO(Long id, String title, String description) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -20,7 +20,7 @@ public class ConferenceDTO {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

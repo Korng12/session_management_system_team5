@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -40,12 +40,16 @@ public class Session {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private SessionStatus status;
+    
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean deleted = false;
 
     // Constructors
     public Session() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
         this.status = SessionStatus.SCHEDULED;
+        this.deleted = false;
     }
 
     public Session(String title, User chair, Room room, Conference conference, LocalDateTime startTime, LocalDateTime endTime) {
@@ -59,11 +63,11 @@ public class Session {
     }
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -137,6 +141,14 @@ public class Session {
 
     public void setStatus(SessionStatus status) {
         this.status = status;
+    }
+    
+    public boolean isDeleted() {
+        return deleted;
+    }
+    
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @PreUpdate

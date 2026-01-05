@@ -12,14 +12,14 @@ public class CreateSessionRequest {
     private String title;
 
     @Min(value = 1, message = "Invalid chair ID")
-    private Integer chairId;
+    private Long chairId;
 
     @Min(value = 1, message = "Invalid room ID")
-    private Integer roomId;
+    private Long roomId;
 
     @NotNull(message = "Conference ID is required")
     @Min(value = 1, message = "Invalid conference ID")
-    private Integer conferenceId;
+    private Long conferenceId;
 
     @NotNull(message = "Start time is required")
     @FutureOrPresent(message = "Start time must be in the present or future")
@@ -35,7 +35,7 @@ public class CreateSessionRequest {
     public CreateSessionRequest() {
     }
 
-    public CreateSessionRequest(String title, Integer chairId, Integer roomId, Integer conferenceId, 
+    public CreateSessionRequest(String title, Long chairId, Long roomId, Long conferenceId, 
                                LocalDateTime startTime, LocalDateTime endTime) {
         this.title = title;
         this.chairId = chairId;
@@ -46,7 +46,7 @@ public class CreateSessionRequest {
         this.status = SessionStatus.SCHEDULED;
     }
 
-    public CreateSessionRequest(String title, Integer chairId, Integer roomId, Integer conferenceId, 
+    public CreateSessionRequest(String title, Long chairId, Long roomId, Long conferenceId, 
                                LocalDateTime startTime, LocalDateTime endTime, SessionStatus status) {
         this.title = title;
         this.chairId = chairId;
@@ -70,7 +70,7 @@ public class CreateSessionRequest {
         return chairId;
     }
 
-    public void setChairId(Integer chairId) {
+    public void setChairId(Long chairId) {
         this.chairId = chairId;
     }
 
@@ -78,7 +78,7 @@ public class CreateSessionRequest {
         return roomId;
     }
 
-    public void setRoomId(Integer roomId) {
+    public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
 
@@ -86,7 +86,7 @@ public class CreateSessionRequest {
         return conferenceId;
     }
 
-    public void setConferenceId(Integer conferenceId) {
+    public void setConferenceId(Long conferenceId) {
         this.conferenceId = conferenceId;
     }
 

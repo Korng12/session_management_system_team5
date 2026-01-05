@@ -1,7 +1,7 @@
 package com.team5.demo.dto;
 
 public class RoomDTO {
-    private Integer id;
+    private Long id;
     private String name;
     private Integer capacity;
 
@@ -9,7 +9,7 @@ public class RoomDTO {
     public RoomDTO() {
     }
 
-    public RoomDTO(Integer id, String name, Integer capacity) {
+    public RoomDTO(Long id, String name, Long capacity) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
@@ -20,7 +20,7 @@ public class RoomDTO {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -36,7 +36,7 @@ public class RoomDTO {
         return capacity;
     }
 
-    public void setCapacity(Integer capacity) {
+    public void setCapacity(Long capacity) {
         this.capacity = capacity;
     }
 }
