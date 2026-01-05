@@ -66,7 +66,7 @@ public class CreateSessionRequest {
         this.title = title;
     }
 
-    public Integer getChairId() {
+    public Long getChairId() {
         return chairId;
     }
 
@@ -74,7 +74,7 @@ public class CreateSessionRequest {
         this.chairId = chairId;
     }
 
-    public Integer getRoomId() {
+    public Long getRoomId() {
         return roomId;
     }
 
@@ -82,7 +82,7 @@ public class CreateSessionRequest {
         this.roomId = roomId;
     }
 
-    public Integer getConferenceId() {
+    public Long getConferenceId() {
         return conferenceId;
     }
 

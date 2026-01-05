@@ -16,7 +16,7 @@ public class ConferenceDTO {
     }
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

@@ -60,7 +60,7 @@ public class TimeConflictResponse {
 
     // Inner class for conflicting session details
     public static class ConflictingSession {
-        private Integer id;
+        private Long id;
         private String title;
         private String chair;
         private String room;
@@ -80,7 +80,7 @@ public class TimeConflictResponse {
         }
 
         // Getters and Setters
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 

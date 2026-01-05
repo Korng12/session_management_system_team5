@@ -3,7 +3,7 @@ package com.team5.demo.dto;
 public class RoomDTO {
     private Long id;
     private String name;
-    private Integer capacity;
+    private Long capacity;
 
     // Constructors
     public RoomDTO() {
@@ -16,7 +16,7 @@ public class RoomDTO {
     }
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -32,7 +32,7 @@ public class RoomDTO {
         this.name = name;
     }
 
-    public Integer getCapacity() {
+    public Long getCapacity() {
         return capacity;
     }
 

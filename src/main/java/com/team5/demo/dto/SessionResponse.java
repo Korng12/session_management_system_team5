@@ -4,7 +4,7 @@ import com.team5.demo.entities.SessionStatus;
 import java.time.LocalDateTime;
 
 public class SessionResponse {
-    private Integer id;
+    private Long id;
     private String title;
     private String chairName;
     private String roomName;
@@ -13,6 +13,7 @@ public class SessionResponse {
     private LocalDateTime endTime;
     private LocalDateTime createdAt;
     private SessionStatus status;
+    private Integer version; // For optimistic locking
 
     // Constructors
     public SessionResponse() {
@@ -37,9 +38,16 @@ public class SessionResponse {
         this(id, title, chairName, roomName, conferenceName, startTime, endTime, createdAt);
         this.status = status;
     }
+    
+    public SessionResponse(Long id, String title, String chairName, String roomName, 
+                         String conferenceName, LocalDateTime startTime, LocalDateTime endTime, 
+                         LocalDateTime createdAt, SessionStatus status, Integer version) {
+        this(id, title, chairName, roomName, conferenceName, startTime, endTime, createdAt, status);
+        this.version = version;
+    }
 
     // Getters and Setters
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -109,5 +117,13 @@ public class SessionResponse {
 
     public void setStatus(SessionStatus status) {
         this.status = status;
+    }
+    
+    public Integer getVersion() {
+        return version;
+    }
+    
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 }

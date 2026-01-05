@@ -50,7 +50,7 @@ public class RoomAvailabilityResponse {
 
     // Inner class for conflicting session details
     public static class ConflictingSession {
-        private Integer id;
+        private Long id;
         private String title;
         private LocalDateTime startTime;
         private LocalDateTime endTime;
@@ -65,7 +65,7 @@ public class RoomAvailabilityResponse {
             this.endTime = endTime;
         }
 
-        public Integer getId() {
+        public Long getId() {
             return id;
         }
 
