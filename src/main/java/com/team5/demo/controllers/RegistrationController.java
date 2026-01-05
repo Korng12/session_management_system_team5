@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/registrations")
+
 @RequiredArgsConstructor
 public class RegistrationController {
     

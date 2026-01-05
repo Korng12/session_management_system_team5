@@ -1,0 +1,142 @@
+
+{% comment %} <div class="row g-4">
+
+    <div class="col-md-6 col-lg-4"
+         th:each="conf : ${conferences}">
+
+        <div class="card conference-card h-100">
+
+            <div class="conference-header bg-primary text-white">
+                <h5 class="mb-1" th:text="${conf.title}"></h5>
+                <small>Organized by Admin</small>
+            </div>
+
+            <div class="card-body">
+                <p class="text-muted"
+                   th:text="${conf.description}">
+                </p>
+
+                <span class="badge badge-session mb-3"
+                      th:text="${conf.sessions.size()} + ' Sessions Available'">
+                </span>
+
+                <!-- Show only first 3 sessions -->
+                <ul class="list-unstyled small mt-3">
+                    <li th:each="session, stat : ${conf.sessions}"
+                        th:if="${stat.index < 3}">
+                        ✔ <span th:text="${session.title}"></span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-footer bg-white border-0">
+                <a th:href="@{/conference/details/{id}(id=${conf.id})}"
+                   class="btn btn-outline-primary w-100">
+                    View Conference & Register
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</div> {% endcomment %}
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Sessions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card-shadow {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .table th {
+            background-color: #f1f3f5;
+        }
+
+        .action-btn {
+            min-width: 70px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header}"></div>
+<div th:replace="~{fragments/sidebar}"></div>
+
+<div class="container-fluid px-4 py-5">
+    <h3 class="mb-4 fw-bold">Manage Sessions</h3>
+
+    <div class="card card-shadow">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="mb-0">Conference Sessions</h5>
+                <a href="/admin/add-session" class="btn btn-primary btn-sm">
+                    + Add New Session
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Session Title</th>
+                            <th>Speaker</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01</td>
+                            <td>Introduction to AI</td>
+                            <td>Dr. Smith</td>
+                            <td>10:00 AM</td>
+                            <td>
+                                <span class="badge bg-success">Active</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-warning btn-sm action-btn">Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm action-btn">Delete</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>02</td>
+                            <td>Deep Learning Models</td>
+                            <td>Prof. Lee</td>
+                            <td>11:30 AM</td>
+                            <td>
+                                <span class="badge bg-secondary">Draft</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer}"></div>
+
+</body>
+</html>

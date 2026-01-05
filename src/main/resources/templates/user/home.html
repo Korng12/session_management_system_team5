@@ -1,8 +1,6 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
 
 <section>
-
-    <!-- HERO SECTION -->
     <div class="p-5 mb-5 bg-primary text-white rounded-3 shadow-sm">
         <div class="container py-5 text-center">
             <h1 class="display-5 fw-bold">
@@ -32,8 +30,6 @@
             </div>
         </div>
     </div>
-
-    <!-- SYSTEM OVERVIEW -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">What You Can Do</h2>
 
@@ -58,8 +54,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ACTIVE CONFERENCES -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">Active Conferences</h2>
 
@@ -94,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- EMPTY STATE -->
             <div class="col-12 text-center" th:if="${#lists.isEmpty(conferences)}">
                 <p class="text-muted">
                     No conferences are available at the moment.
@@ -102,8 +95,6 @@
             </div>
         </div>
     </div>
-
-    <!-- HOW IT WORKS -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">How It Works</h2>
 

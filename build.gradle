@@ -50,8 +50,9 @@ implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // ... your other starters
 
     // Explicit Spring Security modules (required for advanced features)
-    implementation 'org.springframework.security:spring-security-config'
-    implementation 'org.springframework.security:spring-security-web'
+   implementation 'org.springframework.security:spring-security-core'
+   implementation 'org.springframework.security:spring-security-web'
+
 
     // JWT (JJWT) - required for JwtUtil and JwtFilter
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'  // Latest stable

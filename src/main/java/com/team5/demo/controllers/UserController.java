@@ -19,6 +19,10 @@ public class UserController {
     public String getRegisterPage() {
         return "public/register";
     }
+    @GetMapping("/registeration")
+    public String getRegisterationPage() {
+        return "public/registeration";
+    }
     @GetMapping("/login")
     public String getLoginPage() {
         return "public/login";
@@ -47,7 +51,11 @@ public class UserController {
     }
     @GetMapping("/about")
     public String getAboutPage() {
-        return "public/about";
+        return "public/aboutPage";
+    }
+       @GetMapping("/contact")
+    public String getContactPage() {
+        return "public/contact";
     }
     @GetMapping("/profile")
     public String getProfilePage(Model model, Authentication authentication) {
@@ -55,5 +63,6 @@ public class UserController {
         model.addAttribute("userEmail", userEmail);
         return "user/profile";  
     }    
+    
     
 }
