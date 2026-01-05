@@ -178,7 +178,7 @@
         async function loadRooms() {
             roomsContainer.innerHTML = '<div class="col-md-6 mb-4"><div class="card room-card"><div class="card-body text-center text-muted"><p>Loading...</p></div></div></div>';
             try {
-                const res = await fetch(api.rooms);
+                const res = await fetch(api.rooms, { credentials: 'include' });
                 if (!res.ok) throw new Error('Failed to load rooms');
                 const rooms = await res.json();
                 if (!rooms.length) {
@@ -198,11 +198,17 @@
                                 <p class="card-text"><strong>Capacity:</strong> ${r.capacity || 'N/A'} people</p>
                             </div>
                             <div class="card-footer">
-                                <button class="btn btn-sm btn-outline-primary me-2" data-room-id="${r.id}" data-room-name="${r.name}" data-room-capacity="${r.capacity}" onclick="openEditModal(event)">Edit</button>
-                                <button class="btn btn-sm btn-outline-danger" data-room-id="${r.id}" data-room-name="${r.name}" onclick="openDeleteModal(event)">Delete</button>
+                                <button class="btn btn-sm btn-outline-primary me-2" data-room-id="${r.id}" data-room-name="${r.name}" data-room-capacity="${r.capacity}">Edit</button>
+                                <button class="btn btn-sm btn-outline-danger" data-room-id="${r.id}" data-room-name="${r.name}">Delete</button>
                             </div>
                         </div>
                     `;
+
+                    const editBtn = div.querySelector('.btn-outline-primary');
+                    const deleteBtn = div.querySelector('.btn-outline-danger');
+                    editBtn.addEventListener('click', openEditModal);
+                    deleteBtn.addEventListener('click', openDeleteModal);
+
                     roomsContainer.appendChild(div);
                 });
             } catch (e) {
@@ -222,6 +228,7 @@
                 const res = await fetch(api.createRoom, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
 
@@ -255,11 +262,14 @@
             formSuccess.classList.add('d-none');
         }
 
-        let editModal, deleteModal;
+        let editModal;
+        const deleteModalEl = document.getElementById('deleteRoomModal');
+        let deleteModal;
 
         function openEditModal(event) {
             event.preventDefault();
-            const btn = event.target;
+            const btn = event.currentTarget || event.target.closest('button');
+            if (!btn) return;
             const roomId = btn.dataset.roomId;
             const name = btn.dataset.roomName;
             const capacity = btn.dataset.roomCapacity;
@@ -274,13 +284,14 @@
 
         function openDeleteModal(event) {
             event.preventDefault();
-            const btn = event.target;
+            const btn = event.currentTarget || event.target.closest('button');
+            if (!btn) return;
             const roomId = btn.dataset.roomId;
             const name = btn.dataset.roomName;
             
             document.getElementById('deleteRoomName').textContent = name;
-            deleteModal = new bootstrap.Modal(document.getElementById('deleteRoomModal'));
-            deleteModal.dataset.roomId = roomId;
+            deleteModal = deleteModal || new bootstrap.Modal(deleteModalEl);
+            deleteModalEl.dataset.roomId = roomId;
             deleteModal.show();
         }
 
@@ -294,6 +305,7 @@
                 const res = await fetch(`${api.createRoom}/${roomId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
                     body: JSON.stringify(payload)
                 });
                 if (!res.ok) {
@@ -312,14 +324,18 @@
         });
 
         document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
-            const roomId = deleteModal.dataset.roomId;
+            const roomId = deleteModalEl.dataset.roomId;
             try {
                 const res = await fetch(`${api.createRoom}/${roomId}`, {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include'
                 });
                 if (!res.ok) {
-                    showError('Failed to delete room');
+                    const errJson = await res.json().catch(() => ({}));
+                    const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
+                    const msg = errJson.message || errText || `Failed to delete room (status ${res.status})`;
+                    showError(msg);
                     return;
                 }
                 deleteModal.hide();
