@@ -9,6 +9,9 @@ public class SessionResponse {
     private String chairName;
     private String roomName;
     private String conferenceName;
+    private Long chairId;
+    private Long roomId;
+    private Long conferenceId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalDateTime createdAt;
@@ -85,6 +88,30 @@ public class SessionResponse {
 
     public void setConferenceName(String conferenceName) {
         this.conferenceName = conferenceName;
+    }
+
+    public Long getChairId() {
+        return chairId;
+    }
+
+    public void setChairId(Long chairId) {
+        this.chairId = chairId;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+
+    public Long getConferenceId() {
+        return conferenceId;
+    }
+
+    public void setConferenceId(Long conferenceId) {
+        this.conferenceId = conferenceId;
     }
 
     public LocalDateTime getStartTime() {
