@@ -15,9 +15,7 @@ import com.team5.demo.services.SessionService;
 import com.team5.demo.repositories.ConferenceRepository;
 import com.team5.demo.repositories.RoomRepository;
 import com.team5.demo.repositories.UserRepository;
-import com.team5.demo.entities.Conference;
 import com.team5.demo.entities.Room;
-import com.team5.demo.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -86,7 +84,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public String showEditSessionForm(@PathVariable Long id, Model model) {
         try {
-            SessionResponse session = sessionService.getSessionById(id);
+            sessionService.getSessionById(id);
             model.addAttribute("sessionId", id);
             return "admin/edit-session";
         } catch (IllegalArgumentException e) {

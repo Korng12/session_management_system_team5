@@ -27,91 +27,49 @@
         </section>
 
     <!-- Profile Content -->
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Full Name</label>
-                                            <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Email</label>
-                                            <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
-                                        </div>
-                                    </div>
-
-<<<<<<< Updated upstream
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Member Since</label>
-                                            <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold">Role</label>
-                                            <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
-                                                  th:each="role : ${userRoles}"
-                                                  class="badge bg-primary me-1" 
-                                                  th:text="${role.name}">Role</span>
-                                            <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                                        </div>
-                                    </div>
-                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
-                                          th:each="role : ${userRoles}"
-                                          class="badge bg-primary me-1" 
-                                          th:text="${role.name}">Role</span>
-                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                                                            <h5 class="mb-3">My Conferences</h5>
-                                                            <div class="alert alert-info">
-                                                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
-                                                            </div>
-
-                                                            <div class="mt-4">
-                                                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
-                                                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
-=======
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Full Name</label>
-                                    <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Email</label>
-                                    <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
-                                </div>
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+                    <div class="card profile-card shadow-sm p-4">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Full Name</label>
+                                <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
                             </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Member Since</label>
-                                    <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Role</label>
-                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
-                                          th:each="role : ${userRoles}"
-                                          class="badge bg-primary me-1" 
-                                          th:text="${role.name}">Role</span>
-                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Email</label>
+                                <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
                             </div>
+                        </div>
 
-                            <hr class="my-4">
-
-                            <h5 class="mb-3">My Conferences</h5>
-                            <div class="alert alert-info">
-                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
->>>>>>> Stashed changes
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Member Since</label>
+                                <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
                             </div>
-
-                            <div class="mt-4">
-                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
-                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
-<<<<<<< Updated upstream
->>>>>>> 5ef9892 (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
-=======
->>>>>>> Stashed changes
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Role</label>
+                                <span th:if="${userRoles != null && !userRoles.isEmpty()}" th:each="role : ${userRoles}" class="badge bg-primary me-1" th:text="${role.name}">Role</span>
+                                <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
                             </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-3">My Conferences</h5>
+                        <div class="alert alert-info">
+                            No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                            <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
     </section>
 </div>

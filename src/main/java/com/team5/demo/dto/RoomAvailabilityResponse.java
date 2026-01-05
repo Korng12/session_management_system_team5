@@ -2,7 +2,6 @@ package com.team5.demo.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RoomAvailabilityResponse {
     private boolean available;

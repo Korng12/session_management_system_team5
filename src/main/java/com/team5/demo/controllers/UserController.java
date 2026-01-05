@@ -21,6 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
+
+    /**
+     * Handles user-related views and basic authentication flows
+     * This controller manages:
+     * - Landing/registration pages
+     * - User account views
+     * - Profile management endpoints
+     */
     @Autowired
     private UserRepository userRepository;
 

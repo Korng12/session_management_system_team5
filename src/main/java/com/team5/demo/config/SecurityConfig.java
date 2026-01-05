@@ -69,7 +69,10 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**",
                                 "/webjars/**",
-                                "/api/auth/**")
+                            "/api/auth/**",
+                            // Actuator health/info for monitoring
+                            "/actuator/health",
+                            "/actuator/info")
                         .permitAll()
                         .requestMatchers("/error").permitAll()
 

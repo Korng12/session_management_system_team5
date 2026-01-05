@@ -300,7 +300,7 @@ public class SessionService {
      * @return SessionDependenciesResponse with dependency information
      */
     public SessionDependenciesResponse checkSessionDependencies(Long sessionId) {
-        Session session = sessionRepository.findById(sessionId)
+        sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found with id: " + sessionId));
 
         // Check for session attendances
@@ -495,8 +495,6 @@ public class SessionService {
     public SessionResponse removeChairFromSession(Long sessionId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found with ID: " + sessionId));
-
-        String previousChairName = session.getChair() != null ? session.getChair().getName() : "None";
         
         // Remove the chair assignment
         session.setChair(null);

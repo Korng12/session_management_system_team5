@@ -1,6 +1,5 @@
 package com.team5.demo.controllers;
 
-import com.team5.demo.dto.AuthResponse;
 import com.team5.demo.dto.LoginRequest;
 import com.team5.demo.dto.RegisterRequest;
 import com.team5.demo.entities.Role;
@@ -12,15 +11,11 @@ import com.team5.demo.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
