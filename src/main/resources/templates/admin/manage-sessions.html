@@ -47,27 +47,30 @@
     </style>
 </head>
 <body>
-       <nav class="navbar navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <span class="navbar-brand">Conference Admin</span>
-        <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-    </div>
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand">Conference Admin</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
     </nav>
-   <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <section class="admin-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-5 fw-bold mb-3">Manage Sessions</h1>
-                    <p class="lead mb-0">Create, edit, delete, and register for conference sessions</p>
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="content">
+        <section class="admin-header mb-4">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto text-center">
+                        <h1 class="display-5 fw-bold mb-3">Manage Sessions</h1>
+                        <p class="lead mb-0">Create, edit, delete, and register for conference sessions</p>
+                    </div>
                 </div>
             </div>
-        </div>
         </section>
-    </section>
-</div>
-                <div class="col-lg-6">
+
+        <div class="container-fluid">
+            <div class="row g-4">
+                <div class="col-lg-5">
                     <h2 class="mb-3">Create New Session</h2>
                     <div class="alert alert-danger d-none" id="formError"></div>
                     <div class="alert alert-success d-none" id="formSuccess"></div>
@@ -114,7 +117,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-lg-6">
+
+                <div class="col-lg-7">
                     <h2 class="mb-3">Existing Sessions</h2>
                     <div class="table-responsive">
                         <table class="table table-striped align-middle" id="sessionsTable">
@@ -137,7 +141,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+      div>
     </section>
 
     <!-- Edit Session Modal -->
@@ -156,7 +160,29 @@
                             <label class="form-label">Title</label>
                             <input type="text" class="form-control" id="editTitle" required maxlength="100">
                         </div>
+
                         <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Chair</label>
+                                <select class="form-select" id="editChairId">
+                                    <option value="" disabled selected>Select...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Room</label>
+                                <select class="form-select" id="editRoomId">
+                                    <option value="" disabled selected>Select...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Conference</label>
+                                <select class="form-select" id="editConferenceId" required>
+                                    <option value="" disabled selected>Select...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-1">
                             <div class="col-md-6">
                                 <label class="form-label">Start Time</label>
                                 <input type="datetime-local" class="form-control" id="editStartTime" required>
@@ -225,25 +251,33 @@
         const roomSelect = document.getElementById('roomId');
         const conferenceSelect = document.getElementById('conferenceId');
 
+        const editChairSelect = document.getElementById('editChairId');
+        const editRoomSelect = document.getElementById('editRoomId');
+        const editConferenceSelect = document.getElementById('editConferenceId');
+
         async function loadOptions() {
             await Promise.all([
-                fetchOptions(api.users, chairSelect, u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
-                fetchOptions(api.rooms, roomSelect, r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
-                fetchOptions(api.conferences, conferenceSelect, c => ({ value: c.id, label: c.title }))
+                fetchOptions(api.users, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
+                fetchOptions(api.rooms, [roomSelect, editRoomSelect], r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
+                fetchOptions(api.conferences, [conferenceSelect, editConferenceSelect], c => ({ value: c.id, label: c.title }))
             ]);
         }
 
-        async function fetchOptions(url, selectEl, mapFn) {
+        async function fetchOptions(url, selectEls, mapFn) {
             const res = await fetch(url);
             if (!res.ok) return;
             const data = await res.json();
-            selectEl.innerHTML = '<option value="" disabled selected>Select...</option>';
-            data.forEach(item => {
-                const opt = document.createElement('option');
-                const mapped = mapFn(item);
-                opt.value = mapped.value;
-                opt.textContent = mapped.label;
-                selectEl.appendChild(opt);
+            const targets = Array.isArray(selectEls) ? selectEls : [selectEls];
+            targets.forEach(selectEl => {
+                if (!selectEl) return;
+                selectEl.innerHTML = '<option value="" disabled selected>Select...</option>';
+                data.forEach(item => {
+                    const opt = document.createElement('option');
+                    const mapped = mapFn(item);
+                    opt.value = mapped.value;
+                    opt.textContent = mapped.label;
+                    selectEl.appendChild(opt);
+                });
             });
         }
 
@@ -268,11 +302,25 @@
                         <td>${formatDateTime(s.startTime)}</td>
                         <td>${formatDateTime(s.endTime)}</td>
                         <td><span class="badge bg-secondary">${s.status || 'N/A'}</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-warning" onclick="openEditModal(${s.id}, '${s.title}', '${s.startTime}', '${s.endTime}', '${s.status}')">Edit</button>
-                            <button class="btn btn-sm btn-danger" onclick="openDeleteModal(${s.id}, '${s.title}')">Delete</button>
+                        <td class="d-flex gap-1">
+                            <button class="btn btn-sm btn-warning">Edit</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
                         </td>
                     `;
+
+                    const [editBtn, deleteBtn] = tr.querySelectorAll('button');
+                    editBtn.addEventListener('click', () => openEditModal(
+                        s.id,
+                        s.title || '',
+                        s.startTime,
+                        s.endTime,
+                        s.status || '',
+                        s.chairId || null,
+                        s.roomId || null,
+                        s.conferenceId || null
+                    ));
+                    deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
+
                     sessionsBody.appendChild(tr);
                 });
 
@@ -342,12 +390,15 @@
 
         let editModal, deleteModal;
 
-        function openEditModal(sessionId, title, startTime, endTime, status) {
+        function openEditModal(sessionId, title, startTime, endTime, status, chairId, roomId, conferenceId) {
             document.getElementById('editSessionId').value = sessionId;
             document.getElementById('editTitle').value = title;
             document.getElementById('editStartTime').value = startTime.substring(0, 16);
             document.getElementById('editEndTime').value = endTime.substring(0, 16);
             document.getElementById('editStatus').value = status;
+            editChairSelect.value = chairId ? String(chairId) : '';
+            editRoomSelect.value = roomId ? String(roomId) : '';
+            editConferenceSelect.value = conferenceId ? String(conferenceId) : '';
             document.getElementById('editError').classList.add('d-none');
             editModal = new bootstrap.Modal(document.getElementById('editSessionModal'));
             editModal.show();
@@ -356,7 +407,7 @@
         function openDeleteModal(sessionId, title) {
             document.getElementById('deleteSessionTitle').textContent = title;
             deleteModal = new bootstrap.Modal(document.getElementById('deleteSessionModal'));
-            deleteModal.dataset.sessionId = sessionId;
+            deleteModal._sessionId = sessionId; // store explicitly to avoid dataset issues
             deleteModal.show();
         }
 
@@ -364,6 +415,9 @@
             const sessionId = document.getElementById('editSessionId').value;
             const payload = {
                 title: document.getElementById('editTitle').value.trim(),
+                chairId: editChairSelect.value ? Number(editChairSelect.value) : null,
+                roomId: editRoomSelect.value ? Number(editRoomSelect.value) : null,
+                conferenceId: editConferenceSelect.value ? Number(editConferenceSelect.value) : null,
                 startTime: document.getElementById('editStartTime').value,
                 endTime: document.getElementById('editEndTime').value,
                 status: document.getElementById('editStatus').value
@@ -375,8 +429,15 @@
                     body: JSON.stringify(payload)
                 });
                 if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
-                    document.getElementById('editError').textContent = err.message || 'Failed to update';
+                    const errJson = await res.json().catch(() => ({}));
+                    const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
+                    let details = '';
+                    if (errJson.errors && typeof errJson.errors === 'object') {
+                        const first = Object.values(errJson.errors)[0];
+                        details = Array.isArray(first) ? first[0] : String(first);
+                    }
+                    const msg = errJson.message || details || errText || `Failed to update (status ${res.status})`;
+                    document.getElementById('editError').textContent = msg;
                     document.getElementById('editError').classList.remove('d-none');
                     return;
                 }
@@ -390,14 +451,17 @@
         });
 
         document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
-            const sessionId = deleteModal.dataset.sessionId;
+            const sessionId = deleteModal?._sessionId;
             try {
                 const res = await fetch(`${api.createSession}/${sessionId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' }
                 });
                 if (!res.ok) {
-                    showError('Failed to delete session');
+                    const errJson = await res.json().catch(() => ({}));
+                    const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
+                    const msg = errJson.message || errText || `Failed to delete (status ${res.status})`;
+                    showError(msg);
                     return;
                 }
                 deleteModal.hide();
@@ -413,6 +477,5 @@
         });
 
     </script>
->>>>>>> 4cbd2d1 (feat: Complete Session CRUD UI with edit/delete actions)
 </body>
 </html>
