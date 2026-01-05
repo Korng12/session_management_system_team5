@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -35,10 +35,10 @@ private final AuthenticationManager authenticationManager;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil,
-                          UserRepository userRepository,
-                          RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+            JwtUtil jwtUtil,
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
@@ -48,91 +48,90 @@ private final AuthenticationManager authenticationManager;
 
     // @PostMapping("/register")
     // public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-    //     if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-    //         return ResponseEntity.badRequest().body("Email already exists");
-    //     }
+    // if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    // return ResponseEntity.badRequest().body("Email already exists");
+    // }
 
-    //     User user = new User();
-    //     user.setName(request.getName());
-    //     user.setEmail(request.getEmail());
-    //     user.setPassword(passwordEncoder.encode(request.getPassword()));
+    // User user = new User();
+    // user.setName(request.getName());
+    // user.setEmail(request.getEmail());
+    // user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-    //     Role attendeeRole = roleRepository.findByName("ATTENDEE")
-    //             .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-    //     user.addRole(attendeeRole);
+    // Role attendeeRole = roleRepository.findByName("ATTENDEE")
+    // .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+    // user.addRole(attendeeRole);
 
-    //     userRepository.save(user);
+    // userRepository.save(user);
 
-    //     String token = jwtUtil.generateToken(user.getEmail());
-    //     return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
+    // String token = jwtUtil.generateToken(user.getEmail());
+    // return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
     // }
     @PostMapping("/register")
-public ResponseEntity<?> register(
-        @RequestBody RegisterRequest request,
-        HttpServletResponse response) {
-
-    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-        return ResponseEntity.badRequest().body("Email already exists");
-    }
-
-    User user = new User();
-    user.setName(request.getName());
-    user.setEmail(request.getEmail());
-    user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-    Role attendeeRole = roleRepository.findByName("ATTENDEE")
-            .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-    user.addRole(attendeeRole);
-
-    userRepository.save(user);
-
-    // 🔐 Generate JWT
-    String token = jwtUtil.generateToken(user.getEmail());
-
-    // 🍪 Store JWT in HttpOnly cookie
-    Cookie cookie = new Cookie("jwt", token);
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(60 * 60); // 1 hour
-    response.addCookie(cookie);
-
-    return ResponseEntity.ok().build();
-}
-
-
-    // @PostMapping("/login")
-    // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    //     Authentication authentication = authenticationManager.authenticate(
-    //             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-    //     );
-
-    //     String token = jwtUtil.generateToken(request.getEmail());
-    //     return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
-    // }
-    @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody LoginRequest request,
+    public ResponseEntity<?> register(
+            @RequestBody RegisterRequest request,
             HttpServletResponse response) {
 
-        Authentication auth = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-            )
-        );
-        System.out.println("Authentication successful for user: " + auth.getPrincipal()+" "+ auth.getAuthorities()+ "" + auth.isAuthenticated());
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
 
-        String token = jwtUtil.generateToken(request.getEmail());
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
+        Role attendeeRole = roleRepository.findByName("ATTENDEE")
+                .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+        user.addRole(attendeeRole);
+
+        userRepository.save(user);
+
+        // 🔐 Generate JWT
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        // 🍪 Store JWT in HttpOnly cookie
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60); // 1 hour
         response.addCookie(cookie);
-        System.out.println("Login successful, JWT cookie set."+ cookie.getName());
 
         return ResponseEntity.ok().build();
     }
+
+    // @PostMapping("/login")
+    // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    // Authentication authentication = authenticationManager.authenticate(
+    // new UsernamePasswordAuthenticationToken(request.getEmail(),
+    // request.getPassword())
+    // );
+
+    // String token = jwtUtil.generateToken(request.getEmail());
+    // return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
+    // }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+            String token = jwtUtil.generateToken(request.getEmail());
+
+            Cookie cookie = new Cookie("jwt", token);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60); // 1 hour
+            response.addCookie(cookie);
+
+            System.out.println("Login successful for user: " + auth.getName());
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            System.out.println("Login failed for email: " + request.getEmail());
+            System.out.println("Exception: " + e.getClass().getSimpleName());
+            return ResponseEntity.status(401).body("{\"error\": \"Invalid email or password\"}");
+        }
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
 
@@ -144,6 +143,5 @@ public ResponseEntity<?> register(
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
-
 
 }
