@@ -14,17 +14,32 @@ import java.util.List;
 
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
-    // Find all sessions for a specific conference
-    List<Session> findByConferenceId(Long conferenceId);
+       // Find all sessions for a specific conference (excluding soft-deleted)
+       List<Session> findByConferenceIdAndDeletedFalse(Long conferenceId);
 
-    // Find all sessions for a specific room
-    List<Session> findByRoomId(Long roomId);
+       // Find all sessions for a specific room (excluding soft-deleted)
+       List<Session> findByRoomIdAndDeletedFalse(Long roomId);
 
-    // Find all sessions with a specific chair
-    List<Session> findByChairId(Long chairId);
+       // Find all sessions with a specific chair (excluding soft-deleted)
+       List<Session> findByChairIdAndDeletedFalse(Long chairId);
     
-    // Find sessions by chair with pagination
-    Page<Session> findByChairId(Long chairId, Pageable pageable);
+       // Find sessions by chair with pagination (excluding soft-deleted)
+       Page<Session> findByChairIdAndDeletedFalse(Long chairId, Pageable pageable);
+
+       // Check if active sessions reference a given room
+       boolean existsByRoomIdAndDeletedFalse(Long roomId);
+
+       // Check if any session (including soft-deleted) references a room
+       boolean existsByRoomId(Long roomId);
+
+       // Fetch all sessions by room (including soft-deleted)
+       List<Session> findByRoomId(Long roomId);
+
+       // Find all active (not deleted) sessions
+       List<Session> findByDeletedFalse();
+
+       // Paginated active sessions
+       Page<Session> findByDeletedFalse(Pageable pageable);
     
     // Find sessions by status
     List<Session> findByStatus(SessionStatus status);
