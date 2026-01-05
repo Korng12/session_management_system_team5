@@ -21,9 +21,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-
-
-
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -60,49 +57,48 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints (allow site pages and auth API)
                         .requestMatchers(
-                            "/",
-                            "/public/**",
-                            "/register",
-                            "/registeration",
-                            "/login",
-                            "/about",
-                            "/register-conference",
-                            "/favicon.ico",
-                            "/css/**",
-                            "/js/**",
-                            "/images/**",
-                            "/webjars/**",
-                            "/api/auth/**"
-                        ).permitAll()
+                                "/",
+                                "/public/**",
+                                "/register",
+                                "/registeration",
+                                "/login",
+                                "/about",
+                                "/register-conference",
+                                "/favicon.ico",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/webjars/**",
+                                "/api/auth/**")
+                        .permitAll()
                         .requestMatchers("/error").permitAll()
-                        
+
                         // Admin endpoints
                         .requestMatchers("/api/roles/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        
+
                         // Chair endpoints
                         .requestMatchers("/api/chair/**").hasRole("CHAIR")
-                        
+
                         // Author endpoints
                         .requestMatchers("/api/author/**").hasRole("AUTHOR")
-                        
+
                         // Participant endpoints
                         .requestMatchers("/api/participant/**").hasRole("PARTICIPANT")
-                        
+
                         // All authenticated requests
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                    })
-                    .accessDeniedHandler((request, response, accessDeniedException) -> {
-                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"error\": \"Forbidden: insufficient permissions\"}");
-                    }))
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Forbidden: insufficient permissions\"}");
+                        }))
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form
                         .loginPage("/login")

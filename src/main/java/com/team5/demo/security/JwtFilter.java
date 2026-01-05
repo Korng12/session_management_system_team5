@@ -94,12 +94,18 @@ public class JwtFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String token = null;
+<<<<<<< Updated upstream
 
         // Prefer Authorization header for API calls
+=======
+        
+        // First, try to get token from Authorization header
+>>>>>>> Stashed changes
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
+<<<<<<< Updated upstream
 
         // Fallback to cookie for browser sessions
         if (token == null && request.getCookies() != null) {
@@ -149,3 +155,53 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     }
+=======
+        
+        // If not in header, try to get from cookie
+        if (token == null && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // If no token found, continue without authentication
+        if (token == null) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Validate token
+        if (!jwtUtil.validateToken(token)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String email = jwtUtil.extractEmail(token);
+
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(email);
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+        chain.doFilter(request, response);
+    }
+
+}
+>>>>>>> Stashed changes
