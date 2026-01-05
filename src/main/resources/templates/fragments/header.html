@@ -42,12 +42,12 @@
                     <ul class="dropdown-menu dropdown-menu-end">
 
                         <li>
-                            <a class="dropdown-item" href="/user/profile">
+                            <a class="dropdown-item" href="/profile">
                                 <i class="bi bi-person me-2"></i>Profile
                             </a>
                         </li>
 
-                        <li>
+                        <li sec:authorize="hasAuthority('ATTENDEE')">
                             <a class="dropdown-item" href="/user/user-schedule">
                                 <i class="bi bi-calendar-check me-2"></i>My Schedule
                             </a>
@@ -58,7 +58,7 @@
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li sec:authorize="hasRole('ADMIN')">
+                        <li sec:authorize="hasAuthority('ADMIN')">
                             <a class="dropdown-item" href="/admin">
                                 <i class="bi bi-gear me-2"></i>Admin Panel
                             </a>

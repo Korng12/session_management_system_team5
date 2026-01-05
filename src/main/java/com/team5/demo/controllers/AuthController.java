@@ -120,6 +120,7 @@ public ResponseEntity<?> register(
                 request.getPassword()
             )
         );
+        System.out.println("Authentication successful for user: " + auth.getPrincipal()+" "+ auth.getAuthorities()+ "" + auth.isAuthenticated());
 
         String token = jwtUtil.generateToken(request.getEmail());
 
@@ -128,6 +129,7 @@ public ResponseEntity<?> register(
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60); // 1 hour
         response.addCookie(cookie);
+        System.out.println("Login successful, JWT cookie set."+ cookie.getName());
 
         return ResponseEntity.ok().build();
     }
