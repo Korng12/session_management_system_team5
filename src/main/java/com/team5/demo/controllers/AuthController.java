@@ -46,26 +46,59 @@ private final AuthenticationManager authenticationManager;
         this.passwordEncoder = passwordEncoder;
     }
 
+    // @PostMapping("/register")
+    // public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    //     if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    //         return ResponseEntity.badRequest().body("Email already exists");
+    //     }
+
+    //     User user = new User();
+    //     user.setName(request.getName());
+    //     user.setEmail(request.getEmail());
+    //     user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+    //     Role attendeeRole = roleRepository.findByName("ATTENDEE")
+    //             .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+    //     user.addRole(attendeeRole);
+
+    //     userRepository.save(user);
+
+    //     String token = jwtUtil.generateToken(user.getEmail());
+    //     return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
+    // }
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("Email already exists");
-        }
+public ResponseEntity<?> register(
+        @RequestBody RegisterRequest request,
+        HttpServletResponse response) {
 
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        Role attendeeRole = roleRepository.findByName("ATTENDEE")
-                .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-        user.addRole(attendeeRole);
-
-        userRepository.save(user);
-
-        String token = jwtUtil.generateToken(user.getEmail());
-        return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
+    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        return ResponseEntity.badRequest().body("Email already exists");
     }
+
+    User user = new User();
+    user.setName(request.getName());
+    user.setEmail(request.getEmail());
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+    Role attendeeRole = roleRepository.findByName("ATTENDEE")
+            .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+    user.addRole(attendeeRole);
+
+    userRepository.save(user);
+
+    // 🔐 Generate JWT
+    String token = jwtUtil.generateToken(user.getEmail());
+
+    // 🍪 Store JWT in HttpOnly cookie
+    Cookie cookie = new Cookie("jwt", token);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    cookie.setMaxAge(60 * 60); // 1 hour
+    response.addCookie(cookie);
+
+    return ResponseEntity.ok().build();
+}
+
 
     // @PostMapping("/login")
     // public ResponseEntity<?> login(@RequestBody LoginRequest request) {

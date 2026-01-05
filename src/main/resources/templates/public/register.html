@@ -19,12 +19,12 @@
                                 <p class="text-muted">Join the conference community</p>
                             </div>
 
-                            <form th:action="@{/register}" method="post">
+                            <form id="registerForm">
                                 
                                 <div class="row">
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Username</label>
-                                        <input type="text" name="name" class="form-control" placeholder="John" required>
+                                        <input id="name" type="text" name="name" class="form-control" placeholder="John" required>
                                     </div>
                                     <!-- <div class="col-md-6 mb-3">
                                         <label class="form-label fw-semibold">Last Name</label>
@@ -33,8 +33,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Email Address</label>
-                                    <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+                                    <label  class="form-label fw-semibold">Email Address</label>
+                                    <input id="email" type="email" name="email" class="form-control" placeholder="name@example.com" required>
                                 </div>
 
                                 <!-- <div class="mb-3">
@@ -44,13 +44,13 @@
 
                                 <div class="mb-3">
                                     <label class="form-label fw-semibold">Password</label>
-                                    <input type="password" name="password" class="form-control" placeholder="Min. 8 characters" required>
+                                    <input id="password" type="password" name="password" class="form-control" placeholder="Min. 8 characters" required>
                                 </div>
 
-                                <div class="mb-4">
+                                <!-- <div class="mb-4">
                                     <label class="form-label fw-semibold">Confirm Password</label>
                                     <input type="password" name="confirmPassword" class="form-control" required>
-                                </div>
+                                </div> -->
 
                                 <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">Create Account</button>
                             </form>

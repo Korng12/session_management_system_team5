@@ -66,7 +66,6 @@ public class SecurityConfig {
                             // ===== Static resources =====
                         .requestMatchers(
                             "/favicon.ico",
-                             
                             "/css/**",
                             "/js/**",
                             "/images/**",
