@@ -2,6 +2,7 @@ package com.team5.demo.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +27,18 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/api/auth/");
+        // Skip JWT filter for public endpoints and static resources
+        return path.startsWith("/api/auth/") || 
+               path.equals("/") ||
+               path.equals("/register") || 
+               path.equals("/login") ||
+               path.equals("/about") ||
+               path.equals("/register-conference") ||
+               path.startsWith("/public/") ||
+               path.startsWith("/css/") ||
+               path.startsWith("/js/") ||
+               path.startsWith("/images/") ||
+               path.startsWith("/webjars/");
     }
 
     // @Override
@@ -83,27 +95,30 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = null;
 
-        // Read JWT from cookie
-        if (request.getCookies() != null) {
-            for (var cookie : request.getCookies()) {
+        // Prefer Authorization header for API calls
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+        }
+
+        // Fallback to cookie for browser sessions
+        if (token == null && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }
             }
-            System.out.println("JWT from cookie: " + token);
         }
 
-        // Fallback to Authorization header (API calls)
+        // No token means continue without authentication
         if (token == null) {
-            String authHeader = request.getHeader("Authorization");
-            System.out.println("Authorization Header: " + authHeader);
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                token = authHeader.substring(7);
-            }
+            chain.doFilter(request, response);
+            return;
         }
 
-        if (token == null || !jwtUtil.validateToken(token)) {
+        // Invalid token: continue without setting auth
+        if (!jwtUtil.validateToken(token)) {
             chain.doFilter(request, response);
             return;
         }

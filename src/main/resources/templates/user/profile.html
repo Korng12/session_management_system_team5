@@ -19,81 +19,59 @@
                     <div class="avatar mb-3">
                         <i class="bi bi-person-circle fs-1"></i>
                     </div>
-                    <h1 th:text="${#authentication.name}"></h1>
-                    <h2>John Doe</h2>
-                    <h1 th:text="${userEmail}"></h1>
-                    <p class="mb-0">Researcher | Conference Attendee</p>
+                    <h2 th:text="${userName != null ? userName : 'Guest User'}">User Name</h2>
+                    <p class="mb-0">Conference Attendee</p>
                 </div>
             </div>
         </div>
         </section>
 
     <!-- Profile Content -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card profile-card shadow">
-                            <div class="card-body p-4">
-                                <h4 class="mb-4">Profile Information</h4>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Full Name</label>
+                                            <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Email</label>
+                                            <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
+                                        </div>
+                                    </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Full Name</label>
-                                        <p>John Doe</p>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Member Since</label>
+                                            <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">Role</label>
+                                            <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
+                                                  th:each="role : ${userRoles}"
+                                                  class="badge bg-primary me-1" 
+                                                  th:text="${role.name}">Role</span>
+                                            <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Email</label>
-                                        <p>john.doe@example.com</p>
-                                    </div>
-                                </div>
+                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
+                                          th:each="role : ${userRoles}"
+                                          class="badge bg-primary me-1" 
+                                          th:text="${role.name}">Role</span>
+                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                                            <h5 class="mb-3">My Conferences</h5>
+                                                            <div class="alert alert-info">
+                                                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
+                                                            </div>
 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Institution</label>
-                                        <p>University of Research</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Department</label>
-                                        <p>Computer Science</p>
-                                    </div>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Registration Status</label>
-                                        <span class="badge bg-success">Confirmed</span>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-bold">Conference ID</label>
-                                        <p>RC2025-00123</p>
-                                    </div>
-                                </div>
-
-                                <hr class="my-4">
-
-                                <h5 class="mb-3">Registered Sessions</h5>
-                                <div class="list-group">
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        Keynote: Future of Research
-                                        <span class="badge bg-success">Confirmed</span>
-                                    </div>
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        AI & Machine Learning Track
-                                        <span class="badge bg-success">Confirmed</span>
-                                    </div>
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        Research Methodology Workshop
-                                        <span class="badge bg-warning">Waitlist</span>
-                                    </div>
-                                </div>
-
-                                <div class="mt-4">
-                                    <a href="/schedule" class="btn btn-primary me-2">View Full Schedule</a>
-                                    <button class="btn btn-outline-primary">Edit Profile</button>
-                                </div>
+                                                            <div class="mt-4">
+                                                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
                             </div>
-                        </div>
+
+                            <div class="mt-4">
+                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+>>>>>>> 5ef9892 (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
+                            </div>
                     </div>
                 </div>
             </div>
