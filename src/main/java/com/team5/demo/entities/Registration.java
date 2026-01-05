@@ -8,7 +8,7 @@ import com.team5.demo.entities.Conference;
 
 @Data
 @Entity
-@Table(name = "participants")
+@Table(name = "registrations")
 public class Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
