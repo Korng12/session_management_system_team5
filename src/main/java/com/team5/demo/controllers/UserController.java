@@ -35,15 +35,13 @@ public class UserController {
     // model.addAttribute("isAdmin", isAdmin);
         return "user/home";
     }
-    @GetMapping("/schedule")
+    @GetMapping("/my/schedule")
     public String getSchedulePage() {
         return "user/user-schedule";
     }
-    
-    
-    @GetMapping("/register-conference")
-    public String getRegisterConferencePage() {
-        return "public/registration";
+    @GetMapping("/my/conferences")
+    public String getConferencePage() {
+        return "user/confernces";
     }
     @GetMapping("/conferences")
     public String getConferencesPage() {
