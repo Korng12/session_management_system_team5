@@ -13,9 +13,11 @@ import com.team5.demo.dto.RoomDTO;
 import com.team5.demo.dto.UserDTO;
 import com.team5.demo.services.SessionService;
 import com.team5.demo.repositories.ConferenceRepository;
+import com.team5.demo.repositories.SessionRepository;
 import com.team5.demo.repositories.RoomRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.entities.Room;
+import com.team5.demo.entities.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 53c0df (recover: Restore Session Management CRUD files and DTOs)
 
@@ -34,6 +37,9 @@ import org.springframework.ui.Model;
 public class AdminController {
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private SessionRepository sessionRepository;
 
     @Autowired
     private ConferenceRepository conferenceRepository;
@@ -82,7 +88,7 @@ public class AdminController {
     // Edit Session Form
     @GetMapping("/sessions/{id}/edit")
     @PreAuthorize("hasRole('ADMIN')")
-    public String showEditSessionForm(@PathVariable Long id, Model model) {
+    public String showEditSessionForm(@PathVariable("id") Long id, Model model) {
         try {
             sessionService.getSessionById(id);
             model.addAttribute("sessionId", id);
@@ -186,7 +192,7 @@ public class AdminController {
      */
     @PutMapping("/rooms/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateRoom(@PathVariable Long id, @Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
+    public ResponseEntity<?> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
             bindingResult.getFieldErrors().forEach(error -> 
@@ -219,8 +225,17 @@ public class AdminController {
      */
     @DeleteMapping("/rooms/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteRoom(@PathVariable Long id) {
+    @Transactional
+    public ResponseEntity<?> deleteRoom(@PathVariable("id") Long id) {
         try {
+            // Detach room from all referencing sessions to avoid FK violations
+            List<Session> sessions = sessionRepository.findByRoomId(id);
+            sessions.forEach(s -> s.setRoom(null));
+            if (!sessions.isEmpty()) {
+                sessionRepository.saveAll(sessions);
+                sessionRepository.flush();
+            }
+
             Room room = roomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Room not found"));
             roomRepository.delete(room);
             return ResponseEntity.ok(new ValidationErrorResponse("Room deleted"));
@@ -343,7 +358,7 @@ public class AdminController {
      */
     @GetMapping("/sessions/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SessionResponse> getSession(@PathVariable Long id) {
+    public ResponseEntity<SessionResponse> getSession(@PathVariable("id") Long id) {
         try {
             SessionResponse response = sessionService.getSessionById(id);
             return ResponseEntity.ok(response);
@@ -358,7 +373,7 @@ public class AdminController {
      */
     @GetMapping("/sessions/conference/{conferenceId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getSessionsByConference(@PathVariable Long conferenceId) {
+    public ResponseEntity<?> getSessionsByConference(@PathVariable("conferenceId") Long conferenceId) {
         try {
             return ResponseEntity.ok(sessionService.getSessionsByConference(conferenceId));
         } catch (Exception e) {
@@ -373,7 +388,7 @@ public class AdminController {
     @PutMapping("/sessions/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateSession(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody CreateSessionRequest request,
             BindingResult bindingResult) {
         
@@ -413,7 +428,7 @@ public class AdminController {
      */
     @GetMapping("/sessions/{id}/dependencies")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SessionDependenciesResponse> checkSessionDependencies(@PathVariable Long id) {
+    public ResponseEntity<SessionDependenciesResponse> checkSessionDependencies(@PathVariable("id") Long id) {
         try {
             SessionDependenciesResponse dependencies = sessionService.checkSessionDependencies(id);
             return ResponseEntity.ok(dependencies);
@@ -428,7 +443,7 @@ public class AdminController {
      */
     @DeleteMapping("/sessions/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteSession(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSession(@PathVariable("id") Long id) {
         try {
             sessionService.deleteSession(id);
             return ResponseEntity.noContent().build();
@@ -444,7 +459,7 @@ public class AdminController {
     @PatchMapping("/sessions/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateSessionStatus(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody @Valid UpdateSessionStatusRequest request) {
         try {
             SessionResponse response = sessionService.updateSessionStatus(id, request);
@@ -465,7 +480,7 @@ public class AdminController {
      */
     @PostMapping("/sessions/{id}/restore")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> restoreSession(@PathVariable Long id) {
+    public ResponseEntity<?> restoreSession(@PathVariable("id") Long id) {
         try {
             SessionResponse response = sessionService.restoreSession(id);
             return ResponseEntity.ok(response);
@@ -482,7 +497,7 @@ public class AdminController {
      */
     @DeleteMapping("/sessions/{id}/permanent")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> permanentlyDeleteSession(@PathVariable Long id) {
+    public ResponseEntity<Void> permanentlyDeleteSession(@PathVariable("id") Long id) {
         try {
             sessionService.permanentlyDeleteSession(id);
             return ResponseEntity.noContent().build();
@@ -498,10 +513,10 @@ public class AdminController {
     @GetMapping("/rooms/{roomId}/availability")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RoomAvailabilityResponse> checkRoomAvailability(
-            @PathVariable Long roomId,
+            @PathVariable("roomId") Long roomId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
-            @RequestParam(required = false) Long excludeSessionId) {
+            @RequestParam(value = "excludeSessionId", required = false) Long excludeSessionId) {
         try {
             RoomAvailabilityResponse response = sessionService.checkRoomAvailability(
                 roomId, startTime, endTime, excludeSessionId
@@ -519,10 +534,10 @@ public class AdminController {
     @GetMapping("/users/{chairId}/availability")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TimeConflictResponse> checkChairAvailability(
-            @PathVariable Long chairId,
+            @PathVariable("chairId") Long chairId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
-            @RequestParam(required = false) Long excludeSessionId) {
+            @RequestParam(value = "excludeSessionId", required = false) Long excludeSessionId) {
         try {
             TimeConflictResponse response = sessionService.checkChairAvailability(
                 chairId, startTime, endTime, excludeSessionId
@@ -540,8 +555,8 @@ public class AdminController {
     @PostMapping("/sessions/{sessionId}/assign-chair/{chairId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> assignChairToSession(
-            @PathVariable Long sessionId,
-            @PathVariable Long chairId) {
+            @PathVariable("sessionId") Long sessionId,
+            @PathVariable("chairId") Long chairId) {
         try {
             TimeConflictResponse response = sessionService.assignChairToSession(sessionId, chairId);
             
@@ -564,7 +579,7 @@ public class AdminController {
      */
     @DeleteMapping("/sessions/{sessionId}/remove-chair")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> removeChairFromSession(@PathVariable Long sessionId) {
+    public ResponseEntity<?> removeChairFromSession(@PathVariable("sessionId") Long sessionId) {
         try {
             SessionResponse response = sessionService.removeChairFromSession(sessionId);
             return ResponseEntity.ok(response);
