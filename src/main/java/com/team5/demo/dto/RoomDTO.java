@@ -1,25 +1,16 @@
-package com.team5.demo.entities;
+package com.team5.demo.dto;
 
-import jakarta.persistence.*;
-
-@Entity
-@Table(name = "rooms")
-public class Room {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class RoomDTO {
     private Integer id;
-
-    @Column(nullable = false, length = 30, unique = true)
     private String name;
-
-    @Column(nullable = false)
     private Integer capacity;
 
     // Constructors
-    public Room() {
+    public RoomDTO() {
     }
 
-    public Room(String name, Integer capacity) {
+    public RoomDTO(Integer id, String name, Integer capacity) {
+        this.id = id;
         this.name = name;
         this.capacity = capacity;
     }
