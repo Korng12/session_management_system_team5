@@ -2,6 +2,7 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "sessions")
@@ -44,7 +45,9 @@ public class Session {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleted = false;
 
-    // Constructors
+    // SessionAttendance relationship
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionAttendance> attendances;
     public Session() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -149,6 +152,14 @@ public class Session {
     
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public List<SessionAttendance> getAttendances() {
+        return attendances;
+    }
+
+    public void setAttendances(List<SessionAttendance> attendances) {
+        this.attendances = attendances;
     }
 
     @PreUpdate
