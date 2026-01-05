@@ -157,6 +157,85 @@ public class AdminController {
     }
 
     /**
+     * Create a new room
+     * POST /admin/rooms
+     */
+    @PostMapping("/rooms")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createRoom(@Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
+            bindingResult.getFieldErrors().forEach(error -> 
+                errorResponse.addError(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        try {
+            Room room = new Room(request.getName(), request.getCapacity() != null ? request.getCapacity().intValue() : 50);
+            Room saved = roomRepository.save(room);
+            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(), saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to create room: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * Update a room
+     * PUT /admin/rooms/{id}
+     */
+    @PutMapping("/rooms/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateRoom(@PathVariable Long id, @Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
+            bindingResult.getFieldErrors().forEach(error -> 
+                errorResponse.addError(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        try {
+            Room room = roomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Room not found"));
+            room.setName(request.getName());
+            if (request.getCapacity() != null) {
+                room.setCapacity(request.getCapacity().intValue());
+            }
+            Room saved = roomRepository.save(room);
+            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(), saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to update room: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
+     * Delete a room
+     * DELETE /admin/rooms/{id}
+     */
+    @DeleteMapping("/rooms/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteRoom(@PathVariable Long id) {
+        try {
+            Room room = roomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Room not found"));
+            roomRepository.delete(room);
+            return ResponseEntity.ok(new ValidationErrorResponse("Room deleted"));
+        } catch (IllegalArgumentException e) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to delete room: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    /**
      * Get all users for session chair dropdown
      * GET /admin/api/users
      */
