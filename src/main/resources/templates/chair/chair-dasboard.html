@@ -1,20 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chair Dashboard - Conference Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Chair Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
+
 <body>
-    <div th:replace="~{fragments/header}"></div>
-    <div th:replace="~{fragments/sidebar}"></div>
 
-    <div class="container mt-5">
-        <h1>Chair Dashboard</h1>
-        <p>Welcome, you can manage sessions and attendance from here.</p>
+<!-- SIDEBAR -->
+<div th:replace="fragments/sidebar :: sidebar"></div>
+
+<!-- CONTENT -->
+<div class="content">
+    <div class="container-fluid">
+
+        <h2 class="mb-4">🎓 Chair Dashboard</h2>
+
+        <!-- SUMMARY -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted">Assigned Sessions</h6>
+                        <h3>5</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted">Assigned Rooms</h6>
+                        <h3>3</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted">Pending Attendance</h6>
+                        <h3>2</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SESSIONS TABLE -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header fw-bold">
+                My Sessions
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Session</th>
+                            <th>Room</th>
+                            <th>Time</th>
+                            <th>Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>AI in Healthcare</td>
+                            <td>Room A</td>
+                            <td>09:00 - 10:30</td>
+                            <td>
+                                <a href="/manage-attendance"
+                                   class="btn btn-sm btn-primary">
+                                    Take Attendance
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Machine Learning</td>
+                            <td>Room B</td>
+                            <td>11:00 - 12:30</td>
+                            <td>
+                                <span class="badge bg-success">
+                                    Completed
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
+</div>
 
-    <div th:replace="~{fragments/footer}"></div>
+<style>
+    .content {
+        margin-left: 260px;
+        padding: 25px;
+        background: #f9fafb;
+        min-height: 100vh;
+    }
+</style>
+
 </body>
 </html>

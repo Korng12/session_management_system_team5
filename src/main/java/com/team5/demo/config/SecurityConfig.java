@@ -62,7 +62,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/",  "/about", "/contact",("/admin"),("/admin/manage-rooms"),("/admin/manage-sessions"),("/admin/view-attendance"),("/admin/view-registeredUsers"),("/admin/schedule"),"/register", "/login").permitAll()
+                        .requestMatchers("/",  "/about", "/contact",("/admin"),("/admin/manage-rooms"),("/admin/manage-sessions"),("/admin/view-attendance"),("/admin/view-registeredUsers"),("/admin/schedule"),("/chair-dashboard"),"/register", "/login").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
