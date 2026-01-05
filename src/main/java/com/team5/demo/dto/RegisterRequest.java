@@ -1,8 +1,14 @@
 package com.team5.demo.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 public class RegisterRequest {
+    @NotBlank(message = "Email cannot be blank")
+    @Email(message = "Invalid email format")
     private String email;
     private String password;
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
     public String getEmail() {

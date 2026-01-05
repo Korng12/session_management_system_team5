@@ -49,5 +49,11 @@ public class UserController {
     public String getAboutPage() {
         return "public/about";
     }
+    @GetMapping("/profile")
+    public String getProfilePage(Model model, Authentication authentication) {
+        String userEmail = authentication.getName();
+        model.addAttribute("userEmail", userEmail);
+        return "user/profile";  
+    }    
     
 }
