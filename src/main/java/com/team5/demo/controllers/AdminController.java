@@ -1,44 +1,76 @@
 package com.team5.demo.controllers;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.team5.demo.entities.Session;
+import com.team5.demo.services.SessionService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class AdminController {
 
-    // Admin Dashboard
+    private final SessionService sessionService;
+
+    /* ===================== DASHBOARD ===================== */
     @GetMapping("/admin")
-    public String showAdminHomepage(Model model) {
-        return "admin/dashboard"; 
+    public String showAdminHomepage() {
+        return "admin/dashboard";
     }
 
-    // Manage Users
+    /* ===================== MANAGE USERS ===================== */
     @GetMapping("/admin/manage-users")
-    public String manageUsers(Model model) {
-        return "admin/manage_users"; 
+    public String manageUsers() {
+        return "admin/manage_users";
     }
 
-    // Manage Rooms
+    /* ===================== MANAGE ROOMS ===================== */
     @GetMapping("/admin/manage-rooms")
-    public String manageRooms(Model model) {
+    public String manageRooms() {
         return "admin/manage-rooms";
     }
+
+    /* ===================== MANAGE SESSIONS ===================== */
     @GetMapping("/admin/manage-sessions")
-    public String manageSessions(Model model) {
-        return "admin/manage-sessions"; 
+    public String manageSessions() {
+        return "admin/manage-sessions";
     }
 
-    // Manage Schedule
+    /* ===================== MANAGE SCHEDULE ===================== */
     @GetMapping("/admin/schedule")
     public String manageSchedule(Model model) {
-        return "admin/schedule"; // Manage schedule view
+
+        List<Session> sessions = sessionService.getAllSessions();
+        model.addAttribute("sessions", sessions);
+
+        return "admin/schedule";
     }
 
-    // List Registered Users (if applicable, assuming manage-users covers this)
+    /* ===================== DELETE SESSION ===================== */
+    @GetMapping("/admin/schedule/delete/{id}")
+    public String deleteSchedule(@PathVariable("id") Long id) {
+
+        sessionService.deleteSession(id);
+        return "redirect:/admin/schedule";
+    }
+
+    /* ===================== UPDATE SESSION (POPUP) ===================== */
+    @PostMapping("/admin/schedule/update")
+    public String updateSchedule(
+            @RequestParam("id") Long id,
+            @RequestParam("title") String title
+    ) {
+
+        sessionService.updateTitle(id, title);
+        return "redirect:/admin/schedule";
+    }
+
+    /* ===================== VIEW REGISTRATIONS ===================== */
     @GetMapping("/admin/view-registeredUsers")
-    public String listRegisteredUsers(Model model) {
-        return "admin/view-registrations"; 
+    public String listRegisteredUsers() {
+        return "admin/view-registrations";
     }
 }
