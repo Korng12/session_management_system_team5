@@ -72,7 +72,7 @@ public class AdminController {
     // Manage Sessions
     @GetMapping("/manage-sessions")
     public String manageSessions(Model model) {
-        return "admin/sessions-list"; 
+        return "admin/manage-sessions"; 
     }
 
     // Create Session Form

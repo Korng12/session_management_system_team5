@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
+import com.team5.demo.entities.Conference;
 
 @Data
 @Entity
@@ -21,7 +22,7 @@ public class Registration {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference_id", nullable = false)
     @EqualsAndHashCode.Exclude
-    private Session conference;
+    private Conference conference;
     
     @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
