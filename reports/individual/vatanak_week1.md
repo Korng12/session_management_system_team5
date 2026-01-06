@@ -82,3 +82,7 @@
 ### Create Session
 
 ![alt text](image-14.png)
+
+### List all sessions
+
+![alt text](image-15.png)
