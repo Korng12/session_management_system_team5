@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section})}">
+
+<section>
+
+    <h2 class="mb-4">My Assigned Rooms</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Conference</th>
+                    <th>Room Name</th>
+                    <th>Capacity</th>
+                    <th>Session Date</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <!-- Loop assigned rooms -->
+                <tr th:each="assign, stat : ${assignedRooms}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${assign.conference.name}">ResearchConf 2025</td>
+                    <td th:text="${assign.room.name}">Main Hall</td>
+                    <td th:text="${assign.room.capacity}">150</td>
+                    <td th:text="${assign.sessionDate}">2025-03-12</td>
+                    <td>
+                        <a th:href="@{/chair/manage-attendance(roomId=${assign.room.id})}"
+                           class="btn btn-primary btn-sm">
+                            Take Attendance
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Empty state -->
+                <tr th:if="${assignedRooms.size() == 0}">
+                    <td colspan="6" class="text-center text-muted">
+                        No rooms assigned yet
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+</html>

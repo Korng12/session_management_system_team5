@@ -57,6 +57,11 @@ public class UserController {
     public String getContactPage() {
         return "public/contact";
     }
+    @GetMapping("/user-profile")
+    public String getUserProfile() {
+        return "user/profile";
+    }
+    
     
     
 }
