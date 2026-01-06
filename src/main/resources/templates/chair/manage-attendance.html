@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Attendance - Conference Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="~{fragments/header}"></div>
+    <div th:replace="~{fragments/sidebar}"></div>
+
+    <div class="container mt-5">
+        <h1>Manage Attendance</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Session ID</th>
+                    <th>User ID</th>
+                    <th>Attendance Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>01</td>
+                    <td>01</td>
+                    <td>
+                        <select class="form-select">
+                            <option selected>Present</option>
+                            <option>Absent</option>
+                        </select>
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-success btn-sm">Update</a>
+                    </td>
+                </tr>
+                <!-- Additional attendance records would go here -->
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="~{fragments/footer}"></div>
+</body>
+</html>

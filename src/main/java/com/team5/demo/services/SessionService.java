@@ -4,37 +4,37 @@ import com.team5.demo.entities.Session;
 import com.team5.demo.repositories.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SessionService {
 
     private final SessionRepository sessionRepository;
 
-    // For admin schedule table
+    // ✅ For Admin - Manage Schedule table
     public List<Session> getAllSessions() {
         return sessionRepository.findAllWithRoom();
     }
 
-    public Session getSessionById(Long id) {
-        return sessionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
-    }
-
+    // ✅ Safe delete
     public void deleteSession(Long id) {
+        if (!sessionRepository.existsById(id)) {
+            throw new RuntimeException("Session not found with id: " + id);
+        }
         sessionRepository.deleteById(id);
     }
 
-    // ✅ SAFE UPDATE (ONLY TITLE)
+    // ✅ Safe update (title only)
     public void updateTitle(Long id, String title) {
 
         Session session = sessionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Session not found"));
+                .orElseThrow(() -> new RuntimeException("Session not found with id: " + id));
 
         session.setTitle(title);
-
-        sessionRepository.save(session);
+        // No need to call save() explicitly, @Transactional will persist changes
     }
 }

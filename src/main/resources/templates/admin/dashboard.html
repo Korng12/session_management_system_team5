@@ -1,164 +1,96 @@
-<div th:replace="~{layout/main :: layout(~{::section})}">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Admin Header -->
-    <section class="admin-header">
-        <style>
-            .admin-header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 50px 0;
-            }
-            .stat-card {
-                border: none;
-                border-radius: 10px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            }
-            .stat-icon {
-                font-size: 2rem;
-                opacity: 0.8;
-            }
-        </style>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-5 fw-bold mb-3">Admin Dashboard</h1>
-                    <p class="lead mb-0">Manage conference sessions and user registrations</p>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            height: 60px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 240px;
+            height: calc(100vh - 60px);
+            background-color: #212529;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #adb5bd;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 80px 30px 30px;
+        }
+        .card {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <span class="navbar-brand">Conference Admin</span>
+        <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+    </div>
+</nav>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="content">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Registrations</h5>
+                    <p>View conference registrations</p>
+                    <a href="/admin/view-registrations" class="btn btn-primary">View</a>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Statistics -->
-    <section class="py-5 bg-light">
-        <div class="container">
-            <h2 class="text-center mb-4">Conference Statistics</h2>
-            <div class="row">
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-center h-100">
-                        <div class="card-body">
-                            <div class="stat-icon text-primary mb-3">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                            <h3 class="card-title" th:text="${totalUsers ?: '0'}">150</h3>
-                            <p class="card-text text-muted">Total Registrations</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-center h-100">
-                        <div class="card-body">
-                            <div class="stat-icon text-success mb-3">
-                                <i class="bi bi-calendar-event-fill"></i>
-                            </div>
-                            <h3 class="card-title" th:text="${totalSessions ?: '0'}">25</h3>
-                            <p class="card-text text-muted">Active Sessions</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-center h-100">
-                        <div class="card-body">
-                            <div class="stat-icon text-warning mb-3">
-                                <i class="bi bi-clock-fill"></i>
-                            </div>
-                            <h3 class="card-title" th:text="${upcomingSessions ?: '0'}">5</h3>
-                            <p class="card-text text-muted">Upcoming Sessions</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-4">
-                    <div class="card stat-card text-center h-100">
-                        <div class="card-body">
-                            <div class="stat-icon text-info mb-3">
-                                <i class="bi bi-check-circle-fill"></i>
-                            </div>
-                            <h3 class="card-title" th:text="${confirmedSessions ?: '0'}">20</h3>
-                            <p class="card-text text-muted">Confirmed Sessions</p>
-                        </div>
-                    </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Manage Sessions</h5>
+                    <p>Create and edit sessions</p>
+                    <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Management Actions -->
-    <section class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-4">Management Tools</h2>
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Session Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">Create, edit, and manage conference sessions.</p>
-                            <div class="d-grid gap-2">
-                                <a href="/admin/manage-rooms" class="btn btn-primary">Manage Rooms</a>
-                                <a href="/admin/manage-sessions" class="btn btn-outline-primary">Add New Session</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="mb-0"><i class="bi bi-people me-2"></i>User Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">View and manage user registrations and information.</p>
-                            <div class="d-grid gap-2">
-                                <a href="/admin/view-registeredUsers" class="btn btn-success">View Users</a>
-                                
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Schedule Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="card-text">Manage conference schedules.</p>
-                            <div class="d-grid gap-2">
-                                <a href="/admin/schedule" class="btn btn-danger">Manage Schedule</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="row mt-4">
-                <div class="col-12">
-                    <div class="card stat-card">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Admin Activity</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item" th:each="activity : ${recentActivities}">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1" th:text="${activity.title}">New session added</h6>
-                                        <small th:text="${activity.timestamp}">2 hours ago</small>
-                                    </div>
-                                    <p class="mb-1" th:text="${activity.description}">Session "AI in Research" has been created.</p>
-                                </div>
-                                <div class="list-group-item" th:if="${recentActivities == null or #lists.isEmpty(recentActivities)}">
-                                    <p class="mb-0 text-muted">No recent activity</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Manage Rooms</h5>
+                    <p>Manage available rooms</p>
+                    <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 </div>
 
-
-
-
-    
-
+</body>
+</html>

@@ -1,8 +1,6 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
 
 <section>
-
-    <!-- HERO SECTION -->
     <div class="p-5 mb-5 bg-primary text-white rounded-3 shadow-sm">
         <div class="container py-5 text-center">
             <h1 class="display-5 fw-bold">
@@ -11,7 +9,7 @@
             <p class="lead mt-3">
                 Register for conferences, select sessions, and manage your academic schedule with ease.
             </p>
-            <form th:action="@{/conferences}" method="get" class="mb-4">
+            <!-- <form th:action="@{/conferences}" method="get" class="mb-4">
                 <div class="input-group">
                     <input type="text"
                         name="keyword"
@@ -22,21 +20,16 @@
                         Search
                     </button>
                 </div>
-            </form>
-
+            </form> -->
 
             <div class="mt-4">
                 <a th:href="@{/conferences}" class="btn btn-light btn-lg me-3">
                     View Conferences
                 </a>
-                <a th:href="@{/login}" class="btn btn-outline-light btn-lg">
-                    Login
-                </a>
+
             </div>
         </div>
     </div>
-
-    <!-- SYSTEM OVERVIEW -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">What You Can Do</h2>
 
@@ -61,8 +54,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ACTIVE CONFERENCES -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">Active Conferences</h2>
 
@@ -97,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- EMPTY STATE -->
             <div class="col-12 text-center" th:if="${#lists.isEmpty(conferences)}">
                 <p class="text-muted">
                     No conferences are available at the moment.
@@ -105,8 +95,6 @@
             </div>
         </div>
     </div>
-
-    <!-- HOW IT WORKS -->
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">How It Works</h2>
 
@@ -126,16 +114,6 @@
         </ol>
     </div>
 
-    <!-- FINAL CTA -->
-    <div class="container text-center mb-5">
-        <h3 class="fw-bold">Ready to Participate?</h3>
-        <p class="text-muted">
-            Join researchers and professionals from around the world.
-        </p>
-        <a th:href="@{/register}" class="btn btn-primary btn-lg">
-            Create Account
-        </a>
-    </div>
 
 </section>
 

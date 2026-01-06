@@ -10,35 +10,39 @@ import java.util.List;
 
 public interface SessionRepository extends JpaRepository<Session, Long> {
 
-       @Query("""
-              SELECT s FROM Session s
-              JOIN FETCH s.room
-              ORDER BY s.startTime
-       """)
-       List<Session> findAllWithRoom();
+    // ✅ FIXED: LEFT JOIN FETCH (shows sessions even if room is null)
+    @Query("""
+        SELECT DISTINCT s FROM Session s
+        LEFT JOIN FETCH s.room
+        ORDER BY s.startTime
+    """)
+    List<Session> findAllWithRoom();
 
-       List<Session> findByRoom_Id(Long roomId);
+    // ✅ Simple derived query
+    List<Session> findByRoom_Id(Long roomId);
 
-       @Query("""
-              SELECT s FROM Session s
-              WHERE s.room.id = :roomId
-              AND s.startTime < :endTime
-              AND s.endTime > :startTime
-       """)
-       List<Session> findOverlappingSessions(
-              @Param("roomId") Long roomId,
-              @Param("startTime") LocalDateTime startTime,
-              @Param("endTime") LocalDateTime endTime
-       );
+    // ✅ Prevent room double booking
+    @Query("""
+        SELECT s FROM Session s
+        WHERE s.room.id = :roomId
+          AND s.startTime < :endTime
+          AND s.endTime > :startTime
+    """)
+    List<Session> findOverlappingSessions(
+            @Param("roomId") Long roomId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
 
-       @Query("""
-              SELECT s FROM Session s
-              JOIN FETCH s.room
-              JOIN s.attendances a
-              WHERE a.participant.id = :userId
-              ORDER BY s.startTime
-       """)
-       List<Session> findSessionsByParticipantId(
-              @Param("userId") Long userId
-       );
+    // ✅ User / Chair schedule
+    @Query("""
+        SELECT DISTINCT s FROM Session s
+        LEFT JOIN FETCH s.room
+        JOIN s.attendances a
+        WHERE a.participant.id = :userId
+        ORDER BY s.startTime
+    """)
+    List<Session> findSessionsByParticipantId(
+            @Param("userId") Long userId
+    );
 }

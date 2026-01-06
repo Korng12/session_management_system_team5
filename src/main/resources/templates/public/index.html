@@ -1,57 +1,150 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
-    
-    <section>
-        <style>
-            .hero-section {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 100px 0;
-            }
-            .feature-card {
-                transition: transform 0.3s;
-            }
-            .feature-card:hover {
-                transform: translateY(-5px);
-            }
-        </style>
+<section>
 
-        <div class="hero-section text-center">
-            <div class="container">
-                <h1 class="display-4 fw-bold mb-4">International Research Conference 2025</h1>
-                <p class="lead mb-4">Join leading researchers, academics, and industry professionals for groundbreaking discussions.</p>
-                <a th:href="@{/register-conference}" class="btn btn-light btn-lg me-3">Register Now</a>
-                <a th:href="@{/about}" class="btn btn-outline-light btn-lg">Learn More</a>
+<style>
+    :root {
+        --primary: #4f46e5;
+        --secondary: #7cccdeff;
+        --dark: #1f2937;
+        --light: #f9fafb;
+    }
+
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+    .hero {
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.55)
+        ),
+        url('/image/heroSession.png') center / cover no-repeat;
+        color: #191a1aff;
+        padding: 120px 0;
+    }
+
+    .hero h1 {
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+
+    .hero p {
+        max-width: 700px;
+        margin: auto;
+        font-size: 1.2rem;
+    }
+
+    /* Section Title */
+    .section-title {
+        font-weight: 700;
+        color: var(--dark);
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        max-width: 650px;
+        margin: auto;
+    }
+
+    .feature-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .feature-icon {
+        font-size: 2.5rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+    }
+
+    /* CTA Section */
+    .cta {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 80px 0;
+    }
+
+    .btn-custom {
+        border-radius: 30px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+</style>
+<div class="hero text-center">
+    <div class="container">
+        <h1 class="display-4 mb-4">International Research Conference 2025</h1>
+        <p class="mb-5">
+            A global platform connecting researchers, academics, and industry experts
+            to share innovations and future research directions.
+        </p>
+        <a th:href="@{/registration}" class="btn btn-primary btn-lg btn-custom me-3">
+            Register Now
+        </a>
+        <a th:href="@{/about}" class="btn btn-outline-light btn-lg btn-custom">
+            Learn More
+        </a>
+    </div>
+</div>
+<div class="py-5">
+    <div class="container text-center">
+        <h2 class="section-title mb-3">About the Conference</h2>
+        <p class="section-subtitle">
+            The International Research Conference provides a professional environment
+            for presenting research papers, managing sessions, and academic collaboration.
+        </p>
+    </div>
+</div>
+<div class="py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">Why Attend?</h2>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4">
+                    <div class="feature-icon">🌐</div>
+                    <h5 class="fw-bold">Global Networking</h5>
+                    <p class="text-muted">
+                        Connect with international researchers and academic leaders.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4">
+                    <div class="feature-icon">📑</div>
+                    <h5 class="fw-bold">Paper & Session Management</h5>
+                    <p class="text-muted">
+                        Efficiently manage submissions, reviews, and conference sessions.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card feature-card h-100 text-center p-4">
+                    <div class="feature-icon">🎤</div>
+                    <h5 class="fw-bold">Expert Speakers</h5>
+                    <p class="text-muted">
+                        Learn from keynote speakers and domain experts worldwide.
+                    </p>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+<div class="cta text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Ready to Join Us?</h2>
+        <a th:href="@{/register}" class="btn btn-light btn-lg btn-custom">
+            Create Your Account
+        </a>
+    </div>
+</div>
 
-        <div class="py-5">
-            <div class="container text-center">
-                <h2 class="mb-4">About the Conference</h2>
-                <p class="lead">The International Research Conference brings together experts from various fields to share innovative research.</p>
-            </div>
-        </div>
-
-        <div class="py-5 bg-light">
-            <div class="container">
-                <h2 class="text-center mb-5">Why Attend?</h2>
-                <div class="row">
-                    <div class="col-md-4 mb-4">
-                        <div class="card feature-card h-100 border-0 shadow-sm">
-                            <div class="card-body text-center">
-                                <h5 class="card-title">Networking</h5>
-                                <p class="card-text">Connect with researchers and industry leaders.</p>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-            </div>
-        </div>
-
-        <div class="py-5 text-center">
-            <div class="container">
-                <h2 class="mb-4">Ready to Join Us?</h2>
-                <a th:href="@{/register}" class="btn btn-primary btn-lg">Register for Account</a>
-            </div>
-        </div>
-    </section>
+</section>
 </div>
