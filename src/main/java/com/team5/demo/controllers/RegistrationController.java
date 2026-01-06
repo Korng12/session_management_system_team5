@@ -17,9 +17,9 @@ public class RegistrationController {
     private final RegistrationService registrationService;
     
     @PostMapping("/register")
-    public ResponseEntity<?> registerForConference(
-            @RequestParam Long userId,
-            @RequestParam Long conferenceId) {
+        public ResponseEntity<?> registerForConference(
+            @RequestParam("userId") Long userId,
+            @RequestParam("conferenceId") Long conferenceId) {
         try {
             Registration registration = registrationService.registerForConference(userId, conferenceId);
             return ResponseEntity.ok(registration);
@@ -29,7 +29,7 @@ public class RegistrationController {
     }
     
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getUserRegistrations(@PathVariable Long userId) {
+    public ResponseEntity<?> getUserRegistrations(@PathVariable("userId") Long userId) {
         try {
             List<Registration> registrations = registrationService.getUserRegistrations(userId);
             return ResponseEntity.ok(registrations);
@@ -39,7 +39,7 @@ public class RegistrationController {
     }
     
     @GetMapping("/{registrationId}")
-    public ResponseEntity<?> getRegistration(@PathVariable Long registrationId) {
+    public ResponseEntity<?> getRegistration(@PathVariable("registrationId") Long registrationId) {
         try {
             Registration registration = registrationService.getRegistration(registrationId);
             return ResponseEntity.ok(registration);
@@ -49,7 +49,7 @@ public class RegistrationController {
     }
     
     @PutMapping("/{registrationId}/cancel")
-    public ResponseEntity<?> cancelRegistration(@PathVariable Long registrationId) {
+    public ResponseEntity<?> cancelRegistration(@PathVariable("registrationId") Long registrationId) {
         try {
             registrationService.cancelRegistration(registrationId);
             return ResponseEntity.ok("Registration cancelled successfully");

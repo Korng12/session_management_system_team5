@@ -2,52 +2,37 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "registrations")
-@Data
 public class Registration {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    //JPA Relationship with User
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User participant;  // Must be named 'participant'
+    @JoinColumn(name = "participant_id", nullable = false)
+    @EqualsAndHashCode.Exclude
+    private User participant;
     
-    //  JPA Relationship with Conference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "conference_id", nullable = false)
-    private Conference conference;  // Must be named 'conference'
+    @EqualsAndHashCode.Exclude
+    private Conference conference;
     
-    @Column(name = "registered_at")
+    @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
     
-    @Column(length = 20)
-    private String status; // "PENDING", "CONFIRMED", "CANCELLED"
+    @Column(nullable = false)
+    private String status = "CONFIRMED";
     
-    // Constructors
-    public Registration() {
-        this.registeredAt = LocalDateTime.now();
-        this.status = "PENDING";
-    }
-    
-    // With User and Conference entities
-    public Registration(User participant, Conference conference) {
-        this();
-        this.participant = participant;
-        this.conference = conference;
-    }
-    
-    public Registration(User participant, Conference conference, String status) {
-        this(participant, conference);
-        this.status = status;
-    }
-    
-    
-    public boolean isCancelled() {
-        return "CANCELLED".equals(status);
+    @PrePersist
+    protected void onCreate() {
+        if (registeredAt == null) {
+            registeredAt = LocalDateTime.now();
+        }
     }
 }

@@ -12,22 +12,18 @@ import com.team5.demo.security.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -35,10 +31,10 @@ private final AuthenticationManager authenticationManager;
 
     @Autowired
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil,
-                          UserRepository userRepository,
-                          RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+            JwtUtil jwtUtil,
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
@@ -48,23 +44,23 @@ private final AuthenticationManager authenticationManager;
 
     // @PostMapping("/register")
     // public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-    //     if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-    //         return ResponseEntity.badRequest().body("Email already exists");
-    //     }
+    // if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    // return ResponseEntity.badRequest().body("Email already exists");
+    // }
 
-    //     User user = new User();
-    //     user.setName(request.getName());
-    //     user.setEmail(request.getEmail());
-    //     user.setPassword(passwordEncoder.encode(request.getPassword()));
+    // User user = new User();
+    // user.setName(request.getName());
+    // user.setEmail(request.getEmail());
+    // user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-    //     Role attendeeRole = roleRepository.findByName("ATTENDEE")
-    //             .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-    //     user.addRole(attendeeRole);
+    // Role attendeeRole = roleRepository.findByName("ATTENDEE")
+    // .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+    // user.addRole(attendeeRole);
 
-    //     userRepository.save(user);
+    // userRepository.save(user);
 
-    //     String token = jwtUtil.generateToken(user.getEmail());
-    //     return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
+    // String token = jwtUtil.generateToken(user.getEmail());
+    // return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
     // }
     @PostMapping("/register")
 public ResponseEntity<?> register(
@@ -99,15 +95,15 @@ public ResponseEntity<?> register(
     return ResponseEntity.ok().build();
 }
 
-
     // @PostMapping("/login")
     // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    //     Authentication authentication = authenticationManager.authenticate(
-    //             new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-    //     );
+    // Authentication authentication = authenticationManager.authenticate(
+    // new UsernamePasswordAuthenticationToken(request.getEmail(),
+    // request.getPassword())
+    // );
 
-    //     String token = jwtUtil.generateToken(request.getEmail());
-    //     return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
+    // String token = jwtUtil.generateToken(request.getEmail());
+    // return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
     // }
     @PostMapping("/login")
     public ResponseEntity<?> login(
@@ -133,6 +129,7 @@ public ResponseEntity<?> register(
 
         return ResponseEntity.ok().build();
     }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
 
@@ -144,6 +141,5 @@ public ResponseEntity<?> register(
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
-
 
 }
