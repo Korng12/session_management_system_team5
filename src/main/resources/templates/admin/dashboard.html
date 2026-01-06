@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -93,4 +93,95 @@
 </div>
 
 </body>
-</html>
+</html> -->
+
+<div th:replace="~{layout/main :: layout(~{::section})}">
+    <section>
+        <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            height: 60px;
+        }
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 240px;
+            height: calc(100vh - 60px);
+            background-color: #212529;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #adb5bd;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .content {
+            margin-left: 240px;
+            padding: 80px 30px 30px;
+        }
+        .card {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+        <span class="navbar-brand">Conference Admin</span>
+        <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+    </div>
+</nav>
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+<div class="content">
+    <h2 class="mb-4">Admin Dashboard</h2>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Total Registrations</h5>
+                    <p>View conference registrations</p>
+                    <a href="/admin/view-registrations" class="btn btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Manage Sessions</h5>
+                    <p>Create and edit sessions</p>
+                    <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Manage Rooms</h5>
+                    <p>Manage available rooms</p>
+                    <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </section>
+
+</div>

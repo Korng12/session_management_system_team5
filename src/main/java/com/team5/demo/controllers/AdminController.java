@@ -4,6 +4,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 public class AdminController {
@@ -19,6 +21,11 @@ public class AdminController {
     public String manageUsers(Model model) {
         return "admin/manage_users"; 
     }
+    @GetMapping("/admin/manage-schedule")
+    public String manageSchedule() {
+        return "admin/view-schedule";
+    }
+    
 
     // Manage Rooms
     @GetMapping("/admin/manage-rooms")
@@ -37,7 +44,7 @@ public class AdminController {
     }
 
     // List Registered Users (if applicable, assuming manage-users covers this)
-    @GetMapping("/admin/view-registeredUsers")
+    @GetMapping("/admin/view-registrations")
     public String listRegisteredUsers(Model model) {
         return "admin/view-registrations"; 
     }
