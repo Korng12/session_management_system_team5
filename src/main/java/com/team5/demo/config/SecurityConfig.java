@@ -2,7 +2,11 @@ package com.team5.demo.config;
 
 import com.team5.demo.security.CustomUserDetailsService;
 import com.team5.demo.security.JwtFilter;
+
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.security.SecureRandom;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +15,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,7 +25,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
-@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     @Autowired
@@ -32,13 +34,18 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
+        SecureRandom secureRandom;
+        try {
+            secureRandom = SecureRandom.getInstanceStrong();
+        } catch (Exception e) {
+            secureRandom = new SecureRandom();
+        }
+        return new BCryptPasswordEncoder(12, secureRandom);
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -51,73 +58,39 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authenticationProvider(authenticationProvider())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints (allow site pages and auth API)
+                        .requestMatchers("/", "/register","/login").permitAll()
+                            // ===== Static resources =====
                         .requestMatchers(
-                                "/",
-                                "/public/**",
-                                "/register",
-                                "/registeration",
-                                "/login",
-                                "/about",
-                                "/register-conference",
-                                "/favicon.ico",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/webjars/**",
-                            "/api/auth/**",
-                            // Actuator health/info for monitoring
-                            "/actuator/health",
-                            "/actuator/info")
-                        .permitAll()
+                            "/favicon.ico",
+                            "/css/**",
+                            "/js/**",
+                            "/images/**",
+                            "/webjars/**"
+                        ).permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
-
-                        // Admin endpoints
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/roles/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                        // Chair endpoints
-                        .requestMatchers("/api/chair/**").hasRole("CHAIR")
-
-                        // Author endpoints
-                        .requestMatchers("/api/author/**").hasRole("AUTHOR")
-
-                        // Participant endpoints
-                        .requestMatchers("/api/participant/**").hasRole("PARTICIPANT")
-
-                        // All authenticated requests
-                        .anyRequest().authenticated())
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/chair/**").hasAuthority("CHAIR")
+                        .requestMatchers("/attendee/**").hasAuthority("ATTENDEE")
+                        .anyRequest().authenticated()
+                )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                        })
-                        .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Forbidden: insufficient permissions\"}");
-                        }))
+                    .authenticationEntryPoint((request, response, authException) -> {
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    }))
                 .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout=true")
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                        .permitAll())
+                // .formLogin(form -> form
+                //         .disable()
+                // // .loginPage("/login")
+                // // .permitAll()
+                // )
+                // .logout(logout -> logout.permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
