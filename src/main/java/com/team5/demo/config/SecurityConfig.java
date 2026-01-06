@@ -71,7 +71,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/chair/**").hasAuthority("CHAIR")
+                        .requestMatchers("*/attendance/**").hasAuthority("CHAIR")
                         .requestMatchers("/attendee/**").hasAuthority("ATTENDEE")
                         .anyRequest().authenticated()
                 )

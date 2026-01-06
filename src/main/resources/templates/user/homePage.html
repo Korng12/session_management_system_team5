@@ -1,0 +1,91 @@
+
+<div th:replace="~{layout/main :: layout(~{::section})}">
+    <section>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card-shadow {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .table th {
+            background-color: #f1f3f5;
+        }
+
+        .action-btn {
+            min-width: 70px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:replace="~{fragments/header}"></div>
+<div th:replace="~{fragments/sidebar}"></div>
+
+<div class="container-fluid px-4 py-5">
+    <h3 class="mb-4 fw-bold">Manage Sessions</h3>
+
+    <div class="card card-shadow">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+                <h5 class="mb-0">Conference Sessions</h5>
+                <a href="/admin/add-session" class="btn btn-primary btn-sm">
+                    + Add New Session
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Session Title</th>
+                            <th>Speaker</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01</td>
+                            <td>Introduction to AI</td>
+                            <td>Dr. Smith</td>
+                            <td>10:00 AM</td>
+                            <td>
+                                <span class="badge bg-success">Active</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-warning btn-sm action-btn">Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm action-btn">Delete</a>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>02</td>
+                            <td>Deep Learning Models</td>
+                            <td>Prof. Lee</td>
+                            <td>11:30 AM</td>
+                            <td>
+                                <span class="badge bg-secondary">Draft</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+</section>
+</div>

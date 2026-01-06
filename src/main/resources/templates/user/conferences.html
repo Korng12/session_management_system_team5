@@ -1,33 +1,84 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
+
 <section>
-    <div class="container mt-5">
-        <h1>Available Conferences</h1>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="card-title mb-0">AI & Machine Learning Conference</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Join us for an insightful conference on AI and machine learning.</p>
-                        <a href="/register" class="btn btn-primary">Register</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="card h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="card-title mb-0">Future of Research Symposium</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text">Explore the latest trends in research methodologies.</p>
-                        <a href="/register" class="btn btn-primary">Register</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Add more conferences as needed -->
+
+    <!-- PAGE HEADER -->
+    <div class="container mt-4 mb-4">
+        <div class="p-4 bg-light rounded shadow-sm">
+            <h2 class="fw-bold mb-1">Available Conferences</h2>
+            <p class="text-muted mb-0">
+                Browse upcoming academic conferences and view details.
+            </p>
         </div>
     </div>
+
+    <!-- CONFERENCE LIST -->
+    <div class="container mb-5">
+
+        <div class="row g-4">
+
+            <!-- CONFERENCE CARD -->
+            <div class="col-md-4"
+                 th:each="conf : ${conferences}">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"
+                            th:text="${conf.title}">
+                            Conference Title
+                        </h5>
+
+                        <p class="card-text text-muted"
+                           th:text="${conf.description}">
+                            Conference description
+                        </p>
+
+                        <p class="small text-muted mb-2">
+                            <strong>Date:</strong>
+                            <span th:text="${conf.startDate}"></span>
+                            –
+                            <span th:text="${conf.endDate}"></span>
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 d-grid gap-2">
+
+                        <!-- VIEW DETAILS (Everyone) -->
+                        <a th:href="@{/conferences/{id}(id=${conf.id})}"
+                           class="btn btn-outline-primary">
+                            View Details
+                        </a>
+
+                        <!-- REGISTER (ATTENDEE only) -->
+                        <a th:href="@{/conferences/{id}/register(id=${conf.id})}"
+                           class="btn btn-primary"
+                           sec:authorize="hasAuthority('ATTENDEE')">
+                            Register
+                        </a>
+
+                        <!-- LOGIN PROMPT (Guest only) -->
+                        <a th:href="@{/login}"
+                           class="btn btn-secondary"
+                           sec:authorize="!isAuthenticated()">
+                            Login to Register
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div class="col-12 text-center"
+                 th:if="${#lists.isEmpty(conferences)}">
+                <p class="text-muted">
+                    No conferences are available at the moment.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
 </section>
+
 </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

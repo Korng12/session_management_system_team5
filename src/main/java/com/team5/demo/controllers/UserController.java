@@ -57,11 +57,12 @@ public class UserController {
     public String getContactPage() {
         return "public/contact";
     }
-    @GetMapping("/user-profile")
-    public String getUserProfile() {
-        return "user/profile";
-    }
-    
+    @GetMapping("/profile")
+    public String getProfilePage(Model model, Authentication authentication) {
+        String userEmail = authentication.getName();
+        model.addAttribute("userEmail", userEmail);
+        return "user/profile";  
+    }    
     
     
 }
