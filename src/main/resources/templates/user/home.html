@@ -1,119 +1,121 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
 
-<section>
-    <div class="p-5 mb-5 bg-primary text-white rounded-3 shadow-sm">
-        <div class="container py-5 text-center">
-            <h1 class="display-5 fw-bold">
-                Research Conference Management System
-            </h1>
-            <p class="lead mt-3">
-                Register for conferences, select sessions, and manage your academic schedule with ease.
-            </p>
-            <!-- <form th:action="@{/conferences}" method="get" class="mb-4">
-                <div class="input-group">
-                    <input type="text"
-                        name="keyword"
-                        class="form-control"
-                        placeholder="Search conferences..."
-                        th:value="${keyword}">
-                    <button class="btn btn-primary" type="submit">
-                        Search
-                    </button>
+<section class="container my-5">
+
+    <!-- WELCOME -->
+    <div class="mb-5">
+        <h2 class="fw-bold">
+            Welcome back,
+            <span sec:authentication="name">User</span>
+        </h2>
+        <p class="text-muted">
+            Here’s a summary of your conference activities.
+        </p>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📅 Browse Conferences</h5>
+                    <p class="text-muted small">
+                        Discover and register for upcoming conferences
+                    </p>
+                    <a th:href="@{/conferences}" class="btn btn-primary">
+                        View Conferences
+                    </a>
                 </div>
-            </form> -->
+            </div>
+        </div>
 
-            <div class="mt-4">
-                <a th:href="@{/conferences}" class="btn btn-light btn-lg me-3">
-                    View Conferences
-                </a>
+        <div class="col-md-4" sec:authorize="hasAuthority('ATTENDEE')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📝 My Conferences</h5>
+                    <p class="text-muted small">
+                        Conferences you have registered for
+                    </p>
+                    <a th:href="@{/my/conferences}" class="btn btn-outline-primary">
+                        View My Conferences
+                    </a>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-4" sec:authorize="hasAuthority('ATTENDEE')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📊 My Schedule</h5>
+                    <p class="text-muted small">
+                        Sessions you plan to attend
+                    </p>
+                    <a th:href="@{/my/schedule}" class="btn btn-outline-primary">
+                        View Schedule
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MY UPCOMING SESSIONS -->
+    <div class="mb-5" sec:authorize="hasAuthority('ATTENDEE')">
+        <h4 class="fw-bold mb-3">My Upcoming Sessions</h4>
+
+        <div class="card shadow-sm">
+            <ul class="list-group list-group-flush"
+                th:if="${!#lists.isEmpty(mySessions)}">
+
+                <li class="list-group-item"
+                    th:each="s : ${mySessions}">
+                    <strong th:text="${s.title}">Session Title</strong><br>
+                    <small class="text-muted">
+                        <span th:text="${s.conference.title}"></span> ·
+                        <span th:text="${s.startTime}"></span>
+                    </small>
+                </li>
+
+            </ul>
+
+            <div class="card-body text-muted"
+                 th:if="${#lists.isEmpty(mySessions)}">
+                You have not selected any sessions yet.
             </div>
         </div>
     </div>
-    <div class="container mb-5">
-        <h2 class="text-center fw-bold mb-4">What You Can Do</h2>
 
-        <div class="row text-center">
-            <div class="col-md-4">
-                <h5>📅 Discover Conferences</h5>
-                <p class="text-muted">
-                    Browse upcoming academic conferences and view detailed schedules.
-                </p>
-            </div>
-            <div class="col-md-4">
-                <h5>📝 Register & Attend</h5>
-                <p class="text-muted">
-                    Register for conferences and select sessions you want to attend.
-                </p>
-            </div>
-            <div class="col-md-4">
-                <h5>📊 Manage Schedule</h5>
-                <p class="text-muted">
-                    View your personalized session schedule in one place.
-                </p>
-            </div>
-        </div>
-    </div>
-    <div class="container mb-5">
-        <h2 class="text-center fw-bold mb-4">Active Conferences</h2>
+    <!-- CHAIR SECTION (ONLY IF USER IS CHAIR) -->
+    <div sec:authorize="hasAuthority('CHAIR')">
+        <h4 class="fw-bold mb-3">Sessions I Chair</h4>
 
-        <div class="row g-4">
-            <div class="col-md-4" th:each="conf : ${conferences}">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title text-primary"
-                            th:text="${conf.title}">
-                            Conference Title
-                        </h5>
+        <div class="card shadow-sm">
+            <ul class="list-group list-group-flush"
+                th:if="${!#lists.isEmpty(chairedSessions)}">
 
-                        <p class="card-text text-muted"
-                           th:text="${conf.description}">
-                            Conference description
-                        </p>
-
-                        <p class="small text-muted">
-                            <strong>Date:</strong>
-                            <span th:text="${conf.startDate}"></span>
-                            -
-                            <span th:text="${conf.endDate}"></span>
-                        </p>
-                    </div>
-
-                    <div class="card-footer bg-transparent border-0">
-                        <a th:href="@{/conferences/{id}(id=${conf.id})}"
-                           class="btn btn-outline-primary w-100">
-                            View Details
+                <li class="list-group-item"
+                    th:each="s : ${chairedSessions}">
+                    <strong th:text="${s.title}">Session</strong><br>
+                    <small class="text-muted">
+                        <span th:text="${s.conference.title}"></span>
+                    </small>
+                    <div class="mt-2">
+                        <a th:href="@{/chair/sessions/{id}/attendance(id=${s.id})}"
+                           class="btn btn-sm btn-primary">
+                            Manage Attendance
                         </a>
                     </div>
-                </div>
-            </div>
+                </li>
 
-            <div class="col-12 text-center" th:if="${#lists.isEmpty(conferences)}">
-                <p class="text-muted">
-                    No conferences are available at the moment.
-                </p>
+            </ul>
+
+            <div class="card-body text-muted"
+                 th:if="${#lists.isEmpty(chairedSessions)}">
+                You are not assigned as chair to any session.
             </div>
         </div>
     </div>
-    <div class="container mb-5">
-        <h2 class="text-center fw-bold mb-4">How It Works</h2>
-
-        <ol class="list-group list-group-numbered">
-            <li class="list-group-item">
-                Create an account or log in
-            </li>
-            <li class="list-group-item">
-                Register for an available conference
-            </li>
-            <li class="list-group-item">
-                Select sessions you want to attend
-            </li>
-            <li class="list-group-item">
-                View your personalized schedule
-            </li>
-        </ol>
-    </div>
-
 
 </section>
 

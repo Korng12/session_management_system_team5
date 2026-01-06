@@ -5,9 +5,13 @@ import com.team5.demo.services.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -29,9 +33,14 @@ public class AdminController {
         model.addAttribute("activePage", "users");
         return "admin/manage_users";
     }
+    @GetMapping("/admin/manage-schedule")
+    public String manageSchedule() {
+        return "admin/view-schedule";
+    }
+    
 
-    /* ===================== MANAGE ROOMS ===================== */
-    @GetMapping("/manage-rooms")
+    // Manage Rooms
+    @GetMapping("/admin/manage-rooms")
     public String manageRooms(Model model) {
         model.addAttribute("activePage", "rooms");
         return "admin/manage-rooms";
@@ -47,46 +56,12 @@ public class AdminController {
     /* ===================== MANAGE SCHEDULE ===================== */
     @GetMapping("/manage-schedule")
     public String manageSchedule(Model model) {
-
-        List<Session> sessions = sessionService.getAllSessions();
-
-        // DEBUG (you can remove later)
-        System.out.println(">>> ADMIN SCHEDULE - SESSION COUNT = " + sessions.size());
-
-        model.addAttribute("activePage", "schedule");
-        model.addAttribute("sessions", sessions);
-
-        return "admin/view-schedule";
+        return "admin/schedule"; // Manage schedule view
     }
 
-    /* ===================== ALIAS ===================== */
-    // Allows /admin/schedule to also work
-    @GetMapping("/schedule")
-    public String scheduleAlias(Model model) {
-        return manageSchedule(model);
-    }
-
-    /* ===================== DELETE SESSION ===================== */
-    @PostMapping("/manage-schedule/delete/{id}")
-    public String deleteSession(@PathVariable Long id) {
-        sessionService.deleteSession(id);
-        return "redirect:/admin/manage-schedule";
-    }
-
-    /* ===================== UPDATE SESSION ===================== */
-    @PostMapping("/manage-schedule/update")
-    public String updateSession(
-            @RequestParam Long id,
-            @RequestParam String title
-    ) {
-        sessionService.updateTitle(id, title);
-        return "redirect:/admin/manage-schedule";
-    }
-
-    /* ===================== VIEW REGISTRATIONS ===================== */
-    @GetMapping("/view-registeredUsers")
-    public String viewRegistrations(Model model) {
-        model.addAttribute("activePage", "registrations");
-        return "admin/view-registrations";
+    // List Registered Users (if applicable, assuming manage-users covers this)
+    @GetMapping("/admin/view-registeredUsers")
+    public String listRegisteredUsers(Model model) {
+        return "admin/view-registrations"; 
     }
 }
