@@ -2,7 +2,6 @@ package com.team5.demo.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,98 +26,39 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        // Skip JWT filter for public endpoints and static resources
-        return path.startsWith("/api/auth/") ||
-                path.equals("/") ||
-                path.equals("/register") ||
-                path.equals("/login") ||
-                path.equals("/about") ||
-                path.equals("/register-conference") ||
-                path.startsWith("/public/") ||
-                path.startsWith("/css/") ||
-                path.startsWith("/js/") ||
-                path.startsWith("/images/") ||
-                path.startsWith("/webjars/");
+        return path.startsWith("/api/auth/");
     }
-
-    // @Override
-    // protected void doFilterInternal(
-    // HttpServletRequest request,
-    // HttpServletResponse response,
-    // FilterChain chain
-    // ) throws ServletException, IOException {
-
-    // String authHeader = request.getHeader("Authorization");
-
-    // if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-    // chain.doFilter(request, response);
-    // return;
-    // }
-
-    // String token = authHeader.substring(7);
-
-    // if (!jwtUtil.validateToken(token)) {
-    // chain.doFilter(request, response);
-    // return;
-    // }
-
-    // String email = jwtUtil.extractEmail(token);
-
-    // if (email != null && SecurityContextHolder.getContext().getAuthentication()
-    // == null) {
-
-    // UserDetails userDetails =
-    // userDetailsService.loadUserByUsername(email);
-
-    // UsernamePasswordAuthenticationToken authentication =
-    // new UsernamePasswordAuthenticationToken(
-    // userDetails,
-    // null,
-    // userDetails.getAuthorities()
-    // );
-
-    // authentication.setDetails(
-    // new WebAuthenticationDetailsSource().buildDetails(request)
-    // );
-
-    // SecurityContextHolder.getContext().setAuthentication(authentication);
-    // }
-
-    // chain.doFilter(request, response);
-    // }
 
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain chain) throws ServletException, IOException {
+            FilterChain chain
+    ) throws ServletException, IOException {
 
         String token = null;
 
-        // Prefer Authorization header for API calls
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-        }
-
-        // Fallback to cookie for browser sessions
-        if (token == null && request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
+        // Read JWT from cookie
+        if (request.getCookies() != null) {
+            for (var cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }
             }
+            System.out.println("JWT from cookie: " + token);
         }
 
-        // No token means continue without authentication
+        // Fallback to Authorization header (API calls)
         if (token == null) {
-            chain.doFilter(request, response);
-            return;
+            String authHeader = request.getHeader("Authorization");
+            System.out.println("Authorization Header: " + authHeader);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
+            }
         }
 
-        // Invalid token: continue without setting auth
-        if (!jwtUtil.validateToken(token)) {
+        if (token == null || !jwtUtil.validateToken(token)) {
             chain.doFilter(request, response);
             return;
         }
@@ -127,15 +67,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities());
+            UserDetails userDetails =
+                    userDetailsService.loadUserByUsername(email);
+                    System.out.println("UserDetails loaded: " + userDetails);
+            System.out.println("UserDetails loaded: " + userDetails.getUsername());
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
 
             authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request));
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+            );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
