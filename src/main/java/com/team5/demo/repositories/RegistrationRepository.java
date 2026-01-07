@@ -33,7 +33,10 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     /* ===================== COUNTS ===================== */
 
     long countByConference(Conference conference);
+    
+    // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
 
+    boolean existsByParticipantAndConference(User participant, Conference conference);
     long countByParticipant(User participant);
 
     /* ===================== EXISTS CHECK ===================== */

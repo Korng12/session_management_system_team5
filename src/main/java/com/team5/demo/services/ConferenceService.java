@@ -5,13 +5,18 @@ import com.team5.demo.repositories.ConferenceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+
+// @RequiredArgsConstructor
 @Service
-@RequiredArgsConstructor
 public class ConferenceService {
 
     private final ConferenceRepository conferenceRepository;
+    public ConferenceService(ConferenceRepository conferenceRepository) {
+        this.conferenceRepository = conferenceRepository;
+    }
 
     public List<Conference> getAllConferences() {
         return conferenceRepository.findAll();
@@ -37,4 +42,20 @@ public class ConferenceService {
     conferenceRepository.delete(conf);
 }
 
+ 
+
+    /**
+     * Get upcoming or ongoing conferences (user-facing)
+     */
+    public List<Conference> getAvailableConferences() {
+        return conferenceRepository.findUpcomingConferences(LocalDate.now());
+    }
+
+    /**
+     * Get conference by id (used for detail page)
+     */
+    public Conference getConference(Long id) {
+        return conferenceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Conference not found"));
+    }
 }

@@ -8,15 +8,41 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface SessionAttendanceRepository
-        extends JpaRepository<SessionAttendance, SessionAttendanceId> {
+// @Repository
+// public interface SessionAttendanceRepository
+//         extends JpaRepository<SessionAttendance, SessionAttendanceId> {
 
-    //  Load attendance with user + session
-    @Query("""
-        SELECT a FROM SessionAttendance a
-        JOIN FETCH a.participant
-        JOIN FETCH a.session
-    """)
-    List<SessionAttendance> findAllWithRelations();
+//     //  Load attendance with user + session
+//     @Query("""
+//         SELECT a FROM SessionAttendance a
+//         JOIN FETCH a.participant
+//         JOIN FETCH a.session
+//     """)
+//     List<SessionAttendance> findAllWithRelations();
+import org.springframework.stereotype.Repository;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface SessionAttendanceRepository extends JpaRepository<SessionAttendance, SessionAttendanceId> {
+    
+    /**
+     * Find all attendance records for a specific session
+     */
+    List<SessionAttendance> findBySessionId(Long sessionId);
+    
+    /**
+     * Find all attendance records for a specific participant
+     */
+    List<SessionAttendance> findByParticipantId(Long participantId);
+    
+    /**
+     * Find a specific attendance record
+     */
+    Optional<SessionAttendance> findByParticipantIdAndSessionId(Long participantId, Long sessionId);
+    
+    /**
+     * Check if a participant attended a session
+     */
+    boolean existsByParticipantIdAndSessionId(Long participantId, Long sessionId);
 }

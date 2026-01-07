@@ -24,62 +24,54 @@ public class RegistrationService {
     /* ===================== REGISTER ===================== */
 
     @Transactional
-    public Registration registerForConference(Long userId, Long conferenceId) {
+//     public Registration registerForConference(Long userId, Long conferenceId) {
+//         // Find User and Conference entities (REQUIRED for JPA)
+//         User user = userRepository.findById(userId)
+//                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+//         Conference conference = conferenceRepository.findById(conferenceId)
+//                 .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+//         // Check if already registered using JPA entities
+//         boolean alreadyRegistered = registrationRepository
+//                 .findByParticipantAndConference(user, conference)
+//                 .isPresent();
+        
+//         if (alreadyRegistered) {
+//             throw new RuntimeException("User is already registered for this conference");
+//         }
+        
+//         // Create registration with JPA entities
+//         Registration registration = new Registration();
+//         registration.setParticipant(user);        // Set User entity (not ID)
+//         registration.setConference(conference);   // Set Conference entity (not ID)
+//         registration.setRegisteredAt(LocalDateTime.now());
+//         registration.setStatus("CONFIRMED");
+        
+//         return registrationRepository.save(registration);
+//     }
+public Registration registerForConference(String email, Long conferenceId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Conference conference = conferenceRepository.findById(conferenceId)
-                .orElseThrow(() -> new RuntimeException("Conference not found"));
+    Conference conf = conferenceRepository.findById(conferenceId)
+            .orElseThrow(() -> new RuntimeException("Conference not found"));
 
-        // ✅ Prevent duplicate registration
-        if (registrationRepository
-                .existsByParticipant_IdAndConference_Id(userId, conferenceId)) {
-            throw new RuntimeException("User already registered for this conference");
-        }
-
-        Registration registration = new Registration(user, conference);
-        registration.setStatus("CONFIRMED");
-        registration.setRegisteredAt(LocalDateTime.now());
-
-        return registrationRepository.save(registration);
+    if (registrationRepository.existsByParticipantAndConference(user, conf)) {
+        throw new RuntimeException("Already registered");
     }
 
-    /* ===================== USER ===================== */
+    Registration reg = new Registration();
+    reg.setParticipant(user);
+    reg.setConference(conf);
+    reg.setRegisteredAt(LocalDateTime.now());
+    reg.setStatus("CONFIRMED");
 
-    // ✅ User sees ONLY confirmed registrations
-    @Transactional(readOnly = true)
-    public List<Registration> getUserRegistrations(Long userId) {
+    return registrationRepository.save(reg);
+}
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return registrationRepository
-                .findByParticipantAndStatus(user, "CONFIRMED");
-    }
-
-    /* ===================== ADMIN ===================== */
-
-    // ✅ Admin sees CONFIRMED registrations with relations
-    @Transactional(readOnly = true)
-    public List<Registration> getAllRegistrations() {
-
-        List<Registration> list =
-                registrationRepository.findByStatusWithRelations("CONFIRMED");
-
-        System.out.println("🔥 CONFIRMED REGISTRATIONS = " + list.size());
-        return list;
-    }
-
-    // ✅ Admin search (CONFIRMED only)
-    @Transactional(readOnly = true)
-    public List<Registration> searchByParticipant(String keyword) {
-        return registrationRepository.searchConfirmedByParticipant(keyword);
-    }
-
-    /* ===================== SINGLE REGISTRATION ===================== */
-
-    @Transactional(readOnly = true)
+    
     public Registration getRegistration(Long registrationId) {
         return registrationRepository.findById(registrationId)
                 .orElseThrow(() ->
@@ -89,6 +81,24 @@ public class RegistrationService {
 
     /* ===================== CANCEL ===================== */
 
+    
+    public List<Registration> getUserRegistrations(Long userId) {
+        // Find user first (REQUIRED for JPA)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        //Find registrations by user entity
+        return registrationRepository.findByParticipant(user);
+    }
+    public List<Registration> getMyConferences(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return registrationRepository.findByParticipant(user);
+        }
+
+    
     @Transactional
     public void cancelRegistration(Long registrationId) {
 

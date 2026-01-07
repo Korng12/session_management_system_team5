@@ -73,9 +73,9 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/chair/**").hasAuthority("CHAIR")
-                        .requestMatchers("/attendee/**").hasAuthority("ATTENDEE")
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/chair/**").hasAuthority("ROLE_CHAIR")
+                        .requestMatchers("/attendee/**").hasAuthority("ROLE_ATTENDEE")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
@@ -91,14 +91,6 @@ public class SecurityConfig {
                 // // .permitAll()
                 // )
                 // .logout(logout -> logout.permitAll())
-                // .sessionManagement(session -> session
-                //         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // .exceptionHandling(ex -> ex
-                //         .authenticationEntryPoint((request, response, authException) -> {
-                //             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                //             response.setContentType("application/json");
-                //             response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                //         }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
