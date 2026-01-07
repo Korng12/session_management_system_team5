@@ -1,0 +1,132 @@
+<div th:replace="~{layout/main :: layout(~{::section})}">
+
+<section>
+
+    <!-- PAGE HEADER -->
+    <div class="container mt-4 mb-4">
+        <div class="p-4 bg-light rounded shadow-sm">
+            <h2 class="fw-bold mb-1"
+                th:text="${conference.title}">
+                Conference Title
+            </h2>
+
+            <p class="text-muted mb-0">
+                <strong>Date:</strong>
+                <span th:text="${#temporals.format(conference.startDate, 'dd MMM yyyy')}"></span>
+                –
+                <span th:text="${#temporals.format(conference.endDate, 'dd MMM yyyy')}"></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="container mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="fw-bold">About this conference</h5>
+                <p class="text-muted"
+                   th:text="${conference.description}">
+                    Conference description
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="container mb-5">
+        <div class="d-flex gap-3">
+
+            <button id="registerConferenceBtn"
+                    class="btn btn-primary"
+                    sec:authorize="hasAuthority('ROLE_ATTENDEE')"
+                    th:data-conference-id="${conference.id}">
+                Register for Conference
+            </button>
+
+
+            <a th:href="@{/login}"
+               class="btn btn-secondary"
+               sec:authorize="!isAuthenticated()">
+                Login to Register
+            </a>
+
+            <a th:href="@{/conferences}"
+               class="btn btn-outline-secondary">
+                Back to Conferences
+            </a>
+
+        </div>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="container mb-5">
+
+        <h3 class="fw-bold mb-3">Conference Sessions</h3>
+
+        <div class="row g-4">
+
+            <div class="col-md-6"
+                 th:each="sess : ${sessions}">
+
+                <div class="card h-100 shadow-sm">
+
+                    <div class="card-body">
+                        <h5 class="fw-bold"
+                            th:text="${sess.title}">
+                            Session Title
+                        </h5>
+
+                        <p class="small text-muted mb-1">
+                            <strong>Time:</strong>
+                            <span th:text="${#temporals.format(sess.startTime, 'dd MMM yyyy HH:mm')}"></span>
+                            –
+                            <span th:text="${#temporals.format(sess.endTime, 'HH:mm')}"></span>
+                        </p>
+
+                        <p class="small text-muted mb-1">
+                            <strong>Room:</strong>
+                            <span th:text="${sess.roomName}">TBA</span>
+                        </p>
+
+                        <p class="small text-muted">
+                            <strong>Chair:</strong>
+                            <span th:text="${sess.chairName}">TBA</span>
+                        </p>
+
+                        <span class="badge bg-secondary"
+                              th:text="${sess.status}">
+                            SCHEDULED
+                        </span>
+                    </div>
+
+                    <div class="card-footer bg-transparent border-0 d-flex gap-2">
+
+                        <a th:href="@{/sessions/{id}/register(id=${sess.id})}"
+                           class="btn btn-sm btn-primary"
+                           sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                            Register Session
+                        </a>
+
+                        <a th:href="@{/login}"
+                           class="btn btn-sm btn-secondary"
+                           sec:authorize="!isAuthenticated()">
+                            Login to Register
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 text-center"
+                 th:if="${#lists.isEmpty(sessions)}">
+                <p class="text-muted">
+                    No sessions have been scheduled for this conference yet.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+</div>

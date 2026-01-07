@@ -1,4 +1,5 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
+<<<<<<< HEAD
     <section>
     <style>
         body {
@@ -83,3 +84,150 @@
 </html>
     </section>
 </div>
+=======
+
+<section class="container-fluid">
+
+    <div class="container mt-4">
+
+        <!-- PAGE TITLE -->
+        <div class="mb-4">
+            <h2 class="fw-bold">Admin Dashboard</h2>
+            <p class="text-muted">
+                System overview and administration tools
+            </p>
+        </div>
+
+        <!-- KPI CARDS -->
+        <div class="row g-4 mb-5">
+
+            <div class="col-md-3">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Users</h6>
+                        <h3 th:text="${stats.totalUsers}">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Conferences</h6>
+                        <h3 th:text="${stats.totalConferences}">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Sessions</h6>
+                        <h3 th:text="${stats.totalSessions}">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card shadow-sm text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Registrations</h6>
+                        <h3 th:text="${stats.totalRegistrations}">0</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MANAGEMENT ACTIONS -->
+        <div class="row g-4 mb-5">
+
+            <div class="col-md-3">
+                <a href="/admin/conferences"
+                   class="card h-100 shadow-sm text-decoration-none text-dark">
+                    <div class="card-body text-center">
+                        <h5>📅 Conferences</h5>
+                        <p class="text-muted small">
+                            Create & manage conferences
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="/admin/sessions"
+                   class="card h-100 shadow-sm text-decoration-none text-dark">
+                    <div class="card-body text-center">
+                        <h5>🗓️ Sessions</h5>
+                        <p class="text-muted small">
+                            Manage conference sessions
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="/admin/users"
+                   class="card h-100 shadow-sm text-decoration-none text-dark">
+                    <div class="card-body text-center">
+                        <h5>👥 Users</h5>
+                        <p class="text-muted small">
+                            Assign roles & manage users
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-md-3">
+                <a href="/admin/registrations"
+                   class="card h-100 shadow-sm text-decoration-none text-dark">
+                    <div class="card-body text-center">
+                        <h5>📋 Registrations</h5>
+                        <p class="text-muted small">
+                            View participant registrations
+                        </p>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div class="mb-5">
+            <h4 class="fw-bold mb-3">Recent Registrations</h4>
+
+            <div class="card shadow-sm">
+                <ul class="list-group list-group-flush"
+                    th:if="${!#lists.isEmpty(recentRegistrations)}">
+
+                    <li class="list-group-item"
+                        th:each="reg : ${recentRegistrations}">
+                        <strong th:text="${reg.user.email}">
+                            user@email.com
+                        </strong>
+                        registered for
+                        <span th:text="${reg.session.title}">
+                            Session Title
+                        </span>
+                    </li>
+
+                </ul>
+
+                <div class="card-body text-muted"
+                     th:if="${#lists.isEmpty(recentRegistrations)}">
+                    No recent registrations.
+                </div>
+            </div>
+        </div>
+
+        <!-- SYSTEM STATUS -->
+        <div class="alert alert-info">
+            ✔ System running normally · No pending alerts
+        </div>
+
+    </div>
+
+</section>
+
+</div>
+>>>>>>> main

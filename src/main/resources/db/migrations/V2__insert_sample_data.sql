@@ -6,10 +6,10 @@ INSERT INTO roles (name) VALUES
 
 -- 2. Insert users
 INSERT INTO users (name, email, password) VALUES
-('admin', 'admin@gmail.com', '$2a$10$mJHjTiDeZwe24nBV1439zOSzKJoWqjaQqHgP5qSGwmuvK0FGNJCaq'),
-('user', 'user@gmail.com', '$2a$10$mJHjTiDeZwe24nBV1439zOSzKJoWqjaQqHgP5qSGwmuvK0FGNJCaq'),
-('kea', 'kea@gmail.com', '$2a$10$mJHjTiDeZwe24nBV1439zOSzKJoWqjaQqHgP5qSGwmuvK0FGNJCaq'),
-('mesa', 'mesa@gmail.com', '$2a$10$mJHjTiDeZwe24nBV1439zOSzKJoWqjaQqHgP5qSGwmuvK0FGNJCaq');
+('admin', 'admin@gmail.com', '$2a$10$uzwe.DvzO39HY4oNlxVKKefEgjd/psD18AYliojFJGDIfCRpkMSja'),
+('user', 'user@gmail.com', '$2a$10$uzwe.DvzO39HY4oNlxVKKefEgjd/psD18AYliojFJGDIfCRpkMSja'),
+('kea', 'kea@gmail.com', '$2a$10$uzwe.DvzO39HY4oNlxVKKefEgjd/psD18AYliojFJGDIfCRpkMSja'),
+('mesa', 'mesa@gmail.com', '$2a$10$uzwe.DvzO39HY4oNlxVKKefEgjd/psD18AYliojFJGDIfCRpkMSja');
 
 -- 3. Assign roles
 INSERT INTO users_roles (user_id, role_id) VALUES

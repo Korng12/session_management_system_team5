@@ -1,4 +1,5 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
+<<<<<<< HEAD
 <section>
     <div class="p-5 mb-5 bg-primary text-white rounded-3 shadow-sm">
         <div class="container py-5 text-center">
@@ -18,17 +19,95 @@
                     <button class="btn btn-primary" type="submit">
                         Search
                     </button>
+=======
+
+<section class="container my-5">
+
+    <!-- WELCOME -->
+    <div class="mb-5">
+        <h2 class="fw-bold">
+            Welcome back,
+            <span sec:authentication="name">User</span>
+        </h2>
+        <p class="text-muted">
+            Here’s a summary of your conference activities.
+        </p>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="row g-4 mb-5">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📅 Browse Conferences</h5>
+                    <p class="text-muted small">
+                        Discover and register for upcoming conferences
+                    </p>
+                    <a th:href="@{/conferences}" class="btn btn-primary">
+                        View Conferences
+                    </a>
+>>>>>>> main
                 </div>
-            </form> -->
+            </div>
+        </div>
 
-            <div class="mt-4">
-                <a th:href="@{/conferences}" class="btn btn-light btn-lg me-3">
-                    View Conferences
-                </a>
+        <div class="col-md-4" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📝 My Conferences</h5>
+                    <p class="text-muted small">
+                        Conferences you have registered for
+                    </p>
+                    <a th:href="@{/my-conferences}" class="btn btn-outline-primary">
+                        View My Conferences
+                    </a>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-4" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5>📊 My Schedule</h5>
+                    <p class="text-muted small">
+                        Sessions you plan to attend
+                    </p>
+                    <a th:href="@{/my/schedule}" class="btn btn-outline-primary">
+                        View Schedule
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MY UPCOMING SESSIONS -->
+    <div class="mb-5" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+        <h4 class="fw-bold mb-3">My Upcoming Sessions</h4>
+
+        <div class="card shadow-sm">
+            <ul class="list-group list-group-flush"
+                th:if="${!#lists.isEmpty(mySessions)}">
+
+                <li class="list-group-item"
+                    th:each="s : ${mySessions}">
+                    <strong th:text="${s.title}">Session Title</strong><br>
+                    <small class="text-muted">
+                        <span th:text="${s.conference.title}"></span> ·
+                        <span th:text="${s.startTime}"></span>
+                    </small>
+                </li>
+
+            </ul>
+
+            <div class="card-body text-muted"
+                 th:if="${#lists.isEmpty(mySessions)}">
+                You have not selected any sessions yet.
             </div>
         </div>
     </div>
+<<<<<<< HEAD
     <div class="container mb-5">
         <h2 class="text-center fw-bold mb-4">What You Can Do</h2>
 
@@ -82,11 +161,32 @@
                         <a th:href="@{/conferences/{id}(id=${conf.id})}"
                            class="btn btn-outline-primary w-100">
                             View Details
+=======
+
+    <!-- CHAIR SECTION (ONLY IF USER IS CHAIR) -->
+    <div sec:authorize="hasAuthority('CHAIR')">
+        <h4 class="fw-bold mb-3">Sessions I Chair</h4>
+
+        <div class="card shadow-sm">
+            <ul class="list-group list-group-flush"
+                th:if="${!#lists.isEmpty(chairedSessions)}">
+
+                <li class="list-group-item"
+                    th:each="s : ${chairedSessions}">
+                    <strong th:text="${s.title}">Session</strong><br>
+                    <small class="text-muted">
+                        <span th:text="${s.conference.title}"></span>
+                    </small>
+                    <div class="mt-2">
+                        <a th:href="@{/chair/sessions/{id}/attendance(id=${s.id})}"
+                           class="btn btn-sm btn-primary">
+                            Manage Attendance
+>>>>>>> main
                         </a>
                     </div>
-                </div>
-            </div>
+                </li>
 
+<<<<<<< HEAD
             <div class="col-12 text-center" th:if="${#lists.isEmpty(conferences)}">
                 <p class="text-muted">
                     No conferences are available at the moment.
@@ -113,6 +213,16 @@
         </ol>
     </div>
 
+=======
+            </ul>
+
+            <div class="card-body text-muted"
+                 th:if="${#lists.isEmpty(chairedSessions)}">
+                You are not assigned as chair to any session.
+            </div>
+        </div>
+    </div>
+>>>>>>> main
 
 </section>
 </div>

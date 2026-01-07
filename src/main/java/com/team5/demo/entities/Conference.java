@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "conference")
+@Table(name = "conferences")
 @Data
 public class Conference {
 
