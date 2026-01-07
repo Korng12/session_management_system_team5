@@ -1,6 +1,6 @@
 package com.team5.demo.controllers;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,13 +13,6 @@ public class AdminController {
     public String showAdminHomepage(Model model) {
         return "admin/dashboard"; 
     }
-
-    // Manage Users
-    @GetMapping("/admin/manage-users")
-    public String manageUsers(Model model) {
-        return "admin/manage_users"; 
-    }
-
     // Manage Rooms
     @GetMapping("/admin/manage-rooms")
     public String manageRooms(Model model) {
@@ -29,13 +22,6 @@ public class AdminController {
     public String manageSessions(Model model) {
         return "admin/manage-sessions"; 
     }
-
-    // Manage Schedule
-    @GetMapping("/admin/schedule")
-    public String manageSchedule(Model model) {
-        return "admin/schedule"; // Manage schedule view
-    }
-
     // List Registered Users (if applicable, assuming manage-users covers this)
     @GetMapping("/admin/view-registeredUsers")
     public String listRegisteredUsers(Model model) {
