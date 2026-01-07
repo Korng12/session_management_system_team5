@@ -2,8 +2,11 @@ package com.team5.demo.config;
 
 import com.team5.demo.security.CustomUserDetailsService;
 import com.team5.demo.security.JwtFilter;
+
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.security.SecureRandom;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -66,7 +69,6 @@ public class SecurityConfig {
                             "/css/**",
                             "/js/**",
                             "/images/**",
-                            "/chair/attendance/**",
                             "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()

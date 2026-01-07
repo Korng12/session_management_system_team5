@@ -152,11 +152,6 @@ public class UserController {
     public String getAboutPage() {
         return "public/aboutPage";
     }
-       @GetMapping("/contact")
-    public String getContactPage() {
-        return "public/contact";
-    }
-
     @GetMapping("/contact")
     public String getContactPage() {
         return "public/contact";
