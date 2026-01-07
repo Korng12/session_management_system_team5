@@ -30,7 +30,7 @@ public class ScheduleService {
 
     public boolean isUserRegisteredForConference(Long userId, Long conferenceId) {
         return registrationRepository
-                .existsByParticipantIdAndConferenceId(userId, conferenceId);
+                .existsByParticipant_IdAndConference_Id(userId, conferenceId);
     }
 
     private ScheduleDTO convertToScheduleDTO(Session session) {
