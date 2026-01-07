@@ -30,21 +30,21 @@
             </div>
         </div>
 
-        <div class="col-md-4" sec:authorize="hasAuthority('ATTENDEE')">
+        <div class="col-md-4" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
                     <h5>📝 My Conferences</h5>
                     <p class="text-muted small">
                         Conferences you have registered for
                     </p>
-                    <a th:href="@{/my/conferences}" class="btn btn-outline-primary">
+                    <a th:href="@{/my-conferences}" class="btn btn-outline-primary">
                         View My Conferences
                     </a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4" sec:authorize="hasAuthority('ATTENDEE')">
+        <div class="col-md-4" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
                     <h5>📊 My Schedule</h5>
@@ -61,7 +61,7 @@
     </div>
 
     <!-- MY UPCOMING SESSIONS -->
-    <div class="mb-5" sec:authorize="hasAuthority('ATTENDEE')">
+    <div class="mb-5" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
         <h4 class="fw-bold mb-3">My Upcoming Sessions</h4>
 
         <div class="card shadow-sm">

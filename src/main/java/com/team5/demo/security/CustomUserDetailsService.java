@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         Collection<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
-System.out.println("Loaded authorities: " + authorities);
+        System.out.println("Loaded authorities: " + authorities);
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

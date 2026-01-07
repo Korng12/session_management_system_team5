@@ -7,11 +7,21 @@ import com.team5.demo.dto.SessionDependenciesResponse;
 import com.team5.demo.dto.ValidationErrorResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.hibernate.StaleObjectStateException;
 import com.team5.demo.dto.ConferenceDTO;
 import com.team5.demo.dto.RoomDTO;
 import com.team5.demo.dto.UserDTO;
 import com.team5.demo.services.SessionService;
+
+import jakarta.validation.Valid;
+
 import com.team5.demo.repositories.ConferenceRepository;
 import com.team5.demo.repositories.SessionRepository;
 import com.team5.demo.repositories.RoomRepository;
@@ -30,7 +40,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-53c0df (recover: Restore Session Management CRUD files and DTOs)
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequestMapping("/admin")
@@ -64,6 +84,10 @@ public class AdminController {
     @GetMapping("/admin/manage-schedule")
     public String manageSchedule() {
         return "admin/view-schedule";
+    }
+    @GetMapping("/manage-conferences")
+    public String getMethodName() {
+        return "admin/manage-conferences";
     }
     
 
@@ -105,11 +129,8 @@ public class AdminController {
     }
 
     // List Registered Users (if applicable, assuming manage-users covers this)
-<<<<<<< HEAD
-    @GetMapping("/admin/view-registrations")
-=======
+    // @GetMapping("/admin/view-registrations")
     @GetMapping("/view-registeredUsers")
->>>>>>> 653c0df (recover: Restore Session Management CRUD files and DTOs)
     public String listRegisteredUsers(Model model) {
         return "admin/view-registrations"; 
     }

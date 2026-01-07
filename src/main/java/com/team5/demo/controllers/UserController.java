@@ -1,9 +1,12 @@
 package com.team5.demo.controllers;
 
+import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.Role;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
+import com.team5.demo.services.RegistrationService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,8 @@ public class UserController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private RegistrationService registrationService;
 
     @GetMapping("/")
     public String getLandingPage() {
@@ -124,10 +129,10 @@ public class UserController {
         return "public/registration";
     }
 
-    @GetMapping("/conferences")
-    public String getConferencesPage() {
-        return "user/conferences";
-    }
+    // @GetMapping("/conferences")
+    // public String getConferencesPage() {
+    //     return "user/conferences";
+    // }
 
     @GetMapping("/profile")
     public String getProfilePage(Principal principal, Model model) {
@@ -153,4 +158,11 @@ public class UserController {
     public String getContactPage() {
         return "public/contact";
     }
+    @GetMapping("/my-conferences")
+    public String getMyConferences(Authentication auth,Model model) {
+        String email =auth.getName();
+        var reg =registrationService.getMyConferences(email);
+        return "user/my-conferences";
+    }
+    
 }

@@ -63,7 +63,7 @@ public class AuthController {
     // return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
     // }
     @PostMapping("/register")
-public ResponseEntity<?> register(
+    public ResponseEntity<?> register(
         @RequestBody RegisterRequest request,
         HttpServletResponse response) {
 
