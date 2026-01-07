@@ -27,8 +27,8 @@
             </thead>
             <tbody>
                 <tr th:each="a : ${attendances}">
-                    <td th:text="${a.session_id}"></td>
-                    <td th:text="${a.participant_id}"></td>
+                     <td th:text="${a.session.title}"></td>
+                     <td th:text="${a.participant.name}"></td>
                     <td>
                         <a th:href="@{/chair/attendance/remove
                         (p=${a.participant_id}, s=${a.session_id})}"

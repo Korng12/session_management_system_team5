@@ -66,6 +66,7 @@ public class SecurityConfig {
                             "/css/**",
                             "/js/**",
                             "/images/**",
+                            "/chair/attendance/**",
                             "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
