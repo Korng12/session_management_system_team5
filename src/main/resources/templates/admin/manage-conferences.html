@@ -1,0 +1,182 @@
+<div th:replace="~{layout/main :: layout(~{::section})}">
+    <section>
+
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
+
+            .navbar {
+                height: 60px;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 60px);
+                background-color: #212529;
+                padding-top: 20px;
+            }
+
+            .sidebar a {
+                display: block;
+                color: #adb5bd;
+                padding: 12px 20px;
+                text-decoration: none;
+                font-size: 15px;
+            }
+
+            .sidebar a:hover,
+            .sidebar a.active {
+                background-color: #343a40;
+                color: #fff;
+            }
+
+            .content {
+                margin-left: 240px;
+                padding: 80px 30px 30px;
+            }
+
+            .card {
+                border-radius: 12px;
+            }
+        </style>
+
+        <nav class="navbar navbar-dark bg-dark fixed-top">
+            <div class="container-fluid">
+                <span class="navbar-brand">Conference Admin</span>
+                <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </nav>
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <div class="container mt-5">
+            <h1>Manage Conferences</h1>
+            <button class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#conferenceModal"
+                onclick="openAddModal()">
+             <i class="bi bi-person-add p-2 fs-5"></i> Add Conference
+            </button>
+            <table class="table mt-4">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Title</th>
+                        <th class="text-center">Description</th>
+                        <th class="text-center">Start Date</th>
+                        <th class="text-center">End Date</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="conf : ${conferences}">
+                        <td class="text-center" th:text="${conf.id}"></td>
+                        <td class="text-center" th:text="${conf.title}"></td>
+                        <td class="text-center" th:text="${conf.description}"></td>
+                        <td class="text-center" th:text="${conf.startDate}"></td>
+                        <td class="text-center" th:text="${conf.endDate}"></td>
+                        <td class="text-center">
+                            <a th:href="@{/admin/conferences/edit/{id}(id=${conf.id})}"
+                                class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#conferenceModal"
+                                th:attr="
+                                    data-id=${conf.id},
+                                    data-title=${conf.title},
+                                    data-desc=${conf.description},
+                                    data-start=${conf.startDate},
+                                    data-end=${conf.endDate}"
+                                onclick="openEditModalFromBtn(this)">
+                                Edit
+                            </a>
+
+                            <a th:href="@{/admin/conferences/delete/{id}(id=${conf.id})}"
+   class="btn btn-danger btn-sm"
+   onclick="return confirm('Delete this conference?')">
+    Delete
+</a>
+                        </td>
+                    </tr>
+                    <tr class="text-center" th:if="${conferences == null or #lists.isEmpty(conferences)}">
+                        <td colspan="6" class="text-center text-muted">
+                            Conferences Not Found!!
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- modal -->
+        <div class="modal fade" id="conferenceModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <form th:action="@{/admin/conferences/save}" method="post">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitle">Add Conference</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <input type="hidden" name="id" id="confId">
+
+                            <div class="mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" id="confTitle" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" id="confDesc" class="form-control"></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" name="startDate" id="confStart" class="form-control" required>
+                                </div>
+                                <div class="col">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" name="endDate" id="confEnd" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Javscript -->
+        <script>
+            function openAddModal() {
+                document.getElementById('modalTitle').innerText = 'Add Conference';
+                document.getElementById('confId').value = '';
+                document.getElementById('confTitle').value = '';
+                document.getElementById('confDesc').value = '';
+                document.getElementById('confStart').value = '';
+                document.getElementById('confEnd').value = '';
+            }
+
+            function openEditModalFromBtn(el) {
+                document.getElementById('modalTitle').innerText = 'Edit Conference';
+
+                document.getElementById('confId').value = el.dataset.id;
+                document.getElementById('confTitle').value = el.dataset.title;
+                document.getElementById('confDesc').value = el.dataset.desc;
+                document.getElementById('confStart').value = el.dataset.start;
+                document.getElementById('confEnd').value = el.dataset.end;
+            }
+        </script>
+
+    </section>
+</div>

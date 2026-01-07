@@ -12,6 +12,11 @@
             Dashboard
         </a>
 
+        <a th:href="@{/admin/manage-conferences}" class="menu-link"
+           th:classappend="${activePage == 'conferences'} ? ' active'">
+            Manage Conferences
+        </a>
+
         <a th:href="@{/admin/manage-rooms}" class="menu-link"
            th:classappend="${activePage == 'rooms'} ? ' active'">
             Manage Rooms

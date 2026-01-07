@@ -2,12 +2,14 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "conferences") // ✅ MUST match DB table name
+@Table(name = "conferences")
 @Data
 public class Conference {
 
@@ -29,11 +31,27 @@ public class Conference {
 
     /* ===================== RELATIONSHIPS ===================== */
 
-    // Conference → Sessions
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Conference → Sessions (One conference has many sessions)
+    @OneToMany(
+        mappedBy = "conference",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Session> sessions;
 
     // Conference → Registrations
-    @OneToMany(mappedBy = "conference", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "conference",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true,
+        fetch = FetchType.LAZY
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Registration> registrations;
+
+    
 }

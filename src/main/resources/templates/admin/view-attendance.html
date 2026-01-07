@@ -65,9 +65,9 @@
                 </thead>
                 <tbody>
                     <tr th:each="a : ${attendances}">
-                        <td class="text-center" th:text="${a.session.id}">1</td>
-                        <td class="text-center" th:text="${a.participant.id}">1</td>
-                        <td class="text-center" th:text="${a.status}">PRESENT</td>
+                        <td class="text-center" th:text="${a.session.id}"></td>
+                        <td class="text-center" th:text="${a.participant.id}"></td>
+                        <td class="text-center" th:text="${a.status}"></td>
                     </tr>
 
                     <tr th:if="${attendances == null or #lists.isEmpty(attendances)}">
