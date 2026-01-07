@@ -155,11 +155,18 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5>Total Registrations</h5>
-                    <p>View conference registrations</p>
-                    <a href="/admin/view-registrations" class="btn btn-primary">View</a>
+                    <span class="text-muted">View conference registrations</span>
+                    <p class="fw-bold text-center text-primary"
+                        th:text="${totalRegistrations}">
+                        0
+                    </p>
+                    <a href="/admin/view-registeredUsers" class="btn btn-primary">
+                        View
+                    </a>
                 </div>
             </div>
         </div>
+
 
         <div class="col-md-4">
             <div class="card shadow-sm">
@@ -180,6 +187,19 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Manage Conference</h5>
+                    <p>Create and edit conferences</p>
+                    <a href="/admin/manage-conferences" class="btn btn-success">Manage</a>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </div>
     </section>

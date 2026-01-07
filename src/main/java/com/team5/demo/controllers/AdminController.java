@@ -1,10 +1,13 @@
 package com.team5.demo.controllers;
 
+
 import com.team5.demo.entities.Conference;
 import com.team5.demo.services.ConferenceService;
 import com.team5.demo.services.RegistrationService;
+import com.team5.demo.entities.Registration;
 import com.team5.demo.services.SessionAttendanceService;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import lombok.RequiredArgsConstructor;
 import com.team5.demo.dto.CreateSessionRequest;
 import com.team5.demo.dto.SessionResponse;
@@ -14,19 +17,27 @@ import com.team5.demo.dto.ValidationErrorResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
 
+
+
+
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
 import org.hibernate.StaleObjectStateException;
 import com.team5.demo.dto.ConferenceDTO;
 import com.team5.demo.dto.RoomDTO;
 import com.team5.demo.dto.UserDTO;
 import com.team5.demo.services.SessionService;
+import com.team5.demo.services.UserService;
 
 import jakarta.validation.Valid;
+
+
 
 import com.team5.demo.repositories.ConferenceRepository;
 import com.team5.demo.repositories.SessionRepository;
@@ -43,6 +54,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -59,6 +73,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+
 
 
 @Controller
@@ -77,25 +96,37 @@ public class AdminController {
     private RoomRepository roomRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
+  
 
-    private final RegistrationService registrationService;
-    private final SessionAttendanceService sessionAttendanceService;
-    private final ConferenceService conferenceService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private RegistrationService registrationService;
+    @Autowired
+    private SessionAttendanceService sessionAttendanceService;
+    @Autowired
+    private ConferenceService conferenceService;
 
     /* ===================== DASHBOARD ===================== */
     @GetMapping
     public String dashboard(Model model) {
+
+        long totalRegistrations = registrationService.getTotalRegistrations(); // ✅ get value
+
         model.addAttribute("activePage", "dashboard");
+        model.addAttribute("totalRegistrations", totalRegistrations);
+
         return "admin/dashboard";
     }
 
+
     /* ===================== MANAGE ROOMS ===================== */
     // Admin Dashboard
-    @GetMapping("")
-    public String showAdminHomepage(Model model) {
-        return "admin/dashboard"; 
-    }
+    // @GetMapping("")
+    // public String showAdminHomepage(Model model) {
+    //     return "admin/dashboard"; 
+    // }
 
     // Manage Users
     @GetMapping("/manage-users")
@@ -106,10 +137,10 @@ public class AdminController {
     public String manageSchedule() {
         return "admin/view-schedule";
     }
-    @GetMapping("/manage-conferences")
-    public String getMethodName() {
-        return "admin/manage-conferences";
-    }
+    // @GetMapping("/manage-conferences")
+    // public String getMethodName() {
+    //     return "admin/manage-conferences";
+    // }
     
 
     // Manage Rooms
@@ -127,7 +158,7 @@ public class AdminController {
     }
 
     /* ===================== MANAGE SCHEDULE ===================== */
-    @GetMapping("/manage-schedule")
+    // @GetMapping("/manage-schedule")
     // Create Session Form
     @GetMapping("/sessions/create")
     public String showCreateSessionForm(Model model) {
@@ -168,7 +199,7 @@ public class AdminController {
     } else {
         model.addAttribute(
                 "registrations",
-                registrationService.getAllRegistrations()
+                registrationService.getTotalRegistrations()
         );
     }
 
@@ -181,9 +212,18 @@ public class AdminController {
 
     /* ===================== OLD URL REDIRECT ===================== */
     @GetMapping("/view-registeredUsers")
-    public String viewRegistrations() {
+    public String viewRegistrations(Model model) {
+
+        long registrations =
+                registrationService.getTotalRegistrations();
+
+        model.addAttribute("registrations", registrations);
+        model.addAttribute("activePage", "registrations");
+
         return "redirect:/admin/manage-registrations";
+
     }
+
 
     /* ===================== VIEW ATTENDANCES ===================== */
     @GetMapping("/view-attendance")
@@ -200,17 +240,36 @@ public class AdminController {
     /* ===================== Manage Attendance ===================== */
     @GetMapping("/manage-conferences")
     public String manageConferences(Model model) {
+
         model.addAttribute("conferences", conferenceService.getAllConferences());
         model.addAttribute("activePage", "conferences");
+
+        // Long userId = userService.getCurrentUserId();
+
+        // List<Registration> registrations =
+        //         registrationService.getMyRegistrations(userId);
+
+        // model.addAttribute("registrations", registrations);
+
         return "admin/manage-conferences";
     }
 
+
+
     // Delete button 
     @GetMapping("/conferences/delete/{id}")
-    public String deleteConference(@PathVariable Long id) {
-        conferenceService.delete(id);
+    public String deleteConference(@PathVariable("id") Long id,
+                                RedirectAttributes ra) {
+        try {
+            conferenceService.delete(id);
+            ra.addFlashAttribute("success", "Conference deleted successfully");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/admin/manage-conferences";
     }
+
+
 
 
     // Insert and Delete 
@@ -222,15 +281,14 @@ public class AdminController {
     
     
 
-    
 
-}
+
     // List Registered Users (if applicable, assuming manage-users covers this)
     // @GetMapping("/admin/view-registrations")
-    @GetMapping("/view-registeredUsers")
-    public String listRegisteredUsers(Model model) {
-        return "admin/view-registrations"; 
-    }
+    // @GetMapping("/view-registeredUsers")
+    // public String listRegisteredUsers(Model model) {
+    //     return "admin/view-registrations"; 
+    // }
 
     // ============ SESSION CRUD OPERATIONS ============
 

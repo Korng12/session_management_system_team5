@@ -76,4 +76,16 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     List<Registration> searchConfirmedByParticipant(
             @Param("keyword") String keyword
     );
+
+    // This query for User
+    @Query("""
+    SELECT r FROM Registration r
+    JOIN FETCH r.conference
+    WHERE r.participant.email = :email
+    AND r.status = 'CONFIRMED'
+        """)
+        List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+
+
+
 }

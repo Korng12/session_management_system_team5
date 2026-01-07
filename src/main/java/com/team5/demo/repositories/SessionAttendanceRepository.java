@@ -19,9 +19,9 @@ import java.util.List;
 //         JOIN FETCH a.session
 //     """)
 //     List<SessionAttendance> findAllWithRelations();
-import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
+// import org.springframework.stereotype.Repository;
+// import java.util.List;
+ import java.util.Optional;
 
 @Repository
 public interface SessionAttendanceRepository extends JpaRepository<SessionAttendance, SessionAttendanceId> {
@@ -45,4 +45,12 @@ public interface SessionAttendanceRepository extends JpaRepository<SessionAttend
      * Check if a participant attended a session
      */
     boolean existsByParticipantIdAndSessionId(Long participantId, Long sessionId);
+
+    //  Load attendance with user + session
+    @Query("""
+        SELECT a FROM SessionAttendance a
+        JOIN FETCH a.participant
+        JOIN FETCH a.session
+    """)
+    List<SessionAttendance> findAllWithRelations();
 }

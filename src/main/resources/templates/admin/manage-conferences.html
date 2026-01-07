@@ -1,5 +1,4 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
-<<<<<<< HEAD
     <section>
 
         <style>
@@ -55,12 +54,17 @@
 
         <div class="container mt-5">
             <h1>Manage Conferences</h1>
-            <button class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#conferenceModal"
-                onclick="openAddModal()">
-             <i class="bi bi-person-add p-2 fs-5"></i> Add Conference
-            </button>
+            <div class="text-end mb-3">
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2 ms-auto"
+                        data-bs-toggle="modal"
+                        data-bs-target="#conferenceModal"
+                        onclick="openAddModal()">
+                    <i class="bi bi-person-add fs-5"></i>
+                    Add Conference
+                </button>
+            </div>
+
+            
             <table class="table mt-4">
                 <thead>
                     <tr>
@@ -81,7 +85,7 @@
                         <td class="text-center" th:text="${conf.endDate}"></td>
                         <td class="text-center">
                             <a th:href="@{/admin/conferences/edit/{id}(id=${conf.id})}"
-                                class="btn btn-warning btn-sm"
+                                class="btn btn-outline-warning btn-sm"
                                 data-bs-toggle="modal"
                                 data-bs-target="#conferenceModal"
                                 th:attr="
@@ -95,10 +99,11 @@
                             </a>
 
                             <a th:href="@{/admin/conferences/delete/{id}(id=${conf.id})}"
-   class="btn btn-danger btn-sm"
-   onclick="return confirm('Delete this conference?')">
-    Delete
-</a>
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('Delete this conference?')">
+                                    Delete
+                            </a>
+
                         </td>
                     </tr>
                     <tr class="text-center" th:if="${conferences == null or #lists.isEmpty(conferences)}">
@@ -181,70 +186,3 @@
 
     </section>
 </div>
-=======
-<section class="container-fluid">
-
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-2 p-0">
-            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-        </div>
-
-        <!-- Content -->
-        <div class="col-md-10 mt-4">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="fw-bold">Manage Conferences</h2>
-                <a href="/admin/conferences/create" class="btn btn-primary">
-                    + Create Conference
-                </a>
-            </div>
-
-            <div class="card shadow-sm">
-                <div class="card-body">
-
-                    <table class="table table-striped align-middle">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Dates</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr th:each="conf : ${conferences}">
-                                <td th:text="${conf.title}"></td>
-                                <td>
-                                    <span th:text="${conf.startDate}"></span>
-                                    →
-                                    <span th:text="${conf.endDate}"></span>
-                                </td>
-                                <td>
-                                    <form th:action="@{/admin/conferences/{id}/delete(id=${conf.id})}"
-                                          method="post"
-                                          style="display:inline">
-                                        <button class="btn btn-sm btn-danger">
-                                            Delete
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-
-                            <tr th:if="${#lists.isEmpty(conferences)}">
-                                <td colspan="3" class="text-center text-muted">
-                                    No conferences available
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-</section>
-</div>
->>>>>>> origin/main
