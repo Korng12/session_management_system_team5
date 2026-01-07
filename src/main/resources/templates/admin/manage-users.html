@@ -1,0 +1,283 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/main :: layout(~{::section})}">
+
+<section class="mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Manage Users</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+      + Create User
+    </button>
+  </div>
+
+  <!-- Users table -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <table class="table table-bordered table-hover">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Roles</th>
+            <th style="width: 160px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <tr>
+            <td colspan="5" class="text-center text-muted">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create User Modal -->
+  <div class="modal fade" id="createUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="createUserForm">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Name</label>
+                <input class="form-control" name="name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" name="email" type="email" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Password</label>
+                <input class="form-control" name="password" type="password" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Roles</label>
+                <div id="createUserRoles" class="border rounded p-2"></div>
+              </div>
+            </div>
+          </form>
+
+          <div id="createUserError" class="text-danger mt-2"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="submitCreateUser()">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="editUserForm">
+            <input type="hidden" name="id">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Name</label>
+                <input class="form-control" name="name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" name="email" type="email" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">New Password (optional)</label>
+                <input class="form-control" name="password" type="password">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Roles</label>
+                <div id="editUserRoles" class="border rounded p-2"></div>
+              </div>
+            </div>
+          </form>
+
+          <div id="editUserError" class="text-danger mt-2"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="submitEditUser()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const USERS_API = "/admin/api/users";
+    const ROLES_API = "/admin/api/roles";
+
+    let rolesCache = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadRoles();
+      await loadUsers();
+    });
+
+    async function loadRoles() {
+      const res = await fetch(ROLES_API);
+      rolesCache = await res.json();
+      renderRoleCheckboxes("createUserRoles", []);
+    }
+
+    async function loadUsers() {
+      const res = await fetch(USERS_API);
+      const users = await res.json();
+      renderUsers(users);
+    }
+
+    function renderUsers(users) {
+      const body = document.getElementById("userTableBody");
+      body.innerHTML = "";
+
+      if (!users.length) {
+        body.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No users found</td></tr>`;
+        return;
+      }
+
+      users.forEach(u => {
+        const roles = (u.roles || []).join(", ");
+        body.innerHTML += `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.name}</td>
+            <td>${u.email}</td>
+            <td>${roles}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-1" onclick="openEditUser(${u.id})">Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})">Delete</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderRoleCheckboxes(containerId, selectedRoles) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      rolesCache.forEach(r => {
+        const checked = selectedRoles.includes(r.name) ? "checked" : "";
+        container.innerHTML += `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="${r.name}" ${checked}>
+            <label class="form-check-label">${r.name}</label>
+          </div>
+        `;
+      });
+    }
+
+    function getCheckedRoles(containerId) {
+      const container = document.getElementById(containerId);
+      return Array.from(container.querySelectorAll("input[type=checkbox]:checked"))
+        .map(cb => cb.value);
+    }
+
+    async function submitCreateUser() {
+      const form = document.getElementById("createUserForm");
+      const errorDiv = document.getElementById("createUserError");
+      errorDiv.innerText = "";
+
+      const payload = {
+        name: form.name.value,
+        email: form.email.value,
+        password: form.password.value,
+        roles: getCheckedRoles("createUserRoles")
+      };
+
+      const res = await fetch(USERS_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        errorDiv.innerText = err.message || "Failed to create user";
+        return;
+      }
+
+      bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide();
+      form.reset();
+      await loadUsers();
+    }
+
+    async function openEditUser(userId) {
+      const res = await fetch(`${USERS_API}/${userId}`);
+      const user = await res.json();
+
+      const form = document.getElementById("editUserForm");
+      form.id.value = user.id;
+      form.name.value = user.name;
+      form.email.value = user.email;
+      form.password.value = "";
+
+      renderRoleCheckboxes("editUserRoles", user.roles || []);
+
+      new bootstrap.Modal(document.getElementById("editUserModal")).show();
+    }
+
+    async function submitEditUser() {
+      const form = document.getElementById("editUserForm");
+      const errorDiv = document.getElementById("editUserError");
+      errorDiv.innerText = "";
+
+      const payload = {
+        name: form.name.value,
+        email: form.email.value,
+        password: form.password.value || null,
+        roles: getCheckedRoles("editUserRoles")
+      };
+
+      const res = await fetch(`${USERS_API}/${form.id.value}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        errorDiv.innerText = err.message || "Failed to update user";
+        return;
+      }
+
+      bootstrap.Modal.getInstance(document.getElementById("editUserModal")).hide();
+      await loadUsers();
+    }
+
+    async function deleteUser(userId) {
+  if (!confirm("Delete this user?")) return;
+
+  const res = await fetch(`/admin/api/users/${userId}`, { method: "DELETE" });
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Delete failed:", text);
+    alert("Delete failed:\n" + text);
+    return;
+  }
+
+  await loadUsers();
+}
+
+  </script>
+
+</section>
+</html>
