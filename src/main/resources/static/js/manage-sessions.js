@@ -64,7 +64,12 @@ async function loadSessions() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${s.title || ''}</td>
-                <td>${s.chairName || '<em class="text-muted">No chair</em>'}</td>
+                <td>
+                    <div class="d-flex gap-2 align-items-center">
+                        <span>${s.chairName || '<em class="text-muted">No chair</em>'}</span>
+                        ${s.chairId ? '<button class="btn btn-sm btn-outline-danger remove-chair-btn" title="Remove chair">✕</button>' : ''}
+                    </div>
+                </td>
                 <td>${s.roomName || ''}</td>
                 <td>${s.conferenceName || ''}</td>
                 <td>${formatDateTime(s.startTime)}</td>
@@ -77,8 +82,16 @@ async function loadSessions() {
                 </td>
             `;
 
-            const [assignChairBtn, editBtn, deleteBtn] = tr.querySelectorAll('button');
+            const assignChairBtn = tr.querySelector('.assign-chair-btn');
+            const removeChairBtn = tr.querySelector('.remove-chair-btn');
+            const [editBtn, deleteBtn] = tr.querySelectorAll('button:not(.assign-chair-btn):not(.remove-chair-btn)');
+            
             assignChairBtn.addEventListener('click', () => openAssignChairModal(s.id, s.title || '', s.startTime, s.endTime));
+            
+            if (removeChairBtn) {
+                removeChairBtn.addEventListener('click', () => openRemoveChairModal(s.id, s.title || '', s.chairName || ''));
+            }
+            
             editBtn.addEventListener('click', () => openEditModal(
                 s.id,
                 s.title || '',
@@ -483,6 +496,41 @@ document.getElementById('confirmAssignChairBtn')?.addEventListener('click', asyn
     } catch (error) {
         document.getElementById('assignChairError').textContent = 'Network error while assigning chair';
         document.getElementById('assignChairError').classList.remove('d-none');
+    }
+});
+
+// Remove Chair Modal
+let removeChairModal;
+function openRemoveChairModal(sessionId, sessionTitle, chairName) {
+    document.getElementById('removeChairSessionTitle').textContent = sessionTitle;
+    document.getElementById('removeChairName').textContent = chairName;
+    removeChairModal = new bootstrap.Modal(document.getElementById('removeChairModal'));
+    removeChairModal._sessionId = sessionId;
+    removeChairModal.show();
+}
+
+// Handle chair removal
+document.getElementById('confirmRemoveChairBtn')?.addEventListener('click', async () => {
+    const sessionId = removeChairModal?._sessionId;
+    
+    try {
+        const res = await fetch(`/admin/sessions/${sessionId}/remove-chair`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            const msg = errJson.message || `Failed to remove chair (status ${res.status})`;
+            showError(msg);
+            return;
+        }
+        
+        removeChairModal.hide();
+        loadSessions();
+        showSuccess('Chair removed successfully');
+    } catch (error) {
+        showError('Network error while removing chair');
     }
 });
 
