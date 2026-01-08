@@ -236,6 +236,32 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () 
     }
 });
 
+function restoreSessionConfirm(sessionId, sessionTitle) {
+    if (confirm(`Restore session "${sessionTitle}"?`)) {
+        restoreSession(sessionId);
+    }
+}
+
+async function restoreSession(sessionId) {
+    try {
+        const res = await fetch(`${api.createSession}/${sessionId}/restore`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
+            const msg = errJson.message || errText || `Failed to restore (status ${res.status})`;
+            showError(msg);
+            return;
+        }
+        loadSessions();
+        showSuccess('Session restored');
+    } catch (error) {
+        showError('Network error while restoring');
+    }
+}
+
 // Search and Filter functionality
 let allSessions = [];
 
@@ -259,13 +285,17 @@ function filterSessions() {
 
 function renderSessions(sessions) {
     if (!sessions.length) {
-        sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No sessions found</td></tr>';
+        sessionsBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No sessions found</td></tr>';
         return;
     }
 
     sessionsBody.innerHTML = '';
     sessions.forEach(s => {
         const tr = document.createElement('tr');
+        const deletedBadge = s.deleted 
+            ? '<span class="badge bg-danger">Deleted</span>' 
+            : '<span class="badge bg-success">Active</span>';
+        
         tr.innerHTML = `
             <td>${s.title || ''}</td>
             <td>${s.chairName || ''}</td>
@@ -274,24 +304,37 @@ function renderSessions(sessions) {
             <td>${formatDateTime(s.startTime)}</td>
             <td>${formatDateTime(s.endTime)}</td>
             <td><span class="badge bg-secondary">${s.status || 'N/A'}</span></td>
+            <td>${deletedBadge}</td>
             <td class="d-flex gap-1">
-                <button class="btn btn-sm btn-warning">Edit</button>
-                <button class="btn btn-sm btn-danger">Delete</button>
+                ${!s.deleted ? '<button class="btn btn-sm btn-warning edit-btn">Edit</button>' : ''}
+                ${!s.deleted ? '<button class="btn btn-sm btn-danger delete-btn">Delete</button>' : '<button class="btn btn-sm btn-info restore-btn">Restore</button>'}
             </td>
         `;
 
-        const [editBtn, deleteBtn] = tr.querySelectorAll('button');
-        editBtn.addEventListener('click', () => openEditModal(
-            s.id,
-            s.title || '',
-            s.startTime,
-            s.endTime,
-            s.status || '',
-            s.chairId || null,
-            s.roomId || null,
-            s.conferenceId || null
-        ));
-        deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
+        const editBtn = tr.querySelector('.edit-btn');
+        const deleteBtn = tr.querySelector('.delete-btn');
+        const restoreBtn = tr.querySelector('.restore-btn');
+
+        if (editBtn) {
+            editBtn.addEventListener('click', () => openEditModal(
+                s.id,
+                s.title || '',
+                s.startTime,
+                s.endTime,
+                s.status || '',
+                s.chairId || null,
+                s.roomId || null,
+                s.conferenceId || null
+            ));
+        }
+
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
+        }
+
+        if (restoreBtn) {
+            restoreBtn.addEventListener('click', () => restoreSessionConfirm(s.id, s.title || ''));
+        }
 
         sessionsBody.appendChild(tr);
     });

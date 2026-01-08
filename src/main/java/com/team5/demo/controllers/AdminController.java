@@ -466,7 +466,7 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteSession(@PathVariable("id") Long id) {
         try {
-            sessionService.permanentlyDeleteSession(id);
+            sessionService.deleteSession(id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
