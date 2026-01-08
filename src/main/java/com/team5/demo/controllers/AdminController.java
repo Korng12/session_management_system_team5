@@ -316,6 +316,30 @@ public class AdminController {
     }
 
     /**
+     * Search user by email
+     * GET /admin/api/users/search-by-email?email=
+     */
+    @GetMapping("/api/users/search-by-email")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
+        return userRepository.findByEmail(email)
+                .map(u -> ResponseEntity.ok(new UserDTO(u.getId(), u.getName(), u.getEmail())))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    /**
+     * Search user by id
+     * GET /admin/api/users/search-by-id?id=
+     */
+    @GetMapping("/api/users/search-by-id")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> getUserById(@RequestParam Long id) {
+        return userRepository.findById(id)
+                .map(u -> ResponseEntity.ok(new UserDTO(u.getId(), u.getName(), u.getEmail())))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    /**
      * Get all sessions
      * GET /admin/api/sessions
      */
