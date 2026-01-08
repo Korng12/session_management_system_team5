@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
+      const rememberMe = document.getElementById("rememberMe").checked;
 
       let valid = true;
 
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe}),
       });
 
       if (!res.ok) {
