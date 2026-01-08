@@ -69,8 +69,28 @@
         </section>
 
         <div class="container-fluid">
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createSessionModal">Create Session</button>
+            <!-- Search and Filter Section -->
+            <div class="card mb-4 p-3">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search by title, chair, or room...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filterStatus">
+                            <option value="">All Status</option>
+                            <option value="SCHEDULED">Scheduled</option>
+                            <option value="ONGOING">Ongoing</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-outline-secondary w-100" id="resetBtn">Reset</button>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createSessionModal">Create Session</button>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-striped align-middle" id="sessionsTable">

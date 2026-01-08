@@ -236,6 +236,91 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () 
     }
 });
 
+// Search and Filter functionality
+let allSessions = [];
+
+function filterSessions() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('filterStatus').value;
+
+    const filtered = allSessions.filter(s => {
+        const matchesSearch = !searchTerm || 
+            s.title.toLowerCase().includes(searchTerm) ||
+            (s.chairName && s.chairName.toLowerCase().includes(searchTerm)) ||
+            (s.roomName && s.roomName.toLowerCase().includes(searchTerm));
+        
+        const matchesStatus = !statusFilter || s.status === statusFilter;
+        
+        return matchesSearch && matchesStatus;
+    });
+
+    renderSessions(filtered);
+}
+
+function renderSessions(sessions) {
+    if (!sessions.length) {
+        sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No sessions found</td></tr>';
+        return;
+    }
+
+    sessionsBody.innerHTML = '';
+    sessions.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${s.title || ''}</td>
+            <td>${s.chairName || ''}</td>
+            <td>${s.roomName || ''}</td>
+            <td>${s.conferenceName || ''}</td>
+            <td>${formatDateTime(s.startTime)}</td>
+            <td>${formatDateTime(s.endTime)}</td>
+            <td><span class="badge bg-secondary">${s.status || 'N/A'}</span></td>
+            <td class="d-flex gap-1">
+                <button class="btn btn-sm btn-warning">Edit</button>
+                <button class="btn btn-sm btn-danger">Delete</button>
+            </td>
+        `;
+
+        const [editBtn, deleteBtn] = tr.querySelectorAll('button');
+        editBtn.addEventListener('click', () => openEditModal(
+            s.id,
+            s.title || '',
+            s.startTime,
+            s.endTime,
+            s.status || '',
+            s.chairId || null,
+            s.roomId || null,
+            s.conferenceId || null
+        ));
+        deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
+
+        sessionsBody.appendChild(tr);
+    });
+}
+
+// Update loadSessions to use new rendering
+const originalLoadSessions = loadSessions;
+async function loadSessionsWithFilter() {
+    sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
+    try {
+        const res = await fetch(api.sessions);
+        if (!res.ok) throw new Error('Failed to load sessions');
+        allSessions = await res.json();
+        filterSessions();
+    } catch (e) {
+        sessionsBody.innerHTML = '<tr><td colspan="8" class="text-danger text-center">Could not load sessions</td></tr>';
+    }
+}
+
+loadSessions = loadSessionsWithFilter;
+
 document.addEventListener('DOMContentLoaded', () => {
     loadOptions().then(loadSessions);
-});
+    
+    // Add search and filter event listeners
+    document.getElementById('searchInput').addEventListener('keyup', filterSessions);
+    document.getElementById('filterStatus').addEventListener('change', filterSessions);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterStatus').value = '';
+        filterSessions();
+    });
