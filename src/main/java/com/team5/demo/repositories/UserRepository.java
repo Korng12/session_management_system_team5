@@ -2,12 +2,23 @@ package com.team5.demo.repositories;
 
 import com.team5.demo.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
+
     // Optional<User> findByUsername(String username);
     boolean existsByEmail(String email);
+
+    @Query("""
+            SELECT COUNT(u)
+            FROM User u
+            JOIN u.roles r
+            WHERE r.name = 'ROLE_ADMIN'
+            """)
+    long countAdmins();
+
 }

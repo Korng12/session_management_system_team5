@@ -11,6 +11,10 @@ import com.team5.demo.security.JwtUtil;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -42,6 +48,15 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // helper for validation errors
+    private Map<String, String> getErrors(BindingResult bindingResult) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : bindingResult.getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return errors;
+    }
+
     // @PostMapping("/register")
     // public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
     // if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -64,36 +79,45 @@ public class AuthController {
     // }
     @PostMapping("/register")
     public ResponseEntity<?> register(
-        @RequestBody RegisterRequest request,
-        HttpServletResponse response) {
+            @Valid @RequestBody RegisterRequest request,
+            BindingResult result,
+            HttpServletResponse response) {
 
-    if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-        return ResponseEntity.badRequest().body("Email already exists");
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(getErrors(result));
+        }
+
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        Role attendeeRole = roleRepository.findByName("ATTENDEE")
+                .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+        user.addRole(attendeeRole);
+
+        userRepository.save(user);
+        //  DEFAULT EXPIRY for register (1 hour)
+        long jwtExpiryMillis = 60L * 60 * 1000; // 1 hour
+        int cookieAge = 60 * 60; // 1 hour
+
+        //  Generate JWT using new method
+        String token = jwtUtil.generateToken(user.getEmail(), jwtExpiryMillis);
+
+        //  Store JWT in HttpOnly cookie
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(cookieAge);
+        response.addCookie(cookie);
+        System.out.println("Login successful, JWT cookie set."+ cookie.getName());
+
+        return ResponseEntity.ok().build();
     }
-
-    User user = new User();
-    user.setName(request.getName());
-    user.setEmail(request.getEmail());
-    user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-    Role attendeeRole = roleRepository.findByName("ATTENDEE")
-            .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-    user.addRole(attendeeRole);
-
-    userRepository.save(user);
-
-    // 🔐 Generate JWT
-    String token = jwtUtil.generateToken(user.getEmail());
-
-    // 🍪 Store JWT in HttpOnly cookie
-    Cookie cookie = new Cookie("jwt", token);
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(60 * 60); // 1 hour
-    response.addCookie(cookie);
-
-    return ResponseEntity.ok().build();
-}
 
     // @PostMapping("/login")
     // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
@@ -107,25 +131,39 @@ public class AuthController {
     // }
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
+            BindingResult result,
             HttpServletResponse response) {
 
-        Authentication auth = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getEmail(),
-                request.getPassword()
-            )
-        );
-        System.out.println("Authentication successful for user: " + auth.getPrincipal()+" "+ auth.getAuthorities()+ "" + auth.isAuthenticated());
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(getErrors(result));
+        }
 
-        String token = jwtUtil.generateToken(request.getEmail());
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid email or password"));
+        }
+        long jwtExpiryMillis = request.isRememberMe()
+                ? 7L * 24 * 60 * 60 * 1000   // 7 days
+                : 60L * 60 * 1000; // 1 hour
+
+        String token = jwtUtil.generateToken(request.getEmail(), jwtExpiryMillis);
+
+        // Cookie expiration depends on rememberMe
+        int cookieAge = request.isRememberMe()
+                ? 7 * 24 * 60 * 60// 7 days
+                : 60 * 60; // 1 hour
 
         Cookie cookie = new Cookie("jwt", token);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setMaxAge(60 * 60); // 1 hour
+        cookie.setMaxAge(cookieAge);
         response.addCookie(cookie);
-        System.out.println("Login successful, JWT cookie set."+ cookie.getName());
 
         return ResponseEntity.ok().build();
     }
@@ -141,5 +179,4 @@ public class AuthController {
         response.addCookie(cookie);
         return ResponseEntity.ok().build();
     }
-
 }

@@ -56,7 +56,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.team5.demo.entities.Role;
 import com.team5.demo.entities.User;
 
@@ -709,9 +710,34 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
-            User user = getUserOrThrow(id);
-            userRepository.delete(user);
+            User userToDelete = getUserOrThrow(id);
+
+            String currentEmail = getCurrentUserEmail();
+            boolean targetIsAdmin = userToDelete.getRoles().stream()
+                    .anyMatch(r -> r.getName().equalsIgnoreCase("ROLE_ADMIN"));
+
+            if (targetIsAdmin && userRepository.countAdmins() <= 1) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ValidationErrorResponse("Cannot delete the last admin."));
+            }
+
+            if (currentEmail == null || currentEmail.equals("anonymousUser")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ValidationErrorResponse("Unauthorized"));
+            }
+
+            User currentUser = userRepository.findByEmail(currentEmail)
+                    .orElseThrow(() -> new IllegalArgumentException("Current user not found"));
+
+            //  Prevent admin deleting himself (use ID)
+            if (currentUser.getId().equals(userToDelete.getId())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ValidationErrorResponse("You cannot delete your own admin account."));
+            }
+
+            userRepository.delete(userToDelete);
             return ResponseEntity.ok(new ValidationErrorResponse("User deleted"));
+
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ValidationErrorResponse(e.getMessage()));
@@ -728,21 +754,6 @@ public class AdminController {
             Role role = getRoleOrThrow(roleName);
 
             user.getRoles().add(role);
-            User saved = userRepository.save(user);
-
-            return ResponseEntity.ok(toAdminUserDTO(saved));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ValidationErrorResponse(e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/api/users/{id}/roles/{roleName}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> removeRoleFromUser(@PathVariable Long id, @PathVariable String roleName) {
-        try {
-            User user = getUserOrThrow(id);
-            user.getRoles().removeIf(r -> r.getName().equalsIgnoreCase(roleName));
             User saved = userRepository.save(user);
 
             return ResponseEntity.ok(toAdminUserDTO(saved));
@@ -771,8 +782,6 @@ public class AdminController {
                     .body(new ValidationErrorResponse("Failed to replace roles: " + e.getMessage()));
         }
     }
-
-    // Role CRUD
 
     @GetMapping("/api/roles")
     @PreAuthorize("hasRole('ADMIN')")
@@ -803,4 +812,9 @@ public class AdminController {
         return new AdminUserDTO(user.getId(), user.getName(), user.getEmail(), roles);
     }
 
+    private String getCurrentUserEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("AUTH_NAME = " + auth.getName());
+        return auth.getName(); // usually email (subject from JWT)
+    }
 }

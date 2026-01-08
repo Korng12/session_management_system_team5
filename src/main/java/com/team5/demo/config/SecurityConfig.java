@@ -62,35 +62,48 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register","/login").permitAll()
-                            // ===== Static resources =====
+                        .requestMatchers("/", "/register", "/login").permitAll()
+                        // ===== Static resources =====
                         .requestMatchers(
-                            "/favicon.ico",
-                            "/css/**",
-                            "/js/**",
-                            "/images/**",
-                            "/webjars/**"
-                        ).permitAll()
+                                "/favicon.ico",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/webjars/**")
+                        .permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/chair/**").hasAuthority("ROLE_CHAIR")
-                        .requestMatchers("/attendee/**").hasAuthority("ROLE_ATTENDEE")
-                        .anyRequest().authenticated()
-                )
-                .exceptionHandling(ex -> ex
-                    .authenticationEntryPoint((request, response, authException) -> {
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/chair/**").hasAuthority("CHAIR")
+                        .requestMatchers("/attendee/**").hasAuthority("ATTENDEE")
+                        .anyRequest().authenticated())
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((request, response, authException) -> {
+
+                    String uri = request.getRequestURI();
+
+                    if (uri.matches("^/(api|admin|chair|attendee)(/.*)?$")) {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType("application/json");
-                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
-                    }))
+                        response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                    } else {
+                        response.sendRedirect("/login");
+                    }
+                }))
                 .httpBasic(basic -> basic.disable())
                 // .formLogin(form -> form
-                //         .disable()
+                // .disable()
                 // // .loginPage("/login")
                 // // .permitAll()
                 // )
                 // .logout(logout -> logout.permitAll())
+                // .sessionManagement(session -> session
+                // .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // .exceptionHandling(ex -> ex
+                // .authenticationEntryPoint((request, response, authException) -> {
+                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                // response.setContentType("application/json");
+                // response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                // }))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
