@@ -1,6 +1,5 @@
 package com.team5.demo.controllers;
 
-import com.team5.demo.dto.AuthResponse;
 import com.team5.demo.dto.LoginRequest;
 import com.team5.demo.dto.RegisterRequest;
 import com.team5.demo.entities.Role;
