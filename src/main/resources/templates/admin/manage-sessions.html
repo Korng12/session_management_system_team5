@@ -294,6 +294,26 @@
         </div>
     </div>
 
+    <!-- Remove Chair Modal -->
+    <div class="modal fade" id="removeChairModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remove Chair from Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove <strong id="removeChairName"></strong> from session <strong id="removeChairSessionTitle"></strong>?</p>
+                    <p class="text-muted small">The session will remain but will have no chair assigned.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmRemoveChairBtn">Remove Chair</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </div>
 
     <!-- Chair Conflict Details Modal -->
