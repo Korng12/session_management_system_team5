@@ -19,9 +19,11 @@ const editChairSelect = document.getElementById('editChairId');
 const editRoomSelect = document.getElementById('editRoomId');
 const editConferenceSelect = document.getElementById('editConferenceId');
 
+const assignChairSelect = document.getElementById('assignChairSelect');
+
 async function loadOptions() {
     await Promise.all([
-        fetchOptions(api.users, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
+        fetchOptions(api.users, [chairSelect, editChairSelect, assignChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
         fetchOptions(api.rooms, [roomSelect, editRoomSelect], r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
         fetchOptions(api.conferences, [conferenceSelect, editConferenceSelect], c => ({ value: c.id, label: c.title }))
     ]);
@@ -60,19 +62,21 @@ async function loadSessions() {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${s.title || ''}</td>
-                <td>${s.chairName || ''}</td>
+                <td>${s.chairName || '<em class="text-muted">No chair</em>'}</td>
                 <td>${s.roomName || ''}</td>
                 <td>${s.conferenceName || ''}</td>
                 <td>${formatDateTime(s.startTime)}</td>
                 <td>${formatDateTime(s.endTime)}</td>
                 <td><span class="badge bg-secondary">${s.status || 'N/A'}</span></td>
                 <td class="d-flex gap-1">
+                    <button class="btn btn-sm btn-info assign-chair-btn">Assign Chair</button>
                     <button class="btn btn-sm btn-warning">Edit</button>
                     <button class="btn btn-sm btn-danger">Delete</button>
                 </td>
             `;
 
-            const [editBtn, deleteBtn] = tr.querySelectorAll('button');
+            const [assignChairBtn, editBtn, deleteBtn] = tr.querySelectorAll('button');
+            assignChairBtn.addEventListener('click', () => openAssignChairModal(s.id, s.title || '', s.startTime, s.endTime));
             editBtn.addEventListener('click', () => openEditModal(
                 s.id,
                 s.title || '',
@@ -355,6 +359,51 @@ async function loadSessionsWithFilter() {
 }
 
 loadSessions = loadSessionsWithFilter;
+
+// Assign Chair Modal
+let assignChairModal;
+function openAssignChairModal(sessionId, sessionTitle, startTime, endTime) {
+    document.getElementById('assignSessionId').value = sessionId;
+    document.getElementById('assignSessionTitle').textContent = sessionTitle;
+    document.getElementById('assignSessionTime').textContent = `${formatDateTime(startTime)} - ${formatDateTime(endTime)}`;
+    document.getElementById('assignChairError').classList.add('d-none');
+    assignChairModal = new bootstrap.Modal(document.getElementById('assignChairModal'));
+    assignChairModal.show();
+}
+
+// Handle chair assignment
+document.getElementById('confirmAssignChairBtn')?.addEventListener('click', async () => {
+    const sessionId = document.getElementById('assignSessionId').value;
+    const chairId = document.getElementById('assignChairSelect').value;
+    
+    if (!chairId) {
+        document.getElementById('assignChairError').textContent = 'Please select a chair';
+        document.getElementById('assignChairError').classList.remove('d-none');
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/admin/sessions/${sessionId}/assign-chair/${chairId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!res.ok) {
+            const errJson = await res.json().catch(() => ({}));
+            const msg = errJson.message || `Failed to assign chair (status ${res.status})`;
+            document.getElementById('assignChairError').textContent = msg;
+            document.getElementById('assignChairError').classList.remove('d-none');
+            return;
+        }
+        
+        assignChairModal.hide();
+        loadSessions();
+        showSuccess('Chair assigned successfully');
+    } catch (error) {
+        document.getElementById('assignChairError').textContent = 'Network error while assigning chair';
+        document.getElementById('assignChairError').classList.remove('d-none');
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     loadOptions().then(loadSessions);
