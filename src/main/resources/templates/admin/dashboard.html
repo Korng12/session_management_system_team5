@@ -181,7 +181,101 @@
             </div>
         </div>
     </div>
+
+    <!-- Upcoming Sessions Widget -->
+    <div class="row g-4 mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">📅 Upcoming Sessions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="upcomingSessionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Chair</th>
+                                    <th>Room</th>
+                                    <th>Start Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="upcoming-sessions-body">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">Loading upcoming sessions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-2">
+                        <a href="/admin/manage-sessions" class="btn btn-sm btn-outline-primary">View All Sessions →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+    <script>
+        // Load upcoming sessions on dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/admin/api/sessions');
+                if (!response.ok) throw new Error('Failed to load sessions');
+                
+                const sessions = await response.json();
+                
+                // Filter upcoming sessions (not deleted, future start time)
+                const now = new Date();
+                const upcomingSessions = sessions
+                    .filter(s => !s.deleted && new Date(s.startTime) > now)
+                    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime))
+                    .slice(0, 5); // Next 5 sessions
+                
+                const tbody = document.getElementById('upcoming-sessions-body');
+                
+                if (upcomingSessions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No upcoming sessions scheduled</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = upcomingSessions.map(s => {
+                    const statusClass = s.status === 'SCHEDULED' ? 'bg-info' : 
+                                       s.status === 'ONGOING' ? 'bg-warning' : 
+                                       s.status === 'COMPLETED' ? 'bg-success' : 'bg-secondary';
+                    
+                    return `
+                        <tr>
+                            <td><strong>${s.title || 'Untitled'}</strong></td>
+                            <td>${s.chairName || '<em class="text-muted">No chair assigned</em>'}</td>
+                            <td>${s.roomName || '<em class="text-muted">TBA</em>'}</td>
+                            <td>${formatDateTime(s.startTime)}</td>
+                            <td><span class="badge ${statusClass}">${s.status || 'N/A'}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading upcoming sessions:', error);
+                document.getElementById('upcoming-sessions-body').innerHTML = 
+                    '<tr><td colspan="5" class="text-center text-danger">Error loading sessions</td></tr>';
+            }
+        });
+        
+        function formatDateTime(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            };
+            return date.toLocaleDateString('en-US', options);
+        }
+    </script>
     </section>
 
 </div>
