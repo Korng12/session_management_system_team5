@@ -459,14 +459,14 @@ public class AdminController {
     }
 
     /**
-     * Delete session (soft delete)
+     * Delete session (hard delete - permanently removes from database)
      * DELETE /admin/sessions/{id}
      */
     @DeleteMapping("/sessions/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteSession(@PathVariable("id") Long id) {
         try {
-            sessionService.deleteSession(id);
+            sessionService.permanentlyDeleteSession(id);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
