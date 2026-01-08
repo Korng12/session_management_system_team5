@@ -384,8 +384,12 @@ function openAssignChairModal(sessionId, sessionTitle, startTime, endTime) {
 // Real-time chair availability checking
 document.getElementById('assignChairSelect')?.addEventListener('change', async (e) => {
     const chairId = e.target.value;
+    const assignBtn = document.getElementById('confirmAssignChairBtn');
+    
     if (!chairId) {
         document.getElementById('chairConflictWarning').classList.add('d-none');
+        assignBtn.disabled = false;
+        assignBtn.classList.remove('disabled');
         return;
     }
     
@@ -395,9 +399,12 @@ document.getElementById('assignChairSelect')?.addEventListener('change', async (
         
         const data = await res.json();
         
-        // If there are conflicts, show warning
+        // If there are conflicts, show warning and disable assignment
         if (data.conflicts && data.conflicts.length > 0) {
             document.getElementById('chairConflictWarning').classList.remove('d-none');
+            assignBtn.disabled = true;
+            assignBtn.classList.add('disabled');
+            assignBtn.innerHTML = '❌ Cannot Assign (Conflicts)';
             
             // Store conflict data for modal
             const chairName = document.getElementById('assignChairSelect').options[document.getElementById('assignChairSelect').selectedIndex].text;
@@ -410,6 +417,9 @@ document.getElementById('assignChairSelect')?.addEventListener('change', async (
             };
         } else {
             document.getElementById('chairConflictWarning').classList.add('d-none');
+            assignBtn.disabled = false;
+            assignBtn.classList.remove('disabled');
+            assignBtn.innerHTML = 'Assign Chair';
         }
     } catch (error) {
         console.error('Error checking chair availability:', error);

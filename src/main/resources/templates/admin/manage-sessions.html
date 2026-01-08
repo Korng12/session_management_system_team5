@@ -270,7 +270,7 @@
                 <div class="modal-body">
                     <div class="alert alert-danger d-none" id="assignChairError"></div>
                     <div class="alert alert-warning d-none" id="chairConflictWarning">
-                        <strong>⚠️ Schedule Conflict!</strong> This chair has overlapping sessions during this time. <a href="#" id="viewConflictDetailsLink" class="alert-link">View details</a>
+                        <strong>🚫 Cannot Assign!</strong> This chair has overlapping sessions during this time and cannot be assigned. <a href="#" id="viewConflictDetailsLink" class="alert-link">View details</a>
                     </div>
                     <div class="alert alert-info mb-3">
                         <strong>Session:</strong> <span id="assignSessionTitle"></span><br>
@@ -288,7 +288,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="confirmAssignChairBtn">Assign Chair</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignChairBtn" title="Select a chair without scheduling conflicts">Assign Chair</button>
                 </div>
             </div>
         </div>
