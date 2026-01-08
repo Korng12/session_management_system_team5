@@ -1,0 +1,186 @@
+<div th:replace="~{layout/main :: layout(~{::section})}">
+<section>
+
+    <!-- Simple modern styling -->
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== Content ===== */
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        /* ===== Card ===== */
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* ===== Form ===== */
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        select, button {
+            padding: 8px;
+            width: 100%;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        /* ===== Table ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f0f2f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+
+        .btn-update {
+            background: #2ecc71;
+        }
+
+        .btn-update:hover {
+            background: #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+    <div class="content">
+
+        <h1>Conference Registrations</h1>
+
+        <!-- ===== CREATE REGISTRATION ===== -->
+        <div class="card">
+            <h3>Register User to Conference</h3>
+
+            <form th:action="@{/admin/registrations}" method="post">
+                <div class="form-row">
+                    <select name="userId" required>
+                        <option value="">-- Select User --</option>
+                        <option th:each="u : ${users}"
+                                th:value="${u.id}"
+                                th:text="${u.name + ' (' + u.email + ')'}">
+                        </option>
+                    </select>
+
+                    <select name="conferenceId" required>
+                        <option value="">-- Select Conference --</option>
+                        <option th:each="c : ${conferences}"
+                                th:value="${c.id}"
+                                th:text="${c.title}">
+                        </option>
+                    </select>
+
+                    <button type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ===== REGISTRATIONS TABLE ===== -->
+        <div class="card">
+            <h3>Existing Registrations</h3>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Conference</th>
+                    <th>Status</th>
+                    <th>Registered At</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="r : ${registrations}">
+                    <td th:text="${r.id}"></td>
+                    <td th:text="${r.participant.email}"></td>
+                    <td th:text="${r.conference.title}"></td>
+                    <td th:text="${r.status}"></td>
+                    <td th:text="${#temporals.format(r.registeredAt, 'yyyy-MM-dd HH:mm')}"></td>
+
+                    <td class="actions">
+
+                        <!-- UPDATE STATUS -->
+                        <form th:action="@{/admin/registrations/{id}/status(id=${r.id})}" method="post">
+                            <select name="status">
+                                <option value="CONFIRMED" th:selected="${r.status=='CONFIRMED'}">CONFIRMED</option>
+                                <option value="CANCELLED" th:selected="${r.status=='CANCELLED'}">CANCELLED</option>
+                            </select>
+                            <button class="btn-update" type="submit">Update</button>
+                        </form>
+
+                        <!-- DELETE -->
+                        <form th:action="@{/admin/registrations/{id}/delete(id=${r.id})}" method="post">
+                            <button class="btn-delete"
+                                    type="submit"
+                                    onclick="return confirm('Delete this registration?')">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</section>
+</div>

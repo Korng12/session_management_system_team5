@@ -70,11 +70,15 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    
+ 
+
     // Admin Dashboard
     @GetMapping("")
     public String showAdminHomepage(Model model) {
         return "admin/dashboard"; 
     }
+
     // Manage Rooms
     @GetMapping("/manage-rooms")
     public String manageRooms(Model model) {
@@ -593,4 +597,5 @@ public class AdminController {
                 .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
     }
+ 
 }

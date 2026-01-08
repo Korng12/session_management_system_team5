@@ -46,7 +46,7 @@ public class User {
     // ✅ SessionAttendance relationship - Assuming SessionAttendance entity exists
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SessionAttendance> sessionAttendances;
-
+    
     // Helper methods
     public void addRole(Role role) {
         this.roles.add(role);
