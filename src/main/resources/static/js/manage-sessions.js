@@ -363,15 +363,84 @@ async function loadSessionsWithFilter() {
 loadSessions = loadSessionsWithFilter;
 
 // Assign Chair Modal
-let assignChairModal;
+let assignChairModal, chairConflictDetailsModal;
+let currentSessionStartTime, currentSessionEndTime;
+
 function openAssignChairModal(sessionId, sessionTitle, startTime, endTime) {
     document.getElementById('assignSessionId').value = sessionId;
     document.getElementById('assignSessionTitle').textContent = sessionTitle;
     document.getElementById('assignSessionTime').textContent = `${formatDateTime(startTime)} - ${formatDateTime(endTime)}`;
     document.getElementById('assignChairError').classList.add('d-none');
+    document.getElementById('chairConflictWarning').classList.add('d-none');
+    document.getElementById('assignChairSelect').value = '';
+    
+    currentSessionStartTime = startTime;
+    currentSessionEndTime = endTime;
+    
     assignChairModal = new bootstrap.Modal(document.getElementById('assignChairModal'));
     assignChairModal.show();
 }
+
+// Real-time chair availability checking
+document.getElementById('assignChairSelect')?.addEventListener('change', async (e) => {
+    const chairId = e.target.value;
+    if (!chairId) {
+        document.getElementById('chairConflictWarning').classList.add('d-none');
+        return;
+    }
+    
+    try {
+        const res = await fetch(`/admin/users/${chairId}/availability?startTime=${currentSessionStartTime}&endTime=${currentSessionEndTime}`);
+        if (!res.ok) return;
+        
+        const data = await res.json();
+        
+        // If there are conflicts, show warning
+        if (data.conflicts && data.conflicts.length > 0) {
+            document.getElementById('chairConflictWarning').classList.remove('d-none');
+            
+            // Store conflict data for modal
+            const chairName = document.getElementById('assignChairSelect').options[document.getElementById('assignChairSelect').selectedIndex].text;
+            window.currentConflicts = {
+                chairId: chairId,
+                chairName: chairName,
+                startTime: currentSessionStartTime,
+                endTime: currentSessionEndTime,
+                conflicts: data.conflicts
+            };
+        } else {
+            document.getElementById('chairConflictWarning').classList.add('d-none');
+        }
+    } catch (error) {
+        console.error('Error checking chair availability:', error);
+    }
+});
+
+// View conflict details
+document.getElementById('viewConflictDetailsLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (window.currentConflicts) {
+        document.getElementById('conflictChairName').textContent = window.currentConflicts.chairName;
+        document.getElementById('conflictSessionTime').textContent = 
+            `${formatDateTime(window.currentConflicts.startTime)} - ${formatDateTime(window.currentConflicts.endTime)}`;
+        
+        const conflictList = document.getElementById('conflictSessionsList');
+        conflictList.innerHTML = '';
+        window.currentConflicts.conflicts.forEach(conflict => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${conflict.title || 'N/A'}</td>
+                <td>${conflict.roomName || 'N/A'}</td>
+                <td>${formatDateTime(conflict.startTime)}</td>
+                <td>${formatDateTime(conflict.endTime)}</td>
+            `;
+            conflictList.appendChild(row);
+        });
+        
+        chairConflictDetailsModal = new bootstrap.Modal(document.getElementById('chairConflictDetailsModal'));
+        chairConflictDetailsModal.show();
+    }
+});
 
 // Handle chair assignment
 document.getElementById('confirmAssignChairBtn')?.addEventListener('click', async () => {

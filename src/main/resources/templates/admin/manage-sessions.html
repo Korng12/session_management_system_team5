@@ -269,6 +269,9 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger d-none" id="assignChairError"></div>
+                    <div class="alert alert-warning d-none" id="chairConflictWarning">
+                        <strong>⚠️ Schedule Conflict!</strong> This chair has overlapping sessions during this time. <a href="#" id="viewConflictDetailsLink" class="alert-link">View details</a>
+                    </div>
                     <div class="alert alert-info mb-3">
                         <strong>Session:</strong> <span id="assignSessionTitle"></span><br>
                         <strong>Time:</strong> <span id="assignSessionTime"></span>
@@ -291,6 +294,42 @@
         </div>
     </div>
 
+    </div>
+
+    <!-- Chair Conflict Details Modal -->
+    <div class="modal fade" id="chairConflictDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Chair Schedule Conflicts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Chair:</strong> <span id="conflictChairName"></span></p>
+                    <p><strong>Selected Session Time:</strong> <span id="conflictSessionTime"></span></p>
+                    <p class="text-muted mt-3">This chair has the following sessions during the selected time:</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Session Title</th>
+                                    <th>Room</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conflictSessionsList"></tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small>You can still assign this chair, but they will have overlapping sessions. Consider selecting a different chair or adjusting the session time.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div th:replace="~{fragments/footer}"></div>
