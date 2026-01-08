@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @IdClass(SessionAttendanceId.class)
 public class SessionAttendance {
 
-    /* ===================== COMPOSITE KEY ===================== */
-
     @Id
     @Column(name = "participant_id")
     private Long participantId;
@@ -32,7 +30,7 @@ public class SessionAttendance {
     private Session session;
 
     @Column(length = 20)
-    private String status; // PRESENT, ABSENT, LATE, REGISTERED
+    private String status; // PRESENT, ABSENT, REGISTERED
 
     public SessionAttendance() {
         this.status = "REGISTERED";
@@ -45,4 +43,6 @@ public class SessionAttendance {
         this.sessionId = session.getId();
         this.status = "REGISTERED";
     }
+
+    
 }

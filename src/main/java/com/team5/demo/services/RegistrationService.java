@@ -101,6 +101,12 @@ public Registration registerForConference(String email, Long conferenceId) {
         return list;
     }
 
+    @Transactional(readOnly = true)
+    public List<Registration> getAllRegistrations() {
+        return registrationRepository.findAllWithRelations();
+    }
+
+
     //--------
     // @Transactional(readOnly = true)
     // public List<Registration> getMyRegistrationsByEmail(String email) {

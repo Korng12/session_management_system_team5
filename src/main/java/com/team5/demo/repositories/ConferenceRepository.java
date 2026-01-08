@@ -25,7 +25,7 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     // === UPCOMING / ONGOING CONFERENCES ===
     @Query("""
         SELECT c FROM Conference c
-        WHERE c.endDate <= :today
+        WHERE c.endDate >= :today
         ORDER BY c.startDate ASC
     """)
     List<Conference> findUpcomingConferences(@Param("today") LocalDate today);

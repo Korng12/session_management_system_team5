@@ -18,11 +18,17 @@ public class SessionAttendanceService {
 
     @Transactional(readOnly = true)
     public List<SessionAttendance> getAllAttendances() {
-
         List<SessionAttendance> list =
                 attendanceRepository.findAllWithRelations();
 
-        System.out.println(" ATTENDANCES FOUND = " + list.size());
+        System.out.println("ATTENDANCES FOUND = " + list.size());
         return list;
+    }
+
+    /* ===================== USER ===================== */
+
+    @Transactional(readOnly = true)
+    public List<SessionAttendance> getMySchedule(String email) {
+        return attendanceRepository.findMySchedule(email);
     }
 }

@@ -2,10 +2,12 @@ package com.team5.demo.controllers;
 
 import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.Role;
+import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.services.RegistrationService;
+import com.team5.demo.services.SessionAttendanceService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -26,6 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+
+
 public class UserController {
 
     @Autowired
@@ -42,6 +46,10 @@ public class UserController {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    private SessionAttendanceService sessionAttendanceService;
+
 
     /* ===================== PUBLIC PAGES ===================== */
 
@@ -153,4 +161,19 @@ public class UserController {
 
         return "user/my-conferences";
     }
+
+    @GetMapping("/my-schedule")
+    public String mySchedule(Authentication auth, Model model) {
+
+        String email = auth.getName();
+
+        model.addAttribute(
+            "schedules",
+            sessionAttendanceService.getMySchedule(email)
+        );
+
+        return "user/user-schedule";
+
+    }
+    
 }

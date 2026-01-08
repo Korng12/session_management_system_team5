@@ -188,41 +188,50 @@ public class AdminController {
     /* ===================== MANAGE REGISTRATIONS (search and clear) ===================== */
     @GetMapping("/manage-registrations")
     public String manageRegistrations(
-        @RequestParam(value = "keyword", required = false) String keyword,
-        Model model) {
+            @RequestParam(value = "keyword", required = false) String keyword,
+            Model model) {
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        model.addAttribute(
-                "registrations",
-                registrationService.searchByParticipant(keyword)
-        );
-    } else {
-        model.addAttribute(
-                "registrations",
-                registrationService.getTotalRegistrations()
-        );
+        List<Registration> registrations;
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            registrations = registrationService.searchByParticipant(keyword);
+        } else {
+            registrations = registrationService.getAllRegistrations(); // ✅ LIST
+        }
+
+        long totalRegistrations = registrationService.getTotalRegistrations(); // ✅ COUNT
+
+        model.addAttribute("registrations", registrations);       // ✅ ALWAYS LIST
+        model.addAttribute("totalRegistrations", totalRegistrations);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("activePage", "registrations");
+
+        return "admin/view-registrations";
     }
 
-    model.addAttribute("keyword", keyword);
-    model.addAttribute("activePage", "registrations");
-
-    return "admin/view-registrations"; 
-}
 
 
     /* ===================== OLD URL REDIRECT ===================== */
     @GetMapping("/view-registeredUsers")
     public String viewRegistrations(Model model) {
 
-        long registrations =
+        // For table
+        List<Registration> registrations =
+                registrationService.getAllRegistrations();
+
+        // For summary
+        long totalRegistrations =
                 registrationService.getTotalRegistrations();
 
-        model.addAttribute("registrations", registrations);
+        model.addAttribute("registrations", registrations);       // ✅ LIST
+        model.addAttribute("totalRegistrations", totalRegistrations); // ✅ LONG
         model.addAttribute("activePage", "registrations");
 
-        return "redirect:/admin/manage-registrations";
-
+        return "admin/view-registrations";
     }
+
+
+
 
 
     /* ===================== VIEW ATTENDANCES ===================== */

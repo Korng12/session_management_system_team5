@@ -86,7 +86,7 @@
                 </thead>
                 <tbody>
                     <tr th:each="reg : ${registrations}">
-                        <td class="text-center" th:text="${reg.id}">1</td>
+                        <td class="text-center" th:text="${reg.id}"></td>
 
                         <td class="text-center" th:text="${reg.participant != null ? reg.participant.name : 'N/A'}">
                             Name
