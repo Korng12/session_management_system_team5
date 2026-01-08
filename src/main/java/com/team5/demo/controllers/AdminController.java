@@ -295,6 +295,30 @@ public class AdminController {
     }
 
     /**
+     * Get all users with CHAIR role for session chair assignment
+     * GET /admin/api/users/chairs
+     */
+    @GetMapping("/api/users/chairs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDTO>> getChairUsers() {
+        try {
+            List<UserDTO> chairs = userRepository.findAll()
+                    .stream()
+                    .filter(user -> user.getRoles().stream()
+                            .anyMatch(role -> role.getName().equals("CHAIR")))
+                    .map(user -> new UserDTO(
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail()
+                    ))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(chairs);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /**
      * Get all sessions
      * GET /admin/api/sessions
      */
