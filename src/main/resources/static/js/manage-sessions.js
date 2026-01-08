@@ -324,3 +324,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('filterStatus').value = '';
         filterSessions();
     });
+});

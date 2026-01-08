@@ -47,6 +47,15 @@ public class RegistrationService {
         return registrationRepository.save(registration);
     }
     
+    @Transactional
+    public Registration registerForConference(String email, Long conferenceId) {
+        // Find User by email
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        
+        return registerForConference(user.getId(), conferenceId);
+    }
+    
     public Registration getRegistration(Long registrationId) {
         return registrationRepository.findById(registrationId)
                 .orElseThrow(() -> new RuntimeException("Registration not found with id: " + registrationId));
@@ -110,5 +119,12 @@ public class RegistrationService {
         
         return registrationRepository.findByParticipantAndConference(user, conference)
                 .isPresent();
+    }
+    
+    public List<Registration> getMyConferences(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+        
+        return registrationRepository.findByParticipant(user);
     }
 }
