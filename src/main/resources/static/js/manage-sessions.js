@@ -89,7 +89,7 @@ async function loadSessions() {
             assignChairBtn.addEventListener('click', () => openAssignChairModal(s.id, s.title || '', s.startTime, s.endTime));
             
             if (removeChairBtn) {
-                removeChairBtn.addEventListener('click', () => openRemoveChairModal(s.id, s.title || '', s.chairName || ''));
+                removeChairBtn.addEventListener('click', () => removeChairFromSession(s.id, s.chairName || '', s.title || ''));
             }
             
             editBtn.addEventListener('click', () => openEditModal(
@@ -499,19 +499,11 @@ document.getElementById('confirmAssignChairBtn')?.addEventListener('click', asyn
     }
 });
 
-// Remove Chair Modal
-let removeChairModal;
-function openRemoveChairModal(sessionId, sessionTitle, chairName) {
-    document.getElementById('removeChairSessionTitle').textContent = sessionTitle;
-    document.getElementById('removeChairName').textContent = chairName;
-    removeChairModal = new bootstrap.Modal(document.getElementById('removeChairModal'));
-    removeChairModal._sessionId = sessionId;
-    removeChairModal.show();
-}
-
-// Handle chair removal
-document.getElementById('confirmRemoveChairBtn')?.addEventListener('click', async () => {
-    const sessionId = removeChairModal?._sessionId;
+// One-click chair removal with confirmation
+async function removeChairFromSession(sessionId, chairName, sessionTitle) {
+    if (!confirm(`Remove ${chairName} from "${sessionTitle}"?`)) {
+        return;
+    }
     
     try {
         const res = await fetch(`/admin/sessions/${sessionId}/remove-chair`, {
@@ -526,13 +518,12 @@ document.getElementById('confirmRemoveChairBtn')?.addEventListener('click', asyn
             return;
         }
         
-        removeChairModal.hide();
         loadSessions();
         showSuccess('Chair removed successfully');
     } catch (error) {
         showError('Network error while removing chair');
     }
-});
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     loadOptions().then(loadSessions);
