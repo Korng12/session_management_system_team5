@@ -21,142 +21,94 @@ public class RegistrationService {
 
         @Transactional
 
-        public Registration registerForConference(String email, Long conferenceId) {
+    /**
+     * Registers a user for a conference if not already registered.
+     * @param userId the user ID
+     * @param conferenceId the conference ID
+     * @return the created Registration
+     * @throws RuntimeException if user or conference not found, or already registered
+     */
+    public Registration registerForConference(Long userId, Long conferenceId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
-                User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
 
-                 Conference conf = conferenceRepository.findById(conferenceId)
-                .orElseThrow(() -> new RuntimeException("Conference not found"));
-
-        // Disallow registration for conferences that have already ended
-        if (conf.getEndDate() != null && conf.getEndDate().isBefore(java.time.LocalDate.now())) {
-            throw new IllegalStateException("Cannot register for a conference that has already completed");
+        if (registrationRepository.findByParticipantAndConference(user, conference).isPresent()) {
+            throw new RuntimeException("User is already registered for this conference");
         }
 
-        Optional<Registration> regOpt=registrationRepository.findByParticipantAndConference(user,conf);
-
-        if(regOpt.isPresent()){
-                Registration exitstingReg =regOpt.get();
-                if(exitstingReg.getStatus() == RegistrationStatus.CONFIRMED){
-                        throw new RuntimeException("Already registered");
-                }
-                exitstingReg.setStatus(RegistrationStatus.CONFIRMED);
-                exitstingReg.setRegisteredAt(LocalDateTime.now());
-                return exitstingReg;
-        }
-
-                Registration reg = new Registration();
-                reg.setParticipant(user);
-                reg.setConference(conf);
-                reg.setRegisteredAt(LocalDateTime.now());
-                //     reg.setStatus("CONFIRMED");
-                        reg.setStatus(RegistrationStatus.CONFIRMED);
-
-                return registrationRepository.save(reg);
-        }
-
-        public Registration getRegistration(Long registrationId) {
-                return registrationRepository.findById(registrationId)
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Registration not found with id: " + registrationId));
-        }
-
-        public List<Registration> getUserRegistrations(Long userId) {
-                // Find user first (REQUIRED for JPA)
-                User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-                // Find registrations by user entity
-                return registrationRepository.findByParticipant(user);
-        }
-
-        public List<Registration> getMyConferences(String email) {
-
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-
-                return registrationRepository.findByParticipant(user);
-        }
-
+        Registration registration = new Registration();
+        registration.setParticipant(user);
+        registration.setConference(conference);
+        registration.setRegisteredAt(LocalDateTime.now());
+        registration.setStatus(RegistrationStatus.CONFIRMED);
+        return registrationRepository.save(registration);
+    }
+    
+    public Registration getRegistration(Long registrationId) {
+        return registrationRepository.findById(registrationId)
+                .orElseThrow(() -> new RuntimeException("Registration not found with id: " + registrationId));
+    }
+    
+    public List<Registration> getUserRegistrations(Long userId) {
+        // Find user first (REQUIRED for JPA)
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        //Find registrations by user entity
+        return registrationRepository.findByParticipant(user);
+    }
+    
+        /**
+         * Cancels a registration by setting its status to CANCELED.
+         * @param registrationId the registration ID
+         */
         @Transactional
         public void cancelRegistration(Long registrationId) {
-                Registration registration = getRegistration(registrationId);
+            Registration registration = getRegistration(registrationId);
 
-                // Disallow cancelling registration for conferences that have already ended
-                Conference conf = registration.getConference();
-                if (conf.getEndDate() != null && !conf.getEndDate().isAfter(java.time.LocalDate.now())) {
-                    throw new IllegalStateException("Cannot cancel registration for a conference that has already completed");
-                }
+            // Disallow cancelling registration for conferences that have already ended
+            Conference conf = registration.getConference();
+            if (conf.getEndDate() != null && !conf.getEndDate().isAfter(java.time.LocalDate.now())) {
+                throw new IllegalStateException("Cannot cancel registration for a conference that has already completed");
+            }
 
-                // Prevent cancelling while the user still has session registrations in this conference
-                var participant = registration.getParticipant();
-                var registeredSessionIds = sessionRegistrationRepository.findRegisteredSessionIds(participant, conf.getId());
-                if (registeredSessionIds != null && !registeredSessionIds.isEmpty()) {
-                    throw new IllegalStateException("Cannot cancel conference registration while registered for sessions. Please cancel session registrations first.");
-                }
+            // Prevent cancelling while the user still has session registrations in this conference
+            var participant = registration.getParticipant();
+            var registeredSessionIds = sessionRegistrationRepository.findRegisteredSessionIds(participant, conf.getId());
+            if (registeredSessionIds != null && !registeredSessionIds.isEmpty()) {
+                throw new IllegalStateException("Cannot cancel conference registration while registered for sessions. Please cancel session registrations first.");
+            }
 
-                // registration.setStatus("CANCELLED");
-                registration.setStatus(RegistrationStatus.CANCELED);
-                registrationRepository.save(registration);
+            registration.setStatus(RegistrationStatus.CANCELED);
+            registrationRepository.save(registration);
         }
-
-        // Additional useful methods
-        public List<Registration> getConferenceRegistrations(Long conferenceId) {
-                Conference conference = conferenceRepository.findById(conferenceId)
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Conference not found with id: " + conferenceId));
-
-                return registrationRepository.findByConference(conference);
-        }
-
-        public long countRegistrationsForConference(Long conferenceId) {
-                Conference conference = conferenceRepository.findById(conferenceId)
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Conference not found with id: " + conferenceId));
-
-                return registrationRepository.countByConference(conference);
-        }
-
-        public boolean isUserRegisteredForConference(Long userId, Long conferenceId) {
-                User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-                Conference conference = conferenceRepository.findById(conferenceId)
-                                .orElseThrow(() -> new RuntimeException(
-                                                "Conference not found with id: " + conferenceId));
-
-                return registrationRepository.findByParticipantAndConference(user, conference)
-                                .isPresent();
-        }
-
-        public java.util.Optional<Registration> getRegistrationForUserAndConference(String email, Long conferenceId) {
-                User user = userRepository.findByEmail(email)
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-
-                Conference conference = conferenceRepository.findById(conferenceId)
-                                .orElseThrow(() -> new RuntimeException("Conference not found"));
-
-                // Only consider an active registration if its status is CONFIRMED
-                return registrationRepository.findByParticipantAndConference(user, conference)
-                                .filter(reg->RegistrationStatus.CONFIRMED == reg.getStatus());
-                                // .filter(reg -> "CONFIRMED".equalsIgnoreCase(reg.getStatus()));
-        }
-        @Transactional(readOnly = true)
-        public boolean isRegisteredForConference(String email, Long conferenceId) {
-
-                User user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
-
-                Conference conference = conferenceRepository.findById(conferenceId)
-                        .orElseThrow(() -> new RuntimeException("Conference not found"));
-
-                return registrationRepository.existsByParticipantAndConferenceAndStatus(
-                        user,
-                        conference,
-                        RegistrationStatus.CONFIRMED
-                );
-        }
-
-
+    
+    // Additional useful methods
+    public List<Registration> getConferenceRegistrations(Long conferenceId) {
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.findByConference(conference);
+    }
+    
+    public long countRegistrationsForConference(Long conferenceId) {
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.countByConference(conference);
+    }
+    
+    public boolean isUserRegisteredForConference(Long userId, Long conferenceId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
+        Conference conference = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found with id: " + conferenceId));
+        
+        return registrationRepository.findByParticipantAndConference(user, conference)
+                .isPresent();
+    }
 }
