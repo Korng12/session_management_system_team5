@@ -2,6 +2,7 @@ const api = {
     sessions: '/admin/api/sessions',
     createSession: '/admin/sessions',
     users: '/admin/api/users',
+    chairs: '/admin/api/users/chairs',
     rooms: '/admin/api/rooms',
     conferences: '/admin/api/conferences'
 };
@@ -23,7 +24,8 @@ const assignChairSelect = document.getElementById('assignChairSelect');
 
 async function loadOptions() {
     await Promise.all([
-        fetchOptions(api.users, [chairSelect, editChairSelect, assignChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
+        fetchOptions(api.users, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
+        fetchOptions(api.chairs, [assignChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
         fetchOptions(api.rooms, [roomSelect, editRoomSelect], r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
         fetchOptions(api.conferences, [conferenceSelect, editConferenceSelect], c => ({ value: c.id, label: c.title }))
     ]);
