@@ -36,13 +36,14 @@ public class SessionAttendance {
     @Column(name = "check_out_time")
     private LocalDateTime checkOutTime;
     
+    @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private String status; // "PRESENT", "ABSENT", "LATE", "REGISTERED"
+    private AttendanceStatus status; // PRESENT, ABSENT
     
     // Constructors
     public SessionAttendance() {
         this.attendedAt = LocalDateTime.now();
-        this.status = "REGISTERED";
+        this.status = AttendanceStatus.ABSENT;
     }
     
     public SessionAttendance(User participant, Session session) {
