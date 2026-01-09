@@ -169,6 +169,7 @@ public class UserController {
     public String getMyConferences(Authentication auth,Model model) {
         String email =auth.getName();
         var reg =registrationService.getMyConferences(email);
+        model.addAttribute("registrations", reg);
         return "user/my-conferences";
     }
     

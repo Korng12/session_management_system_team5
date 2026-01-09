@@ -1,36 +1,69 @@
+<div th:replace="~{layout/main :: layout(~{::section})}">
+<section class="container mt-5">
 
+    <h1 class="mb-4">My Schedule & Attendance</h1>
 
-    <div th:replace="~{layout/main :: layout(~{::section})}" >
-        <section class="container mt-5">
-            <h1>My Schedule</h1>
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Session Title</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Keynote: Future of Research</td>
-                            <td>December 20, 2025</td>
-                            <td>09:00 - 10:30</td>
-                            <td><span class="badge bg-success">Confirmed</span></td>
-                        </tr>
-                        <tr>
-                            <td>AI & Machine Learning Workshop</td>
-                            <td>December 20, 2025</td>
-                            <td>14:00 - 17:00</td>
-                            <td><span class="badge bg-warning">Waitlist</span></td>
-                        </tr>
-                        <!-- Repeat for more sessions -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        </section>
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+
+            <thead>
+                <tr>
+                    <th>Session</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Session Status</th>
+                    <th>Attendance</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="s : ${sessions}">
+                    <td th:text="${s.title}">Session title</td>
+
+                    <td th:text="${#temporals.format(s.date, 'dd MMM yyyy')}"></td>
+
+                    <td>
+                        <span th:text="${s.startTime}"></span>
+                        –
+                        <span th:text="${s.endTime}"></span>
+                    </td>
+
+                    <!-- Session lifecycle -->
+                    <td>
+                        <span class="badge"
+                              th:classappend="
+                                ${s.sessionStatus.name() == 'SCHEDULED'} ? ' bg-secondary' :
+                                ${s.sessionStatus.name() == 'ONGOING'} ? ' bg-info' :
+                                ' bg-success'"
+                              th:text="${s.sessionStatus}">
+                        </span>
+                    </td>
+
+                    <!-- Attendance (only meaningful after completed) -->
+                    <td>
+                        <span th:if="${s.attendance != null}"
+                              class="badge"
+                              th:classappend="
+                                ${s.attendance.name() == 'PRESENT'} ? ' bg-success' : ' bg-danger'"
+                              th:text="${s.attendance}">
+                        </span>
+
+                        <span th:if="${s.attendance == null}"
+                              class="text-muted">
+                            Not recorded
+                        </span>
+                    </td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(sessions)}">
+                    <td colspan="5" class="text-center text-muted">
+                        You have not registered for any sessions yet.
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
     </div>
+
+</section>
+</div>

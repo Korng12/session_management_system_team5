@@ -16,3 +16,4 @@ public enum SessionStatus {
         return displayName;
     }
 }
+

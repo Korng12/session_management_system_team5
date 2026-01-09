@@ -45,14 +45,22 @@ public class RegistrationService {
         
 //         return registrationRepository.save(registration);
 //     }
-public Registration registerForConference(String email, Long conferenceId) {
+        public Registration registerForConference(String email, Long conferenceId) {
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    Conference conf = conferenceRepository.findById(conferenceId)
-            .orElseThrow(() -> new RuntimeException("Conference not found"));
-
+                 Conference conf = conferenceRepository.findById(conferenceId)
+                .orElseThrow(() -> new RuntimeException("Conference not found"));
+                boolean registered =
+                registrationRepository.existsByParticipantAndConferenceAndStatus(
+                        user,
+                        conf,
+                        RegistrationStatus.CONFIRMED
+                );
+        if (!registered) {
+                throw new IllegalStateException("Register for the conference first");
+        }
         Optional<Registration> regOpt=registrationRepository.findByParticipantAndConference(user,conf);
 //     if (registrationRepository.existsByParticipantAndConference(user, conf,RegistrationStatus status)) {
 //         throw new RuntimeException("Already registered");
@@ -67,12 +75,12 @@ public Registration registerForConference(String email, Long conferenceId) {
                 return exitstingReg;
         }
 
-    Registration reg = new Registration();
-    reg.setParticipant(user);
-    reg.setConference(conf);
-    reg.setRegisteredAt(LocalDateTime.now());
-//     reg.setStatus("CONFIRMED");
-        reg.setStatus(RegistrationStatus.CONFIRMED);
+        Registration reg = new Registration();
+        reg.setParticipant(user);
+        reg.setConference(conf);
+        reg.setRegisteredAt(LocalDateTime.now());
+        //     reg.setStatus("CONFIRMED");
+                reg.setStatus(RegistrationStatus.CONFIRMED);
 
     return registrationRepository.save(reg);
 }
