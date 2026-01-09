@@ -12,17 +12,15 @@ import java.util.Optional;
 @Repository
 public interface ConferenceRepository extends JpaRepository<Conference, Long> {
 
-    // === BASIC ===
+  
     Optional<Conference> findById(Long id);
 
-    // === USER-FACING ===
     List<Conference> findByTitleContainingIgnoreCase(String title);
 
     List<Conference> findByStartDateAfter(LocalDate date);
 
     List<Conference> findByEndDateBefore(LocalDate date);
 
-    // === UPCOMING / ONGOING CONFERENCES ===
     @Query("""
         SELECT c FROM Conference c
         WHERE c.endDate <= :today
