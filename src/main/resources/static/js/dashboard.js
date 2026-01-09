@@ -124,4 +124,74 @@ async function loadSessionStatistics() {
 document.addEventListener('DOMContentLoaded', () => {
     loadUpcomingSessions();
     loadSessionStatistics();
+    loadUserActivities();
 });
+
+// Load and display user activities
+async function loadUserActivities() {
+    const list = document.getElementById('user-activities-list');
+    try {
+        // Fetch recent registrations and session changes (simulate for now)
+        // In a real app, replace with a backend API endpoint like /admin/api/activities
+        const [regRes, sessRes] = await Promise.all([
+            fetch(API.registrations),
+            fetch(API.sessions)
+        ]);
+        if (!regRes.ok || !sessRes.ok) throw new Error('Failed to load activities');
+        const registrations = await regRes.json();
+        const sessions = await sessRes.json();
+
+        // Recent registrations (last 5)
+        const recentRegs = registrations
+            .sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt))
+            .slice(0, 5)
+            .map(r => ({
+                type: 'registration',
+                time: r.registeredAt,
+                user: r.userName,
+                conference: r.conferenceTitle
+            }));
+
+        // Recent session status changes (last 5)
+        const recentSess = sessions
+            .filter(s => s.statusHistory && Array.isArray(s.statusHistory))
+            .flatMap(s => s.statusHistory.map(h => ({
+                type: 'session-status',
+                time: h.changedAt,
+                status: h.status,
+                title: s.title
+            })))
+            .sort((a, b) => new Date(b.time) - new Date(a.time))
+            .slice(0, 5);
+
+        // Combine and sort all activities by time (latest first)
+        const activities = [...recentRegs, ...recentSess]
+            .sort((a, b) => new Date(b.time) - new Date(a.time))
+            .slice(0, 8);
+
+        if (activities.length === 0) {
+            list.innerHTML = '<li class="list-group-item text-muted text-center">No recent activities</li>';
+            return;
+        }
+
+        list.innerHTML = activities.map(act => {
+            if (act.type === 'registration') {
+                return `<li class="list-group-item">
+                    <span class="badge bg-primary me-2">Registration</span>
+                    <strong>${act.user}</strong> registered for <strong>${act.conference}</strong>
+                    <span class="float-end text-muted small">${formatDateTime(act.time)}</span>
+                </li>`;
+            } else if (act.type === 'session-status') {
+                return `<li class="list-group-item">
+                    <span class="badge bg-info me-2">Session</span>
+                    Status changed to <strong>${act.status}</strong> for <strong>${act.title}</strong>
+                    <span class="float-end text-muted small">${formatDateTime(act.time)}</span>
+                </li>`;
+            }
+            return '';
+        }).join('');
+    } catch (error) {
+        console.error('Error loading user activities:', error);
+        list.innerHTML = '<li class="list-group-item text-danger text-center">Error loading activities</li>';
+    }
+}
