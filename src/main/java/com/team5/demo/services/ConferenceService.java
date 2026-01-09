@@ -53,6 +53,10 @@ public class ConferenceService {
             .orElseThrow(() -> new RuntimeException("Conference not found"));
     }
 
+    // This function for sum total in admin
+    public long countAll() {
+       return conferenceRepository.count();
+    }
 
 
 

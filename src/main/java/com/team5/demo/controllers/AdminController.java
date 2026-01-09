@@ -116,6 +116,15 @@ public class AdminController {
 
         model.addAttribute("activePage", "dashboard");
         model.addAttribute("totalRegistrations", totalRegistrations);
+        model.addAttribute("totalSessions",
+                sessionService.countAll());
+
+        // model.addAttribute("totalRooms",
+        //         roomService.countAll());
+
+        model.addAttribute("totalConferences",
+                conferenceService.countAll());
+
 
         return "admin/dashboard";
     }
