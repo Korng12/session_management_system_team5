@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -116,8 +117,14 @@ public class UserController {
 
     @GetMapping("/home")
     public String getHome() {
+        System.out.println(
+            "this is user principle"+
+        SecurityContextHolder.getContext().getAuthentication().getDetails()
+
+        );
         return "user/home";
     }
+
 
     @GetMapping("/schedule")
     public String getSchedulePage() {

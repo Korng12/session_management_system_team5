@@ -27,3 +27,26 @@ document.getElementById("registerConferenceBtn")?.addEventListener("click", asyn
     }
 });
 
+// Cancel conference registration
+document.getElementById("cancelConferenceBtn")?.addEventListener("click", async function () {
+    const registrationId = this.dataset.registrationId;
+
+    try {
+        const response = await fetch(`/api/registrations/${registrationId}/cancel`, {
+            method: "PUT"
+        });
+
+        if (!response.ok) {
+            const msg = await response.text();
+            alert("Cancel failed: " + msg);
+            return;
+        }
+
+        alert("Registration cancelled successfully");
+        location.reload();
+
+    } catch (err) {
+        alert("Network error");
+    }
+});
+
