@@ -29,4 +29,12 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
         ORDER BY c.startDate ASC
     """)
     List<Conference> findUpcomingConferences(@Param("today") LocalDate today);
+    @Query(
+        """
+        SELECT  c FROM Conference c 
+        WHERE lower(c.title) like lower(concat('%',:keyword,'%'))
+        OR LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    List<Conference>  searchConferenceByTitle(@Param("keyword") String keyword);
+
 }

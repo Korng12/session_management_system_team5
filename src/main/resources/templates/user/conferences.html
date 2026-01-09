@@ -14,8 +14,27 @@
 
     <!-- CONFERENCE LIST -->
     <div class="container mb-5">
-
         <div class="row g-4">
+            <form method="get"
+              th:action="@{/conferences/title}"
+              class="row g-2 mb-3">
+
+            <div class="col-md-4">
+                <input type="text"
+                       name="title"
+                       class="form-control"
+                       placeholder="Search by name or email"
+                       th:value="${title}">
+            </div>
+
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">
+                     Search
+                </button>
+          
+            </div>
+
+            </form>
 
             <!-- CONFERENCE CARD -->
             <div class="col-md-4"

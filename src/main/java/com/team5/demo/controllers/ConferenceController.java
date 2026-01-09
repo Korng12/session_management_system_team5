@@ -29,17 +29,25 @@ public class ConferenceController {
     }
 
     // GET /conferences
-@GetMapping
-public String listConferences(Model model) {
-    System.out.println(">>> /conferences controller called");
+    @GetMapping
+    public String listConferences(Model model) {
+        System.out.println(">>> /conferences controller called");
 
-    var conferences = conferenceService.getAvailableConferences();
+        var conferences = conferenceService.getAvailableConferences();
+        
+        System.out.println(">>> conferences size = " + conferences.size());
+        model.addAttribute("conferences", conferences);
+
+        return "user/conferences";
+    }
+    @GetMapping("/title")
+    public String getMethodName(@RequestParam("title") String title,Model model) {
+        var conferences=conferenceService.getConferencesByTittle(title);
+        System.out.println("Size in user search conf"+conferences.size());
+        model.addAttribute("conferences",conferences);
+        return "user/conferences";
+    }
     
-    System.out.println(">>> conferences size = " + conferences.size());
-    model.addAttribute("conferences", conferences);
-
-    return "user/conferences";
-}
 
 
     // GET /conferences/{id}
