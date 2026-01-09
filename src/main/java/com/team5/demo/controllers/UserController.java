@@ -55,7 +55,6 @@ public class UserController {
     public String getRegisterPage() {
         return "public/register";
     }
-
     @GetMapping("/registeration")
     public String getRegisterationPage() {
         return "public/registeration";
@@ -151,9 +150,8 @@ public class UserController {
 
     @GetMapping("/about")
     public String getAboutPage() {
-        return "public/about";
+        return "public/aboutPage";
     }
-
     @GetMapping("/contact")
     public String getContactPage() {
         return "public/contact";
@@ -164,5 +162,6 @@ public class UserController {
         var reg =registrationService.getMyConferences(email);
         return "user/my-conferences";
     }
+    
     
 }

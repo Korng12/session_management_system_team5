@@ -70,26 +70,14 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    
+ 
+
     // Admin Dashboard
     @GetMapping("")
     public String showAdminHomepage(Model model) {
         return "admin/dashboard"; 
     }
-
-    // Manage Users
-    @GetMapping("/manage-users")
-    public String manageUsers(Model model) {
-        return "admin/manage_users"; 
-    }
-    @GetMapping("/admin/manage-schedule")
-    public String manageSchedule() {
-        return "admin/view-schedule";
-    }
-    @GetMapping("/manage-conferences")
-    public String getMethodName() {
-        return "admin/manage-conferences";
-    }
-    
 
     // Manage Rooms
     @GetMapping("/manage-rooms")
@@ -609,4 +597,5 @@ public class AdminController {
                 .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
     }
+ 
 }

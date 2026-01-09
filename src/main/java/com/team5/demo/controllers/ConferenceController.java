@@ -45,4 +45,5 @@ public String listConferences(Model model) {
         System.out.println(sessionService.getSessionsByConference(id).size());   
         return "user/conference-detail";
     }
+    
 }

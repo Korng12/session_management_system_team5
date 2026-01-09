@@ -1,6 +1,5 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
 <section>
-
 <style>
     :root {
         --primary: #4f46e5;
@@ -13,7 +12,11 @@
         font-family: 'Inter', 'Segoe UI', sans-serif;
     }
     .hero {
-        background: url('/image/heroSession.png') center / cover no-repeat;
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.55),
+            rgba(0, 0, 0, 0.55)
+        ),
+        url('/image/heroSession.png') center / cover no-repeat;
         color: #191a1aff;
         padding: 120px 0;
     }
@@ -141,6 +144,5 @@
         </a>
     </div>
 </div>
-
 </section>
 </div>

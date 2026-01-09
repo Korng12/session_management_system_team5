@@ -43,7 +43,8 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     
     // Find sessions by status
     List<Session> findByStatus(SessionStatus status);
-    
+//      List<Session> findByConferenceIdAndStatus(Long conferenceId, String status);
+//      long countByConferenceId(Long conferenceId);
     // Check if room is available for a time period
     @Query("SELECT CASE WHEN COUNT(s) = 0 THEN true ELSE false END FROM Session s " +
            "WHERE s.room.id = :roomId " +

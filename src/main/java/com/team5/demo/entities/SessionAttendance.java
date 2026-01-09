@@ -6,49 +6,38 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "session_attendance")
+@IdClass(SessionAttendanceId.class)
 @Data
-@IdClass(SessionAttendanceId.class) 
 public class SessionAttendance {
-    
+
     @Id
-    @Column(name = "participant_id", insertable = false, updatable = false)
+    @Column(name = "participant_id")
     private Long participantId;
-    
+
     @Id
-    @Column(name = "session_id", insertable = false, updatable = false)
+    @Column(name = "session_id")
     private Long sessionId;
-    
-    // JPA Relationships
+
+    // 🔗 Participant (User)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "participant_id", nullable = false)
     private User participant;
-    
+
+    // 🔗 Session
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "session_id", nullable = false)
     private Session session;
-    
+
     @Column(name = "attended_at")
     private LocalDateTime attendedAt;
-    
-    @Column(name = "check_in_time")
-    private LocalDateTime checkInTime;
-    
-    @Column(name = "check_out_time")
-    private LocalDateTime checkOutTime;
-    
+
     @Column(length = 20)
-    private String status; // "PRESENT", "ABSENT", "LATE", "REGISTERED"
-    
-    // Constructors
-    public SessionAttendance() {
+    private String status; // REGISTERED, PRESENT, LATE, ABSENT
+
+    @PrePersist
+    protected void onCreate() {
         this.attendedAt = LocalDateTime.now();
         this.status = "REGISTERED";
-    }
-    
-    public SessionAttendance(User participant, Session session) {
-        this();
-        this.participant = participant;
-        this.session = session;
         this.participantId = participant.getId();
         this.sessionId = session.getId();
     }
