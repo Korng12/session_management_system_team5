@@ -52,22 +52,61 @@
 
         <div class="container mt-5">
             <h1>View Registrations</h1>
+            <form method="get"
+              th:action="@{/admin/manage-registrations}"
+              class="row g-2 mb-3">
+
+            <div class="col-md-4">
+                <input type="text"
+                       name="keyword"
+                       class="form-control"
+                       placeholder="Search by name or email"
+                       th:value="${keyword}">
+            </div>
+
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">
+                     Search
+                </button>
+                <a th:href="@{/admin/manage-registrations}"
+                   class="btn btn-danger ms-2">
+                    Clear
+                </a>
+            </div>
+
+            </form>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>User ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Registration Date</th>
+                        <th class="text-center">User ID</th>
+                        <th class="text-center">Name</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Registration Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>01</td>
-                        <td>John Doe</td>
-                        <td>john@example.com</td>
-                        <td>2025-01-01</td>
+                    <tr th:each="reg : ${registrations}">
+                        <td class="text-center" th:text="${reg.id}"></td>
+
+                        <td class="text-center" th:text="${reg.participant != null ? reg.participant.name : 'N/A'}">
+                            Name
+                        </td>
+
+                        <td class="text-center" th:text="${reg.participant != null ? reg.participant.email : 'N/A'}">
+                            Email
+                        </td>
+
+                        <td class="text-center" th:text="${#temporals.format(reg.registeredAt, 'yyyy-MM-dd HH:mm')}">
+                            Date
+                        </td>
                     </tr>
+                    <!-- If empty -->
+                    <tr th:if="${#lists.isEmpty(registrations)}">
+                        <td colspan="4" class="text-center text-muted">
+                            No registrations found.
+                        </td>
+                    </tr>
+
                     <!-- Additional registrations would go here -->
                 </tbody>
             </table>

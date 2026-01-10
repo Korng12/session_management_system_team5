@@ -12,8 +12,43 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {
+
+    // ✅ FIXED: LEFT JOIN FETCH (shows sessions even if room is null)
+    @Query("""
+        SELECT DISTINCT s FROM Session s
+        LEFT JOIN FETCH s.room
+        ORDER BY s.startTime
+    """)
+    List<Session> findAllWithRoom();
+
+    // ✅ Simple derived query
+    List<Session> findByRoom_Id(Long roomId);
+
+    // ✅ Prevent room double booking
+    @Query("""
+        SELECT s FROM Session s
+        WHERE s.room.id = :roomId
+          AND s.startTime < :endTime
+          AND s.endTime > :startTime
+    """)
+    List<Session> findOverlappingSessions(
+            @Param("roomId") Long roomId,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
+    );
+
+    // ✅ User / Chair schedule
+    @Query("""
+        SELECT DISTINCT s FROM Session s
+        LEFT JOIN FETCH s.room
+        JOIN s.attendances a
+        WHERE a.participant.id = :userId
+        ORDER BY s.startTime
+    """)
+    List<Session> findSessionsByParticipantId(
+            @Param("userId") Long userId
+    );
        // Find all sessions for a specific conference (excluding soft-deleted)
        List<Session> findByConferenceIdAndDeletedFalse(Long conferenceId);
 

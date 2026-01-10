@@ -18,6 +18,8 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     // === USER-FACING ===
     List<Conference> findByTitleContainingIgnoreCase(String title);
 
+    
+
     List<Conference> findByStartDateAfter(LocalDate date);
 
     List<Conference> findByEndDateBefore(LocalDate date);
@@ -25,7 +27,7 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     // === UPCOMING / ONGOING CONFERENCES ===
     @Query("""
         SELECT c FROM Conference c
-        WHERE c.endDate <= :today
+        WHERE c.endDate >= :today
         ORDER BY c.startDate ASC
     """)
     List<Conference> findUpcomingConferences(@Param("today") LocalDate today);
