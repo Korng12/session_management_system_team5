@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Manage Registrations</title>
-
+<div th:replace="~{layout/main :: layout(~{::section})}">
+<section>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -70,12 +71,8 @@
         }
     </style>
 </head>
-
+<div th:replace="~{fragments/sidebar :: sidebar}"></div>
 <body>
-
-<div th:replace="~{layout/main :: layout(~{::section})}">
-<section>
-
     <h2>Conference & Session Registration (ADMIN)</h2>
 
     <div class="card">
