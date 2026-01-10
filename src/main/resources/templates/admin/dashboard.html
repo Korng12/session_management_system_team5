@@ -62,85 +62,155 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
     <section>
         <style>
-        body {
-            background-color: #f8f9fa;
-        }
+            body {
+                background-color: #f8f9fa;
+            }
 
-        .navbar {
-            height: 60px;
-        }
-        .sidebar {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            width: 240px;
-            height: calc(100vh - 60px);
-            background-color: #212529;
-            padding-top: 20px;
-        }
+            .navbar {
+                height: 60px;
+            }
 
-        .sidebar a {
-            display: block;
-            color: #adb5bd;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 15px;
-        }
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 60px);
+                background-color: #212529;
+                padding-top: 20px;
+            }
 
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #343a40;
-            color: #fff;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 80px 30px 30px;
-        }
-        .card {
-            border-radius: 12px;
-        }
-    </style>
-</head>
+            .sidebar a {
+                display: block;
+                color: #adb5bd;
+                padding: 12px 20px;
+                text-decoration: none;
+                font-size: 15px;
+            }
 
-<body>
-<nav class="navbar navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <span class="navbar-brand">Conference Admin</span>
-        <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-    </div>
-</nav>
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            .sidebar a:hover,
+            .sidebar a.active {
+                background-color: #343a40;
+                color: #fff;
+            }
 
-<div class="content">
-    <h2 class="mb-4">Admin Dashboard</h2>
+            .content {
+                margin-left: 240px;
+                padding: 80px 30px 30px;
+            }
 
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Total Registrations</h5>
-                    <p>View conference registrations</p>
-                    <a href="/admin/view-registrations" class="btn btn-primary">View</a>
+            .card {
+                border-radius: 12px;
+            }
+        </style>
+        </head>
+
+        <body>
+            <nav class="navbar navbar-dark bg-dark fixed-top">
+                <div class="container-fluid">
+                    <span class="navbar-brand">Conference Admin</span>
+                    <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
                 </div>
-            </div>
-        </div>
+            </nav>
+            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Manage Sessions</h5>
-                    <p>Create and edit sessions</p>
-                    <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
+            <div class="content">
+                <h2 class="mb-4">Admin Dashboard</h2>
+
+                <div class="row g-4">
+
+                    <!-- REGISTRATIONS -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm text-center">
+                            <div class="card-body">
+                                <i class="bi bi-people fs-2 text-primary"></i>
+                                <h6 class="mt-2">Registrations</h6>
+                                <h4 th:text="${totalRegistrations}" class="btn btn-primary">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SESSIONS -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm text-center">
+                            <div class="card-body">
+                                <i class="bi bi-calendar-event fs-2 text-success"></i>
+                                <h6 class="mt-2">Sessions</h6>
+                                <h4 th:text="${totalSessions}" class="btn btn-primary">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROOMS -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm text-center">
+                            <div class="card-body">
+                                <i class="bi bi-door-open fs-2 text-warning"></i>
+                                <h6 class="mt-2">Rooms</h6>
+                                <h4 th:text="${totalRooms}" class="btn btn-primary">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONFERENCES -->
+                    <div class="col-md-3">
+                        <div class="card shadow-sm text-center">
+                            <div class="card-body">
+                                <i class="bi bi-building fs-2 text-info"></i>
+                                <h6 class="mt-2">Conferences</h6>
+                                <h4 th:text="${totalConferences}" class="btn btn-primary">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Manage Rooms</h5>
-                    <p>Manage available rooms</p>
-                    <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
+
+                <div class="row g-4 mt-3">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>View Registrations</h5>
+                                <p class="text-muted">View conference registrations</p>
+                                <a href="/admin/view-registeredUsers" class="btn btn-primary">
+                                    View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Sessions</h5>
+                                <p>Create and edit sessions</p>
+                                <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Rooms</h5>
+                                <p>Manage available rooms</p>
+                                <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Conference</h5>
+                                <p>Create and edit conferences</p>
+                                <a href="/admin/manage-conferences" class="btn btn-success">Manage</a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -241,8 +311,10 @@
     </div>
 </div>
 
-
         <script src="/js/dashboard.js"></script>
     </div>
 </section>
+</div>
+    </section>
+
 </div>
