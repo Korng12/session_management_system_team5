@@ -63,7 +63,7 @@
     <!-- MY UPCOMING SESSIONS -->
     <div class="mb-5" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
         <h4 class="fw-bold mb-3">My Upcoming Sessions</h4>
-
+        
         <div class="card shadow-sm">
             <ul class="list-group list-group-flush"
                 th:if="${!#lists.isEmpty(mySessions)}">

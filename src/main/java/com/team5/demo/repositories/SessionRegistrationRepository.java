@@ -11,5 +11,6 @@ import com.team5.demo.entities.User;
 public interface SessionRegistrationRepository extends JpaRepository <SessionRegistration,Long> {
     List <SessionRegistration> findByParticipant(User participant);
     boolean existsByParticipantAndSession(User participant,Session session) ;
-    
+    List<SessionRegistration> findBySession(Session session);
+
 } 

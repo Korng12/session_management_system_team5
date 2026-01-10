@@ -2,6 +2,8 @@ package com.team5.demo.repositories;
 
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionStatus;
+import com.team5.demo.entities.User;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +24,8 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
 
        // Find all sessions with a specific chair (excluding soft-deleted)
        List<Session> findByChairIdAndDeletedFalse(Long chairId);
-    
+       List<Session> findByChair(User chair);
+
        // Find sessions by chair with pagination (excluding soft-deleted)
        Page<Session> findByChairIdAndDeletedFalse(Long chairId, Pageable pageable);
 

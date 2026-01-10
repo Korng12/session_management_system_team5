@@ -126,7 +126,7 @@ public class UserController {
         System.out.println(
             "this is user principle"+
         SecurityContextHolder.getContext().getAuthentication().getDetails()
-
+            
         );
         return "user/home";
     }

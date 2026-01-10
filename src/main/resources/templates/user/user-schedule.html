@@ -30,14 +30,14 @@
 
                     <!-- Session lifecycle -->
                     <td>
-<span class="badge"
-      th:classappend="${ 
-          s.sessionStatus == T(com.team5.demo.entities.SessionStatus).SCHEDULED ? ' bg-secondary' :
-          s.sessionStatus == T(com.team5.demo.entities.SessionStatus).ONGOING   ? ' bg-info' :
-                                                                               ' bg-success'
-      }"
-      th:text="${s.sessionStatus.displayName}">
-</span>
+                    <span class="badge"
+                        th:classappend="${ 
+                            s.sessionStatus == T(com.team5.demo.entities.SessionStatus).SCHEDULED ? ' bg-secondary' :
+                            s.sessionStatus == T(com.team5.demo.entities.SessionStatus).ONGOING   ? ' bg-info' :
+                                                                                                ' bg-success'
+                        }"
+                        th:text="${s.sessionStatus.displayName}">
+                    </span>
 
 
                     </td>
