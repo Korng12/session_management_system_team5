@@ -74,6 +74,7 @@ CREATE TABLE registrations (
 CREATE TABLE session_attendance (
     participant_id INT NOT NULL,
     session_id INT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ABSENT',
     PRIMARY KEY (participant_id, session_id),
     FOREIGN KEY (participant_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE

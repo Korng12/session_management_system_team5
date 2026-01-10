@@ -52,15 +52,15 @@ public class RegistrationService {
 
                  Conference conf = conferenceRepository.findById(conferenceId)
                 .orElseThrow(() -> new RuntimeException("Conference not found"));
-                boolean registered =
-                registrationRepository.existsByParticipantAndConferenceAndStatus(
-                        user,
-                        conf,
-                        RegistrationStatus.CONFIRMED
-                );
-        if (!registered) {
-                throw new IllegalStateException("Register for the conference first");
-        }
+        //         boolean registered =
+        //         registrationRepository.existsByParticipantAndConferenceAndStatus(
+        //                 user,
+        //                 conf,
+        //                 RegistrationStatus.CONFIRMED
+        //         );
+        // if (!registered) {
+        //         throw new IllegalStateException("Register for the conference first");
+        // }
         Optional<Registration> regOpt=registrationRepository.findByParticipantAndConference(user,conf);
 //     if (registrationRepository.existsByParticipantAndConference(user, conf,RegistrationStatus status)) {
 //         throw new RuntimeException("Already registered");

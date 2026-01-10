@@ -11,7 +11,6 @@ CREATE TABLE session_registrations (
 
 -- 2. Enhance session attendance
 ALTER TABLE session_attendance
-ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'ABSENT',
 ADD COLUMN marked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN marked_by INT;
 
