@@ -55,16 +55,35 @@
         <div class="container mt-5">
             <h1>Manage Conferences</h1>
             <div class="text-end mb-3">
-                <button class="btn btn-outline-primary d-flex align-items-center gap-2 ms-auto"
-                        data-bs-toggle="modal"
-                        data-bs-target="#conferenceModal"
-                        onclick="openAddModal()">
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2 ms-auto" data-bs-toggle="modal"
+                    data-bs-target="#conferenceModal" onclick="openAddModal()">
                     <i class="bi bi-person-add fs-5"></i>
                     Add Conference
                 </button>
             </div>
 
-            
+            <!-- Search form  -->
+            <form th:action="@{/admin/manage-conferences}" method="get" class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input type="text" name="keyword" class="form-control" placeholder="Search conference by title..."
+                        th:value="${keyword}">
+                </div>
+
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+
+                <div class="col-md-2">
+                    <a th:href="@{/admin/manage-conferences}" class="btn btn-danger w-100">
+                        Reset
+                    </a>
+                </div>
+            </form>
+
+
+
             <table class="table mt-4">
                 <thead>
                     <tr>
@@ -85,23 +104,20 @@
                         <td class="text-center" th:text="${conf.endDate}"></td>
                         <td class="text-center">
                             <a th:href="@{/admin/conferences/edit/{id}(id=${conf.id})}"
-                                class="btn btn-outline-warning btn-sm"
-                                data-bs-toggle="modal"
-                                data-bs-target="#conferenceModal"
-                                th:attr="
+                                class="btn btn-outline-warning btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#conferenceModal" th:attr="
                                     data-id=${conf.id},
                                     data-title=${conf.title},
                                     data-desc=${conf.description},
                                     data-start=${conf.startDate},
-                                    data-end=${conf.endDate}"
-                                onclick="openEditModalFromBtn(this)">
+                                    data-end=${conf.endDate}" onclick="openEditModalFromBtn(this)">
                                 Edit
                             </a>
 
                             <a th:href="@{/admin/conferences/delete/{id}(id=${conf.id})}"
                                 class="btn btn-outline-danger btn-sm"
                                 onclick="return confirm('Delete this conference?')">
-                                    Delete
+                                Delete
                             </a>
 
                         </td>

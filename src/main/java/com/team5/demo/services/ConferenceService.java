@@ -58,8 +58,12 @@ public class ConferenceService {
        return conferenceRepository.count();
     }
 
+    // search for conference 
+    public List<Conference> searchByTitle(String keyword) {
+        return conferenceRepository.findByTitleContainingIgnoreCase(keyword);
+    }
 
-
+   
  
 
     /**

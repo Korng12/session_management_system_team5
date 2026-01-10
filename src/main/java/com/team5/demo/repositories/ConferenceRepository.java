@@ -18,6 +18,8 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     // === USER-FACING ===
     List<Conference> findByTitleContainingIgnoreCase(String title);
 
+    
+
     List<Conference> findByStartDateAfter(LocalDate date);
 
     List<Conference> findByEndDateBefore(LocalDate date);

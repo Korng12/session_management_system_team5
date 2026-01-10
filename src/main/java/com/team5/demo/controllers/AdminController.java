@@ -205,12 +205,12 @@ public class AdminController {
         if (keyword != null && !keyword.trim().isEmpty()) {
             registrations = registrationService.searchByParticipant(keyword);
         } else {
-            registrations = registrationService.getAllRegistrations(); // ✅ LIST
+            registrations = registrationService.getAllRegistrations(); 
         }
 
-        long totalRegistrations = registrationService.getTotalRegistrations(); // ✅ COUNT
+        long totalRegistrations = registrationService.getTotalRegistrations(); 
 
-        model.addAttribute("registrations", registrations);       // ✅ ALWAYS LIST
+        model.addAttribute("registrations", registrations);       
         model.addAttribute("totalRegistrations", totalRegistrations);
         model.addAttribute("keyword", keyword);
         model.addAttribute("activePage", "registrations");
@@ -257,20 +257,28 @@ public class AdminController {
         }
     /* ===================== Manage Attendance ===================== */
     @GetMapping("/manage-conferences")
-    public String manageConferences(Model model) {
+    public String manageConferences(
+            @RequestParam(value = "keyword", required = false) String keyword,
+        Model model) {
 
-        model.addAttribute("conferences", conferenceService.getAllConferences());
-        model.addAttribute("activePage", "conferences");
+    List<Conference> conferences;
 
-        // Long userId = userService.getCurrentUserId();
-
-        // List<Registration> registrations =
-        //         registrationService.getMyRegistrations(userId);
-
-        // model.addAttribute("registrations", registrations);
-
-        return "admin/manage-conferences";
+    if (keyword != null && !keyword.trim().isEmpty()) {
+        conferences = conferenceService.searchByTitle(keyword);
+    } else {
+        conferences = conferenceService.getAllConferences();
     }
+
+    model.addAttribute("conferences", conferences);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("activePage", "conferences");
+
+    return "admin/manage-conferences";
+    }
+
+
+
+    
 
 
 
