@@ -30,13 +30,16 @@
 
                     <!-- Session lifecycle -->
                     <td>
-                        <span class="badge"
-                              th:classappend="
-                                ${s.sessionStatus.name() == 'SCHEDULED'} ? ' bg-secondary' :
-                                ${s.sessionStatus.name() == 'ONGOING'} ? ' bg-info' :
-                                ' bg-success'"
-                              th:text="${s.sessionStatus}">
-                        </span>
+<span class="badge"
+      th:classappend="${ 
+          s.sessionStatus == T(com.team5.demo.entities.SessionStatus).SCHEDULED ? ' bg-secondary' :
+          s.sessionStatus == T(com.team5.demo.entities.SessionStatus).ONGOING   ? ' bg-info' :
+                                                                               ' bg-success'
+      }"
+      th:text="${s.sessionStatus.displayName}">
+</span>
+
+
                     </td>
 
                     <!-- Attendance (only meaningful after completed) -->

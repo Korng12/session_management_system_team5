@@ -17,6 +17,7 @@ import com.team5.demo.repositories.SessionRegistrationRepository;
 import com.team5.demo.repositories.UserRepository;
 
 
+
 // import com.team5.demo.dto.ScheduleDTO;  // FIXED: Changed from com.conference
 // import com.team5.demo.entities.Session;
 // import com.team5.demo.repositories.RegistrationRepository;
@@ -94,7 +95,7 @@ public class ScheduleService {
                         .orElse(null);
 
             return new UserScheduleDto(
-                    s.getId(),
+  
                     s.getTitle(),
                     s.getStartTime().toLocalDate(),
                     s.getStartTime().toLocalTime(),

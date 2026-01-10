@@ -1,14 +1,18 @@
 package com.team5.demo.controllers;
 
+import com.team5.demo.dto.UserScheduleDto;
 import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.Role;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.services.RegistrationService;
+import com.team5.demo.services.ScheduleService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,6 +50,8 @@ public class UserController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private RegistrationService registrationService;
+    @Autowired 
+    private ScheduleService scheduleService;
 
     @GetMapping("/")
     public String getLandingPage() {
@@ -127,7 +133,15 @@ public class UserController {
 
 
     @GetMapping("/schedule")
-    public String getSchedulePage() {
+    public String mySchedule(Authentication authentication, Model model) {
+
+        String email = authentication.getName();
+
+        List<UserScheduleDto> schedule =
+                scheduleService.getUserSchedule(email);
+
+        model.addAttribute("sessions", schedule);
+
         return "user/user-schedule";
     }
 
