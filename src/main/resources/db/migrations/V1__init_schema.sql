@@ -1,11 +1,9 @@
 
--- 1. ROLES (Create this first)
 CREATE TABLE roles (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE -- Changed from 'username' to 'name' (e.g., ROLE_ADMIN)
 );
 
--- 2. USERS
 CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
@@ -15,7 +13,6 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 3. USERS_ROLES (The Bridge Table for Spring Security)
 CREATE TABLE users_roles (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
@@ -24,7 +21,6 @@ CREATE TABLE users_roles (
     FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
 );
 
--- 4. CONFERENCES
 CREATE TABLE conferences (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
@@ -33,14 +29,12 @@ CREATE TABLE conferences (
     end_date DATE
 );
 
--- 5. ROOMS
 CREATE TABLE rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(30) NOT NULL UNIQUE,
     capacity INT NOT NULL CHECK (capacity > 0 AND capacity <= 100)
 );
 
--- 6. SESSIONS (Fixed typos in Foreign Keys)
 CREATE TABLE sessions (    
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(100) NOT NULL,
@@ -58,7 +52,6 @@ CREATE TABLE sessions (
     FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
 );
 
--- 7. REGISTRATIONS (Conference level)
 CREATE TABLE registrations (
     id INT PRIMARY KEY AUTO_INCREMENT,
     participant_id INT NOT NULL,
@@ -70,11 +63,10 @@ CREATE TABLE registrations (
     FOREIGN KEY (conference_id) REFERENCES conferences(id) ON DELETE CASCADE
 );
 
--- 8. SESSION_ATTENDANCE (Session level Bridge Table)
 CREATE TABLE session_attendance (
     participant_id INT NOT NULL,
     session_id INT NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'ABSENT',
+    status VARCHAR(20) DEFAULT 'REGISTERED',
     PRIMARY KEY (participant_id, session_id),
     FOREIGN KEY (participant_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
