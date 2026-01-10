@@ -122,12 +122,13 @@ public class UserController {
     }
 
     @GetMapping("/home")
-    public String getHome() {
+    public String getHome(Authentication auth,Model model) {
         System.out.println(
             "this is user principle"+
         SecurityContextHolder.getContext().getAuthentication().getDetails()
-            
+
         );
+        model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
         return "user/home";
     }
 

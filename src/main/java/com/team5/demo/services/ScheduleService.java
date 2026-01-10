@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.team5.demo.dto.MyUpcomingSessionDto;
 import com.team5.demo.dto.UserScheduleDto;
 import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
@@ -106,4 +107,27 @@ public class ScheduleService {
 
         }).toList();
     }
+        public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
+
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return sessionRegRepo.findByParticipant(user)
+                .stream()
+                .map(reg -> {
+
+                    Session s = reg.getSession();
+
+                    return new MyUpcomingSessionDto(
+                            s.getId(),
+                            s.getTitle(),
+                            s.getConference().getTitle(),
+                            s.getStartTime(),
+                            s.getEndTime(),
+                            s.getStatus()
+                    );
+                })
+                .toList();
+    }
+    
 }
