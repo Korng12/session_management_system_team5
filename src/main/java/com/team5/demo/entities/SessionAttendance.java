@@ -2,6 +2,7 @@ package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,27 +19,35 @@ public class SessionAttendance {
     @Column(name = "session_id")
     private Long sessionId;
 
-    // 🔗 Participant (User)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant_id", nullable = false)
+    @MapsId("participantId")
+    @JoinColumn(name = "participant_id")
     private User participant;
 
-    // 🔗 Session
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", nullable = false)
+    @MapsId("sessionId")
+    @JoinColumn(name = "session_id")
     private Session session;
 
-    @Column(name = "attended_at")
-    private LocalDateTime attendedAt;
-
     @Column(length = 20)
-    private String status; // REGISTERED, PRESENT, LATE, ABSENT
+    private String status; // PRESENT, ABSENT, REGISTERED
 
-    @PrePersist
-    protected void onCreate() {
-        this.attendedAt = LocalDateTime.now();
+    public SessionAttendance() {
         this.status = "REGISTERED";
+    }
+
+    public SessionAttendance(User participant, Session session) {
+        this.participant = participant;
+        this.session = session;
         this.participantId = participant.getId();
         this.sessionId = session.getId();
+        this.status = "REGISTERED";
     }
+
+    public void setAttendedAt(LocalDateTime now) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setAttendedAt'");
+    }
+
+    
 }

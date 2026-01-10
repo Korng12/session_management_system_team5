@@ -17,13 +17,15 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
 
     List<Conference> findByTitleContainingIgnoreCase(String title);
 
+    
+
     List<Conference> findByStartDateAfter(LocalDate date);
 
     List<Conference> findByEndDateBefore(LocalDate date);
 
     @Query("""
         SELECT c FROM Conference c
-        WHERE c.endDate <= :today
+        WHERE c.endDate >= :today
         ORDER BY c.startDate ASC
     """)
     List<Conference> findUpcomingConferences(@Param("today") LocalDate today);

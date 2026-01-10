@@ -51,11 +51,17 @@
                         </a>
 
                         <!-- REGISTER (ATTENDEE only) -->
-                        <a th:href="@{/conferences/{id}/register(id=${conf.id})}"
-                           class="btn btn-primary"
-                           sec:authorize="hasAuthority('ATTENDEE')">
-                            Register
-                        </a>
+                        <div th:if="${registeredConferenceIds != null and registeredConferenceIds.contains(conf.id)}" sec:authorize="hasAuthority('ATTENDEE')">
+                            <form th:action="@{/conferences/{id}/cancel(id=${conf.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger">Cancel Registration</button>
+                            </form>
+                        </div>
+                        <div th:if="${registeredConferenceIds == null or !registeredConferenceIds.contains(conf.id)}" sec:authorize="hasAuthority('ATTENDEE')">
+                            <a th:href="@{/conferences/{id}/register(id=${conf.id})}"
+                               class="btn btn-primary">
+                                Register
+                            </a>
+                        </div>
 
                         <!-- LOGIN PROMPT (Guest only) -->
                         <a th:href="@{/login}"

@@ -1,18 +1,22 @@
 package com.team5.demo.entities;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "sessions")
 public class Session {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 100)
     private String title;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chair_id")

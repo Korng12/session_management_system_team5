@@ -117,6 +117,12 @@ public class SessionService {
         return convertToResponse(savedSession);
     }
 
+    // Function for total in admin
+    public long countAll() {
+        return sessionRepository.count();
+    }
+
+
     /**
      * Get all sessions for a specific conference
      */

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.team5.demo.entities.Conference;
 import com.team5.demo.services.ConferenceService;
 import com.team5.demo.services.SessionService;
 
@@ -22,17 +23,17 @@ public class ConferenceController {
     }
 
     // GET /conferences
-@GetMapping
-public String listConferences(Model model) {
-    System.out.println(">>> /conferences controller called");
+    @GetMapping
+    public String listConferences(Model model) {
+        System.out.println(">>> /conferences controller called");
 
-    var conferences = conferenceService.getAvailableConferences();
-    
-    System.out.println(">>> conferences size = " + conferences.size());
-    model.addAttribute("conferences", conferences);
+        var conferences = conferenceService.getAvailableConferences();
+        
+        System.out.println(">>> conferences size = " + conferences.size());
+        model.addAttribute("conferences", conferences);
 
-    return "user/conferences";
-}
+        return "user/conferences";
+    }
 
 
     // GET /conferences/{id}
@@ -45,5 +46,15 @@ public String listConferences(Model model) {
         System.out.println(sessionService.getSessionsByConference(id).size());   
         return "user/conference-detail";
     }
-    
+
+    // @Autowired
+    // private ConferenceService conferenceService;
+
+    @GetMapping("/{id}/view")
+    public String viewConference(@PathVariable Long id, Model model) {
+        model.addAttribute("conference",
+                conferenceService.getConferenceById(id));
+        return "conference/view-conference";
+    }
+
 }

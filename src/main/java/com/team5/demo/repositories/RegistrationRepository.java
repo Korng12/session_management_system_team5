@@ -5,26 +5,34 @@ import com.team5.demo.entities.User;
 
 import com.team5.demo.entities.Conference;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
 
+    /* ===================== BASIC QUERIES ===================== */
 
-    Optional<Registration> findByParticipantAndConference(User participant, Conference conference);
-    
+    Optional<Registration> findByParticipantAndConference(
+            User participant,
+            Conference conference
+    );
+
     List<Registration> findByParticipant(User participant);
-    
+
+    List<Registration> findByParticipantAndStatus(
+            User participant,
+            String status
+    );
+
     List<Registration> findByConference(Conference conference);
-    
-    List<Registration> findByParticipantAndStatus(User participant, String status);
-    
-    List<Registration> findByConferenceAndStatus(Conference conference, String status);
- List<Registration> findByConferenceId(Long conferenceId);
-    void deleteByConferenceIdAndParticipantId(Long conferenceId, Long participantId);
+
+    /* ===================== COUNTS ===================== */
+
     long countByConference(Conference conference);
     
     // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
@@ -32,9 +40,56 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     boolean existsByParticipantAndConference(User participant, Conference conference);
     
     long countByParticipant(User participant);
-    
-    List<Registration> findByStatus(String status);
-    boolean existsByParticipantIdAndConferenceId(Long participantId, Long conferenceId);
-    
-    
+
+    /* ===================== EXISTS CHECK ===================== */
+
+    boolean existsByParticipant_IdAndConference_Id(
+            Long participantId,
+            Long conferenceId
+    );
+
+    /* ===================== ADMIN QUERIES ===================== */
+
+    @Query("""
+        SELECT r FROM Registration r
+        JOIN FETCH r.participant
+        JOIN FETCH r.conference
+        WHERE r.status = :status
+    """)
+    List<Registration> findByStatusWithRelations(@Param("status") String status);
+
+    @Query("""
+        SELECT r FROM Registration r
+        JOIN FETCH r.participant
+        JOIN FETCH r.conference
+    """)
+    List<Registration> findAllWithRelations();
+
+    @Query("""
+        SELECT r FROM Registration r
+        JOIN FETCH r.participant p
+        JOIN FETCH r.conference c
+        WHERE r.status = 'CONFIRMED'
+          AND (
+               LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+            OR LOWER(p.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          )
+    """)
+    List<Registration> searchConfirmedByParticipant(
+            @Param("keyword") String keyword
+    );
+
+    // This query for User
+    @Query("""
+    SELECT r FROM Registration r
+    JOIN FETCH r.conference
+    WHERE r.participant.email = :email
+    AND r.status = 'CONFIRMED'
+        """)
+        List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+
+    boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
+
+
+
 }
