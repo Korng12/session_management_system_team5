@@ -24,9 +24,10 @@ public interface SessionAttendanceRepository extends JpaRepository<SessionAttend
      * Find a specific attendance record
      */
     Optional<SessionAttendance> findByParticipantIdAndSessionId(Long participantId, Long sessionId);
-    
+
     /**
      * Check if a participant attended a session
      */
     boolean existsByParticipantIdAndSessionId(Long participantId, Long sessionId);
+    
 }
