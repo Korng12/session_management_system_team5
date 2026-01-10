@@ -1,31 +1,32 @@
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Manage Registrations</title>
-<div th:replace="~{layout/main :: layout(~{::section})}">
-<section>
+    <title>Conference Registrations</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
             background: #f4f6f9;
+            margin: 0;
         }
 
-        h2 {
-            margin-bottom: 15px;
+        h1 {
+            margin-bottom: 20px;
         }
 
         .card {
-            background: #ffffff;
+            background: #fff;
             padding: 20px;
             margin-bottom: 25px;
-            border-radius: 8px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
         }
 
         .form-row {
             display: flex;
-            gap: 10px;
-            align-items: center;
+            gap: 15px;
         }
 
         select, button {
@@ -48,7 +49,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            background: #fff;
         }
 
         th, td {
@@ -58,27 +58,45 @@
         }
 
         th {
-            background: #f1f1f1;
+            background: #f0f2f5;
         }
 
         .actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
-        .actions form {
-            display: inline-block;
+        .btn-update {
+            background: #2ecc71;
+        }
+
+        .btn-update:hover {
+            background: #27ae60;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background: #c0392b;
         }
     </style>
 </head>
-<div th:replace="~{fragments/sidebar :: sidebar}"></div>
-<body>
-    <h2>Conference & Session Registration (ADMIN)</h2>
 
+<body>
+
+<div th:replace="~{layout/main :: layout(~{::section})}">
+<section>
+
+    <h1>Conference Registrations</h1>
+
+    <!-- ================= CREATE REGISTRATION ================= -->
     <div class="card">
+        <h3>Register User to Conference</h3>
+
         <form th:action="@{/admin/registrations}" method="post">
             <div class="form-row">
-
                 <select name="userId" required>
                     <option value="">-- Select User --</option>
                     <option th:each="u : ${users}"
@@ -87,7 +105,7 @@
                     </option>
                 </select>
 
-                <select name="conferenceId" id="conferenceSelect" required>
+                <select name="conferenceId" required>
                     <option value="">-- Select Conference --</option>
                     <option th:each="c : ${conferences}"
                             th:value="${c.id}"
@@ -95,23 +113,19 @@
                     </option>
                 </select>
 
-                <select name="sessionId" id="sessionSelect">
-                    <option value="">-- Session (optional) --</option>
-                </select>
-
                 <button type="submit">Register</button>
             </div>
         </form>
     </div>
-
     <div class="card">
+        <h3>Existing Registrations</h3>
+
         <table>
             <thead>
             <tr>
                 <th>ID</th>
-                <th>User Email</th>
+                <th>User</th>
                 <th>Conference</th>
-                <th>Session</th>
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
@@ -119,15 +133,14 @@
 
             <tbody>
             <tr th:each="r : ${registrations}">
-                <td th:text="${r.registrationId}"></td>
-                <td th:text="${r.userEmail}"></td>
-                <td th:text="${r.conferenceTitle}"></td>
-                <td th:text="${r.sessionTitle != null ? r.sessionTitle : '-'}"></td>
+                <td th:text="${r.id}"></td>
+                <td th:text="${r.participant.email}"></td>
+                <td th:text="${r.conference.title}"></td>
                 <td th:text="${r.status}"></td>
 
                 <td class="actions">
 
-                    <form th:action="@{/admin/registrations/{id}/status(id=${r.registrationId})}"
+                    <form th:action="@{/admin/registrations/{id}/status(id=${r.id})}"
                           method="post">
                         <select name="status">
                             <option value="CONFIRMED"
@@ -139,12 +152,13 @@
                                 CANCELLED
                             </option>
                         </select>
-                        <button type="submit">Update</button>
+                        <button type="submit" class="btn-update">Update</button>
                     </form>
 
-                    <form th:action="@{/admin/registrations/{id}/delete(id=${r.registrationId})}"
+                    <form th:action="@{/admin/registrations/{id}/delete(id=${r.id})}"
                           method="post">
                         <button type="submit"
+                                class="btn-delete"
                                 onclick="return confirm('Delete this registration?')">
                             Delete
                         </button>
@@ -158,37 +172,6 @@
 
 </section>
 </div>
-
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const conferenceSelect = document.getElementById('conferenceSelect');
-        const sessionSelect = document.getElementById('sessionSelect');
-
-        conferenceSelect.addEventListener('change', function () {
-            const conferenceId = this.value;
-
-            sessionSelect.innerHTML =
-                '<option value="">-- Session (optional) --</option>';
-
-            if (!conferenceId) return;
-
-            fetch('/admin/conferences/' + conferenceId + '/sessions')
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(session => {
-                        const option = document.createElement('option');
-                        option.value = session.id;
-                        option.textContent = session.title;
-                        sessionSelect.appendChild(option);
-                    });
-                })
-                .catch(() => {
-                    console.error('Failed to load sessions');
-                });
-        });
-    });
-</script>
 
 </body>
 </html>

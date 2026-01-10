@@ -124,6 +124,8 @@ public class AdminController {
 
         model.addAttribute("totalConferences",
                 conferenceService.countAll());
+        model.addAttribute("conferences", conferenceService.getAllConferences());
+        model.addAttribute("registrations", registrationService.getAllRegistrations());
 
 
         return "admin/dashboard";
@@ -195,28 +197,28 @@ public class AdminController {
     }
 
     /* ===================== MANAGE REGISTRATIONS (search and clear) ===================== */
-    @GetMapping("/manage-registrations")
-    public String manageRegistrations(
-            @RequestParam(value = "keyword", required = false) String keyword,
-            Model model) {
+    // @GetMapping("/manage-registrations")
+    // public String manageRegistrations(
+    //         @RequestParam(value = "keyword", required = false) String keyword,
+    //         Model model) {
 
-        List<Registration> registrations;
+    //     List<Registration> registrations;
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            registrations = registrationService.searchByParticipant(keyword);
-        } else {
-            registrations = registrationService.getAllRegistrations(); 
-        }
+    //     if (keyword != null && !keyword.trim().isEmpty()) {
+    //         registrations = registrationService.searchByParticipant(keyword);
+    //     } else {
+    //         registrations = registrationService.getAllRegistrations(); 
+    //     }
 
-        long totalRegistrations = registrationService.getTotalRegistrations(); 
+    //     long totalRegistrations = registrationService.getTotalRegistrations(); 
 
-        model.addAttribute("registrations", registrations);       
-        model.addAttribute("totalRegistrations", totalRegistrations);
-        model.addAttribute("keyword", keyword);
-        model.addAttribute("activePage", "registrations");
+    //     model.addAttribute("registrations", registrations);       
+    //     model.addAttribute("totalRegistrations", totalRegistrations);
+    //     model.addAttribute("keyword", keyword);
+    //     model.addAttribute("activePage", "registrations");
 
-        return "admin/view-registrations";
-    }
+    //     return "admin/view-registrations";
+    // }
 
 
 
