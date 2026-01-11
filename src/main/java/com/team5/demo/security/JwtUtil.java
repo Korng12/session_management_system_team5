@@ -20,11 +20,11 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(decodedKey);
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email,long expirationMillis) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(key)
                 .compact();
     }

@@ -1,6 +1,7 @@
 package com.team5.demo.controllers;
 
 import com.team5.demo.dto.CreateSessionRequest;
+import com.team5.demo.dto.RoleDTO;
 import com.team5.demo.dto.SessionResponse;
 import com.team5.demo.dto.UpdateSessionStatusRequest;
 import com.team5.demo.dto.SessionDependenciesResponse;
@@ -15,6 +16,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.hibernate.StaleObjectStateException;
+
+import com.team5.demo.dto.AdminCreateUserRequest;
+import com.team5.demo.dto.AdminUpdateUserRequest;
+import com.team5.demo.dto.AdminUserDTO;
+import com.team5.demo.dto.AssignRolesRequest;
 import com.team5.demo.dto.ConferenceDTO;
 import com.team5.demo.dto.RoomDTO;
 import com.team5.demo.dto.UserDTO;
@@ -50,7 +56,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import com.team5.demo.entities.Role;
+import com.team5.demo.entities.User;
 
+import com.team5.demo.repositories.RoleRepository;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Set;
 
 @Controller
 @RequestMapping("/admin")
@@ -70,26 +85,33 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // Admin Dashboard
     @GetMapping("")
     public String showAdminHomepage(Model model) {
-        return "admin/dashboard"; 
+        return "admin/dashboard";
     }
 
     // Manage Users
     @GetMapping("/manage-users")
     public String manageUsers(Model model) {
-        return "admin/manage_users"; 
+        return "admin/manage-users";
     }
+
     @GetMapping("/admin/manage-schedule")
     public String manageSchedule() {
         return "admin/view-schedule";
     }
+
     @GetMapping("/manage-conferences")
     public String getMethodName() {
         return "admin/manage-conferences";
     }
-    
 
     // Manage Rooms
     @GetMapping("/manage-rooms")
@@ -100,7 +122,7 @@ public class AdminController {
     // Manage Sessions
     @GetMapping("/manage-sessions")
     public String manageSessions(Model model) {
-        return "admin/manage-sessions"; 
+        return "admin/manage-sessions";
     }
 
     // Create Session Form
@@ -132,7 +154,7 @@ public class AdminController {
     // @GetMapping("/admin/view-registrations")
     @GetMapping("/view-registeredUsers")
     public String listRegisteredUsers(Model model) {
-        return "admin/view-registrations"; 
+        return "admin/view-registrations";
     }
 
     // ============ SESSION CRUD OPERATIONS ============
@@ -150,8 +172,7 @@ public class AdminController {
                     .map(conference -> new ConferenceDTO(
                             conference.getId(),
                             conference.getTitle(),
-                            conference.getDescription()
-                    ))
+                            conference.getDescription()))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(conferences);
         } catch (Exception e) {
@@ -172,8 +193,7 @@ public class AdminController {
                     .map(room -> new RoomDTO(
                             room.getId(),
                             room.getName(),
-                            room.getCapacity() != null ? room.getCapacity().longValue() : null
-                    ))
+                            room.getCapacity() != null ? room.getCapacity().longValue() : null))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(rooms);
         } catch (Exception e) {
@@ -190,19 +210,21 @@ public class AdminController {
     public ResponseEntity<?> createRoom(@Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
-            bindingResult.getFieldErrors().forEach(error -> 
-                errorResponse.addError(error.getField(), error.getDefaultMessage())
-            );
+            bindingResult.getFieldErrors()
+                    .forEach(error -> errorResponse.addError(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
         try {
-            Room room = new Room(request.getName(), request.getCapacity() != null ? request.getCapacity().intValue() : 50);
+            Room room = new Room(request.getName(),
+                    request.getCapacity() != null ? request.getCapacity().intValue() : 50);
             Room saved = roomRepository.save(room);
-            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(), saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
+            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(),
+                    saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to create room: " + e.getMessage());
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(
+                    "Failed to create room: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -213,12 +235,12 @@ public class AdminController {
      */
     @PutMapping("/rooms/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDTO request, BindingResult bindingResult) {
+    public ResponseEntity<?> updateRoom(@PathVariable("id") Long id, @Valid @RequestBody RoomDTO request,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
-            bindingResult.getFieldErrors().forEach(error -> 
-                errorResponse.addError(error.getField(), error.getDefaultMessage())
-            );
+            bindingResult.getFieldErrors()
+                    .forEach(error -> errorResponse.addError(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
@@ -229,13 +251,15 @@ public class AdminController {
                 room.setCapacity(request.getCapacity().intValue());
             }
             Room saved = roomRepository.save(room);
-            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(), saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
+            RoomDTO response = new RoomDTO(saved.getId(), saved.getName(),
+                    saved.getCapacity() != null ? saved.getCapacity().longValue() : null);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
-            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to update room: " + e.getMessage());
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(
+                    "Failed to update room: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -264,7 +288,8 @@ public class AdminController {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse(e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (Exception e) {
-            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Failed to delete room: " + e.getMessage());
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(
+                    "Failed to delete room: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -282,8 +307,7 @@ public class AdminController {
                     .map(user -> new UserDTO(
                             user.getId(),
                             user.getName(),
-                            user.getEmail()
-                    ))
+                            user.getEmail()))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(users);
         } catch (Exception e) {
@@ -333,31 +357,30 @@ public class AdminController {
      * 
      * Request Body:
      * {
-     *     "title": "Keynote Session",
-     *     "chairId": 1,
-     *     "roomId": 1,
-     *     "conferenceId": 1,
-     *     "startTime": "2025-01-15T09:00:00",
-     *     "endTime": "2025-01-15T10:00:00"
+     * "title": "Keynote Session",
+     * "chairId": 1,
+     * "roomId": 1,
+     * "conferenceId": 1,
+     * "startTime": "2025-01-15T09:00:00",
+     * "endTime": "2025-01-15T10:00:00"
      * }
      */
     @PostMapping("/sessions")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createSession(@Valid @RequestBody CreateSessionRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> createSession(@Valid @RequestBody CreateSessionRequest request,
+            BindingResult bindingResult) {
         // Check for validation errors
         if (bindingResult.hasErrors()) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
-            
+
             // Add field errors
-            bindingResult.getFieldErrors().forEach(error -> 
-                errorResponse.addError(error.getField(), error.getDefaultMessage())
-            );
-            
+            bindingResult.getFieldErrors()
+                    .forEach(error -> errorResponse.addError(error.getField(), error.getDefaultMessage()));
+
             // Add global errors (like ValidSessionTime, ValidDuration)
-            bindingResult.getGlobalErrors().forEach(error ->
-                errorResponse.addError("session", error.getDefaultMessage())
-            );
-            
+            bindingResult.getGlobalErrors()
+                    .forEach(error -> errorResponse.addError("session", error.getDefaultMessage()));
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
@@ -368,7 +391,8 @@ public class AdminController {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         } catch (Exception e) {
-            ValidationErrorResponse errorResponse = new ValidationErrorResponse("An unexpected error occurred. Please try again.");
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse(
+                    "An unexpected error occurred. Please try again.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
@@ -412,22 +436,20 @@ public class AdminController {
             @PathVariable("id") Long id,
             @Valid @RequestBody CreateSessionRequest request,
             BindingResult bindingResult) {
-        
+
         // Check for validation errors
         if (bindingResult.hasErrors()) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
-            
-            bindingResult.getFieldErrors().forEach(error -> 
-                errorResponse.addError(error.getField(), error.getDefaultMessage())
-            );
-            
-            bindingResult.getGlobalErrors().forEach(error ->
-                errorResponse.addError("session", error.getDefaultMessage())
-            );
-            
+
+            bindingResult.getFieldErrors()
+                    .forEach(error -> errorResponse.addError(error.getField(), error.getDefaultMessage()));
+
+            bindingResult.getGlobalErrors()
+                    .forEach(error -> errorResponse.addError("session", error.getDefaultMessage()));
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
-        
+
         try {
             SessionResponse response = sessionService.updateSession(id, request);
             return ResponseEntity.ok(response);
@@ -436,8 +458,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         } catch (StaleObjectStateException e) {
             ValidationErrorResponse errorResponse = new ValidationErrorResponse(
-                "Concurrent edit detected: The session was modified by another user. Please refresh and try again."
-            );
+                    "Concurrent edit detected: The session was modified by another user. Please refresh and try again.");
             errorResponse.addError("version", "CONCURRENT_EDIT");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         }
@@ -489,7 +510,8 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (StaleObjectStateException e) {
             Map<String, String> error = new HashMap<>();
-            error.put("error", "Concurrent edit detected: The session was modified by another user. Please refresh and try again.");
+            error.put("error",
+                    "Concurrent edit detected: The session was modified by another user. Please refresh and try again.");
             error.put("errorCode", "CONCURRENT_EDIT");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
@@ -540,8 +562,7 @@ public class AdminController {
             @RequestParam(value = "excludeSessionId", required = false) Long excludeSessionId) {
         try {
             RoomAvailabilityResponse response = sessionService.checkRoomAvailability(
-                roomId, startTime, endTime, excludeSessionId
-            );
+                    roomId, startTime, endTime, excludeSessionId);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -561,8 +582,7 @@ public class AdminController {
             @RequestParam(value = "excludeSessionId", required = false) Long excludeSessionId) {
         try {
             TimeConflictResponse response = sessionService.checkChairAvailability(
-                chairId, startTime, endTime, excludeSessionId
-            );
+                    chairId, startTime, endTime, excludeSessionId);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -580,17 +600,17 @@ public class AdminController {
             @PathVariable("chairId") Long chairId) {
         try {
             TimeConflictResponse response = sessionService.assignChairToSession(sessionId, chairId);
-            
+
             if (response.isHasConflict()) {
                 // Chair has conflicts - return 409 Conflict with details
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             }
-            
+
             // Chair assigned successfully
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
+                    .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
     }
 
@@ -606,7 +626,195 @@ public class AdminController {
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
+                    .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
+    }
+
+    // User CRUD
+
+    @GetMapping("/api/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            User user = getUserOrThrow(id);
+            return ResponseEntity.ok(toAdminUserDTO(user));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ValidationErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PostMapping("/api/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> createUser(@Valid @RequestBody AdminCreateUserRequest req, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            ValidationErrorResponse errorResponse = new ValidationErrorResponse("Validation failed");
+            bindingResult.getFieldErrors()
+                    .forEach(error -> errorResponse.addError(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        if (userRepository.existsByEmail(req.getEmail())) {
+            return ResponseEntity.badRequest()
+                    .body(new ValidationErrorResponse("Email already exists"));
+        }
+
+        User user = new User();
+        user.setName(req.getName());
+        user.setEmail(req.getEmail());
+        user.setPassword(passwordEncoder.encode(req.getPassword())); // BCrypt
+
+        if (req.getRoles() != null && !req.getRoles().isEmpty()) {
+            Set<Role> roles = req.getRoles().stream()
+                    .map(this::getRoleOrThrow)
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
+        User saved = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toAdminUserDTO(saved));
+    }
+
+    @PutMapping("/api/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody AdminUpdateUserRequest req) {
+        try {
+            User user = getUserOrThrow(id);
+
+            if (req.getName() != null)
+                user.setName(req.getName());
+            if (req.getEmail() != null)
+                user.setEmail(req.getEmail());
+
+            if (req.getPassword() != null && !req.getPassword().isBlank()) {
+                user.setPassword(passwordEncoder.encode(req.getPassword())); // BCrypt
+            }
+
+            if (req.getRoles() != null) {
+                Set<Role> roles = req.getRoles().stream()
+                        .map(this::getRoleOrThrow)
+                        .collect(Collectors.toSet());
+                user.setRoles(roles);
+            }
+
+            User saved = userRepository.save(user);
+            return ResponseEntity.ok(toAdminUserDTO(saved));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ValidationErrorResponse(e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/api/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            User userToDelete = getUserOrThrow(id);
+
+            String currentEmail = getCurrentUserEmail();
+            boolean targetIsAdmin = userToDelete.getRoles().stream()
+                    .anyMatch(r -> r.getName().equalsIgnoreCase("ROLE_ADMIN"));
+
+            if (targetIsAdmin && userRepository.countAdmins() <= 1) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ValidationErrorResponse("Cannot delete the last admin."));
+            }
+
+            if (currentEmail == null || currentEmail.equals("anonymousUser")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ValidationErrorResponse("Unauthorized"));
+            }
+
+            User currentUser = userRepository.findByEmail(currentEmail)
+                    .orElseThrow(() -> new IllegalArgumentException("Current user not found"));
+
+            //  Prevent admin deleting himself (use ID)
+            if (currentUser.getId().equals(userToDelete.getId())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ValidationErrorResponse("You cannot delete your own admin account."));
+            }
+
+            userRepository.delete(userToDelete);
+            return ResponseEntity.ok(new ValidationErrorResponse("User deleted"));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ValidationErrorResponse(e.getMessage()));
+        }
+    }
+
+    // User Role Management
+
+    @PostMapping("/api/users/{id}/roles/{roleName}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> addRoleToUser(@PathVariable Long id, @PathVariable String roleName) {
+        try {
+            User user = getUserOrThrow(id);
+            Role role = getRoleOrThrow(roleName);
+
+            user.getRoles().add(role);
+            User saved = userRepository.save(user);
+
+            return ResponseEntity.ok(toAdminUserDTO(saved));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ValidationErrorResponse(e.getMessage()));
+        }
+    }
+
+    @PutMapping("/api/users/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> replaceUserRoles(@PathVariable Long id, @RequestBody AssignRolesRequest req) {
+        try {
+            User user = getUserOrThrow(id);
+
+            Set<Role> roles = req.getRoles().stream()
+                    .map(this::getRoleOrThrow)
+                    .collect(Collectors.toSet());
+
+            user.setRoles(roles);
+            User saved = userRepository.save(user);
+
+            return ResponseEntity.ok(toAdminUserDTO(saved));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ValidationErrorResponse("Failed to replace roles: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/api/roles")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RoleDTO>> getAllRoles() {
+        List<RoleDTO> roles = roleRepository.findAll()
+                .stream()
+                .map(r -> new RoleDTO(r.getId(), r.getName()))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(roles);
+    }
+
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    private Role getRoleOrThrow(String roleName) {
+        return roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+    }
+
+    private AdminUserDTO toAdminUserDTO(User user) {
+        Set<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        return new AdminUserDTO(user.getId(), user.getName(), user.getEmail(), roles);
+    }
+
+    private String getCurrentUserEmail() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("AUTH_NAME = " + auth.getName());
+        return auth.getName(); // usually email (subject from JWT)
     }
 }
