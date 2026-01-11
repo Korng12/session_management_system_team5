@@ -18,7 +18,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -52,6 +51,9 @@ public class UserController {
     private RegistrationService registrationService;
     @Autowired 
     private ScheduleService scheduleService;
+
+    @Autowired
+    private com.team5.demo.services.ChairService chairService;
 
     @GetMapping("/")
     public String getLandingPage() {
@@ -129,11 +131,22 @@ public class UserController {
 
         );
         model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
+
+        // Include chaired sessions for users with the chair role
+        boolean isChair = auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
+
+        if (isChair) {
+            model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
+        } else {
+            model.addAttribute("chairedSessions", java.util.Collections.emptyList());
+        }
+
         return "user/home";
     }
 
 
-    @GetMapping("/schedule")
+    @GetMapping("/schedule-attendance")
     public String mySchedule(Authentication authentication, Model model) {
 
         String email = authentication.getName();
@@ -150,11 +163,7 @@ public class UserController {
     public String getRegisterConferencePage() {
         return "public/registration";
     }
-
-    // @GetMapping("/conferences")
-    // public String getConferencesPage() {
-    //     return "user/conferences";
-    // }
+    
 
     @GetMapping("/profile")
     public String getProfilePage(Principal principal, Model model) {

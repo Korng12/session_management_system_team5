@@ -30,9 +30,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     long countByConference(Conference conference);
     
     // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
-
     // boolean existsByParticipantAndConference(User participant, Conference conference);
-    // boolean existsByParticipantAndConference(User participant, Conference conference,RegistrationStatus status);
     boolean existsByParticipantAndConferenceAndStatus(
         User participant,
         Conference conference,
@@ -42,6 +40,6 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     long countByParticipant(User participant);
     
     // List<Registration> findByStatus(String status);
-    List<Registration> findByStatus(Registration status);
+    List<Registration> findByStatus(RegistrationStatus status);
 
 }

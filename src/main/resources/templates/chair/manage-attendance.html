@@ -6,6 +6,12 @@
         Session Attendance
     </h2>
 
+    <div th:if="${currentSess.status != T(com.team5.demo.entities.SessionStatus).ONGOING}" class="alert alert-warning">
+        Attendance can only be marked while the session is <strong>Ongoing</strong>.
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
     <div class="table-responsive">
         <table class="table table-hover align-middle">
 
@@ -40,9 +46,9 @@
                         </span>
                     </td>
 
-                    <td>
+                    <td th:if="${a.attendance == null}">
                         <form method="post"
-                              th:action="@{/chair/sessions/{sid}/attendance(sid=${session.id})}"
+                              th:action="@{/chair/sessions/{sid}/attendance(sid=${currentSess.id})}"
                               class="d-flex gap-2">
 
                             <input type="hidden"
@@ -51,17 +57,30 @@
 
                             <button name="status"
                                     value="PRESENT"
-                                    class="btn btn-sm btn-success">
+                                    class="btn btn-sm btn-success"
+                                    th:disabled="${currentSess.status != T(com.team5.demo.entities.SessionStatus).ONGOING}">
                                 Present
                             </button>
 
                             <button name="status"
                                     value="ABSENT"
-                                    class="btn btn-sm btn-danger">
+                                    class="btn btn-sm btn-danger"
+                                    th:disabled="${currentSess.status != T(com.team5.demo.entities.SessionStatus).ONGOING}">
                                 Absent
                             </button>
 
                         </form>
+                    </td>
+
+                    <td th:if="${a.attendance != null}">
+                        <span class="badge"
+                              th:classappend="${ 
+                                  a.attendance == T(com.team5.demo.entities.AttendanceStatus).PRESENT
+                                  ? ' bg-success' : ' bg-danger'
+                              }"
+                              th:text="${a.attendance}">
+                        </span>
+                        <small class="text-muted d-block">Recorded</small>
                     </td>
                 </tr>
 

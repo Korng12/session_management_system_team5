@@ -39,7 +39,7 @@
             <button id="cancelConferenceBtn"
                     class="btn btn-danger"
                     sec:authorize="hasAuthority('ROLE_ATTENDEE')"
-                    th:if="${isRegistered}"
+                    th:if="${isRegistered and conference.endDate.isAfter(T(java.time.LocalDate).now())}"
                     th:data-registration-id="${registrationId}">
                 Cancel Registration
             </button>
@@ -47,10 +47,20 @@
             <button id="registerConferenceBtn"
                     class="btn btn-primary"
                     sec:authorize="hasAuthority('ROLE_ATTENDEE')"
-                    th:unless="${isRegistered}"
+                    th:if="${!isRegistered and conference.endDate.isAfter(T(java.time.LocalDate).now())}"
                     th:data-conference-id="${conference.id}">
                 Register for Conference
             </button>
+
+            <button class="btn btn-secondary" disabled
+                    th:if="${conference.endDate.isBefore(T(java.time.LocalDate).now())}"
+                    sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                Conference Completed
+            </button>
+
+            <div th:if="${conference.endDate.isBefore(T(java.time.LocalDate).now())}">
+                <span class="badge bg-secondary">Completed</span>
+            </div>
 
             <a th:href="@{/login}"
                class="btn btn-secondary"
@@ -107,21 +117,39 @@
                         </span>
                     </div>
 
-                    <div class="card-footer bg-transparent border-0 d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
 
-                        <a th:href="@{/sessions/{id}/register(id=${sess.id})}"
-                           class="btn btn-sm btn-primary"
-                           sec:authorize="hasAuthority('ROLE_ATTENDEE')">
-                            Register Session
-                        </a>
+                <!-- Register session -->
+                <form th:if="${isRegistered
+                            and sess.status.name() == 'SCHEDULED'
+                            and !registeredSessionIds.contains(sess.id)}"
+                    th:action="@{/sessions/{id}/register(id=${sess.id})}"
+                    method="post"
+                    class="d-inline"
+                    sec:authorize="hasAuthority('ROLE_ATTENDEE')">
 
-                        <a th:href="@{/login}"
-                           class="btn btn-sm btn-secondary"
-                           sec:authorize="!isAuthenticated()">
-                            Login to Register
-                        </a>
+                    <button type="submit"
+                            class="btn btn-sm btn-primary">
+                        Register Session
+                    </button>
+                </form>
 
-                    </div>
+                <!-- Already registered -->
+                <span th:if="${registeredSessionIds.contains(sess.id)}"
+                    class="badge bg-success">
+                    Registered
+                </span>
+
+                <!-- Session closed -->
+                <span th:if="${sess.status.name() != 'SCHEDULED'}"
+                    class="badge bg-secondary">
+                    Registration closed
+                </span>
+
+            </div>
+
+
+
                 </div>
             </div>
 

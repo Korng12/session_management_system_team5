@@ -27,15 +27,6 @@ public class SessionAttendance {
     @JoinColumn(name = "session_id", referencedColumnName = "id", insertable = false, updatable = false)
     private Session session;
     
-    // @Column(name = "attended_at")
-    // private LocalDateTime attendedAt;
-    
-    // @Column(name = "check_in_time")
-    // private LocalDateTime checkInTime;
-    
-    // @Column(name = "check_out_time")
-    // private LocalDateTime checkOutTime;
-    
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private AttendanceStatus status; // PRESENT, ABSENT
@@ -45,12 +36,8 @@ public class SessionAttendance {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by")
     private User markedBy;
-    // Constructors
-    // public SessionAttendance() {
-    //     this.attendedAt = LocalDateTime.now();
-    //     this.status = AttendanceStatus.ABSENT;
-    // }
-      public SessionAttendance() {
+
+    public SessionAttendance() {
     
     }
     public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,

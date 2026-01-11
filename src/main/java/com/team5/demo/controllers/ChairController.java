@@ -1,5 +1,4 @@
 package com.team5.demo.controllers;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -7,10 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.team5.demo.services.ChairService;
 
-import jakarta.websocket.server.PathParam;
 
 
 @Controller
@@ -24,13 +25,6 @@ public class ChairController {
     public String chairDashboard() {
         return "chair/chair-dashboard";
     }
-
-    @GetMapping("/chair-sessions")
-    public String chairSessions() {
-        return "chair/chair-sessions";
-    }
-
-  
 
     @GetMapping("/chair-profile")
     public String chairProfile() {
@@ -61,6 +55,24 @@ public class ChairController {
         );
 
         return "chair/manage-attendance";
+    }
+
+    @PostMapping("chair/sessions/{sid}/attendance")
+    @PreAuthorize("hasAuthority('ROLE_CHAIR')")
+    public String submitAttendance(
+            @PathVariable("sid") Long sessionId,
+            @RequestParam("participantId") Long participantId,
+            @RequestParam("status") String status,
+            Authentication auth,
+            RedirectAttributes redirectAttrs) {
+
+        try {
+            chairService.markAttendance(sessionId, participantId, com.team5.demo.entities.AttendanceStatus.valueOf(status), auth.getName());
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/chair/sessions/" + sessionId + "/attendance";
     }
 
 }

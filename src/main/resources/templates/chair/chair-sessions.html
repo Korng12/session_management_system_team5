@@ -34,10 +34,15 @@
                 </div>
 
                 <div class="card-footer bg-transparent border-0">
-                    <a th:href="@{/chair/sessions/{id}/attendance(id=${s.id})}"
+                    <a th:if="${s.status == T(com.team5.demo.entities.SessionStatus).ONGOING}"
+                       th:href="@{/chair/sessions/{id}/attendance(id=${s.id})}"
                        class="btn btn-sm btn-primary w-100">
                         Manage Attendance
                     </a>
+                    <button th:if="${s.status != T(com.team5.demo.entities.SessionStatus).ONGOING}"
+                            class="btn btn-sm btn-secondary w-100" disabled>
+                        Manage Attendance
+                    </button>
                 </div>
 
             </div>

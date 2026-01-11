@@ -1,8 +1,10 @@
 package com.team5.demo.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionRegistration;
@@ -12,5 +14,14 @@ public interface SessionRegistrationRepository extends JpaRepository <SessionReg
     List <SessionRegistration> findByParticipant(User participant);
     boolean existsByParticipantAndSession(User participant,Session session) ;
     List<SessionRegistration> findBySession(Session session);
+    Optional<SessionRegistration>  findByParticipantAndSession(User user, Session session);
+       @Query("""
+        select sr.session.id
+        from SessionRegistration sr
+        where sr.participant = :user
+          and sr.session.conference.id = :conferenceId
+    """)
+    List<Long> findRegisteredSessionIds(User user, Long conferenceId);
+
 
 } 
