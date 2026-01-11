@@ -17,6 +17,7 @@ public class RegistrationService {
         private final RegistrationRepository registrationRepository;
         private final UserRepository userRepository;
         private final ConferenceRepository conferenceRepository;
+        private final com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
 
     @Transactional
 
@@ -86,6 +87,13 @@ public class RegistrationService {
                 Conference conf = registration.getConference();
                 if (conf.getEndDate() != null && !conf.getEndDate().isAfter(java.time.LocalDate.now())) {
                     throw new IllegalStateException("Cannot cancel registration for a conference that has already completed");
+                }
+
+                // Prevent cancelling while the user still has session registrations in this conference
+                var participant = registration.getParticipant();
+                var registeredSessionIds = sessionRegistrationRepository.findRegisteredSessionIds(participant, conf.getId());
+                if (registeredSessionIds != null && !registeredSessionIds.isEmpty()) {
+                    throw new IllegalStateException("Cannot cancel conference registration while registered for sessions. Please cancel session registrations first.");
                 }
 
                 // registration.setStatus("CANCELLED");
