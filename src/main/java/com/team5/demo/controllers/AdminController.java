@@ -109,7 +109,6 @@ public class AdminController {
     @Autowired
     private com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
 
-    /* ===================== DASHBOARD ===================== */
     @GetMapping("")
     public String dashboard(Model model) {
         long totalRegistrations = registrationService.getTotalRegistrations();
@@ -830,6 +829,7 @@ public class AdminController {
                 .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
     }
+
     /**
      * Get attendance data with room capacity info
      * GET /admin/api/attendance
@@ -845,13 +845,7 @@ public class AdminController {
                 attendance.put("sessionTitle", session.getTitle());
                 attendance.put("roomName", session.getRoom() != null ? session.getRoom().getName() : "N/A");
                 attendance.put("roomCapacity", session.getRoom() != null ? session.getRoom().getCapacity() : 0);
-                // Count registered attendees for this session using SessionRegistrationRepository
-                long attendeeCount = sessionRegistrationRepository.findBySession(session).size();
-                attendance.put("attendeeCount", attendeeCount);
-                attendance.put("availableSeats", session.getRoom() != null ? session.getRoom().getCapacity() - attendeeCount : 0);
-                attendance.put("isFull", session.getRoom() != null && attendeeCount >= session.getRoom().getCapacity());
-                return attendance;
-            }).collect(Collectors.toList());
+
             return ResponseEntity.ok(attendanceList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -866,4 +860,4 @@ public class AdminController {
     public String viewAttendance() {
         return "admin/view-attendance";
     }
-}
+
