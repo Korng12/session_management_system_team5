@@ -1,10 +1,84 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
 <section class="container mt-5">
 
+    <style>
+        .capacity-card {
+            border-left: 4px solid #0d6efd;
+        }
+        .capacity-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .capacity-low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .capacity-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .capacity-full {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .progress-capacity {
+            height: 1.5rem;
+        }
+    </style>
+
     <h2 class="mb-4"
         th:text="'Attendance – ' + ${currentSess.title}">
         Session Attendance
     </h2>
+
+    <!-- Capacity Information Card -->
+    <div class="card capacity-card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Session Capacity Overview</h5>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="text-muted small">Room</div>
+                    <div class="fw-bold fs-5" th:text="${roomName}">Room Name</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="text-muted small">Registered</div>
+                    <div class="fw-bold fs-5 text-primary" th:text="${totalAttendees}">0</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="text-muted small">Capacity</div>
+                    <div class="fw-bold fs-5" th:text="${roomCapacity}">0</div>
+                </div>
+                <div class="col-md-2">
+                    <div class="text-muted small">Available</div>
+                    <div class="fw-bold fs-5" 
+                         th:classappend="${availableSeats <= 0 ? 'text-danger' : 'text-success'}"
+                         th:text="${availableSeats}">0</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-muted small">Status</div>
+                    <span class="capacity-badge"
+                          th:classappend="${isFull ? 'capacity-full' : (utilizationPercent >= 80 ? 'capacity-warning' : 'capacity-low')}"
+                          th:text="${isFull ? 'Full' : (utilizationPercent >= 80 ? 'Nearly Full' : 'Available')}">
+                        Available
+                    </span>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div class="text-muted small mb-1">Utilization</div>
+                <div class="progress progress-capacity">
+                    <div class="progress-bar"
+                         role="progressbar"
+                         th:style="'width: ' + ${utilizationPercent} + '%;'"
+                         th:classappend="${isFull ? 'bg-danger' : (utilizationPercent >= 80 ? 'bg-warning' : 'bg-success')}"
+                         th:attr="aria-valuenow=${utilizationPercent}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        <span th:text="${utilizationPercent} + '%'">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div th:if="${currentSess.status != T(com.team5.demo.entities.SessionStatus).ONGOING}" class="alert alert-warning">
         Attendance can only be marked while the session is <strong>Ongoing</strong>.

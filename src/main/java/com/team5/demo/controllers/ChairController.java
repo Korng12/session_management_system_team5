@@ -46,13 +46,29 @@ public class ChairController {
             @PathVariable("id") Long sessionId,
             Authentication auth,
             Model model) {
-                System.out.println("session name "+chairService.getSessionForChair(sessionId, auth.getName()).getTitle());
-        model.addAttribute("currentSess",chairService.getSessionForChair(sessionId, auth.getName()));        
         
-        model.addAttribute(
-            "attendees",
-            chairService.getAttendeesWithAttendance(sessionId, auth.getName())
-        );
+        var session = chairService.getSessionForChair(sessionId, auth.getName());
+        System.out.println("session name " + session.getTitle());
+        
+        model.addAttribute("currentSess", session);        
+        
+        var attendees = chairService.getAttendeesWithAttendance(sessionId, auth.getName());
+        model.addAttribute("attendees", attendees);
+        
+        // Add capacity information
+        Integer roomCapacity = session.getRoom() != null ? session.getRoom().getCapacity() : null;
+        int totalAttendees = attendees.size();
+        int availableSeats = roomCapacity != null ? roomCapacity - totalAttendees : 0;
+        boolean isFull = roomCapacity != null && totalAttendees >= roomCapacity;
+        int utilizationPercent = roomCapacity != null && roomCapacity > 0 ? 
+            Math.round((totalAttendees * 100.0f) / roomCapacity) : 0;
+        
+        model.addAttribute("roomCapacity", roomCapacity != null ? roomCapacity : 0);
+        model.addAttribute("totalAttendees", totalAttendees);
+        model.addAttribute("availableSeats", availableSeats);
+        model.addAttribute("isFull", isFull);
+        model.addAttribute("utilizationPercent", utilizationPercent);
+        model.addAttribute("roomName", session.getRoom() != null ? session.getRoom().getName() : "N/A");
 
         return "chair/manage-attendance";
     }

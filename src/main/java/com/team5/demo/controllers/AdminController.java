@@ -70,6 +70,9 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
+
     // Admin Dashboard
     @GetMapping("")
     public String showAdminHomepage(Model model) {
@@ -608,5 +611,46 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
+    }
+
+    /**
+     * Get attendance data with room capacity info
+     * GET /admin/api/attendance
+     */
+    @GetMapping("/api/attendance")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> getAttendanceData() {
+        try {
+            List<Session> sessions = sessionRepository.findAll();
+            List<Map<String, Object>> attendanceList = sessions.stream().map(session -> {
+                Map<String, Object> attendance = new HashMap<>();
+                attendance.put("sessionId", session.getId());
+                attendance.put("sessionTitle", session.getTitle());
+                attendance.put("roomName", session.getRoom() != null ? session.getRoom().getName() : "N/A");
+                attendance.put("roomCapacity", session.getRoom() != null ? session.getRoom().getCapacity() : 0);
+                
+                // Count registered attendees for this session using SessionRegistrationRepository
+                long attendeeCount = sessionRegistrationRepository.findBySession(session).size();
+                
+                attendance.put("attendeeCount", attendeeCount);
+                attendance.put("availableSeats", session.getRoom() != null ? session.getRoom().getCapacity() - attendeeCount : 0);
+                attendance.put("isFull", session.getRoom() != null && attendeeCount >= session.getRoom().getCapacity());
+                
+                return attendance;
+            }).collect(Collectors.toList());
+            
+            return ResponseEntity.ok(attendanceList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /**
+     * Render attendance page
+     * GET /admin/view-attendance
+     */
+    @GetMapping("/view-attendance")
+    public String viewAttendance() {
+        return "admin/view-attendance";
     }
 }

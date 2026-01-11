@@ -19,7 +19,7 @@ public class RegistrationService {
         private final ConferenceRepository conferenceRepository;
         private final com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
 
-    @Transactional
+        @Transactional
 
         public Registration registerForConference(String email, Long conferenceId) {
 
