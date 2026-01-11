@@ -58,53 +58,7 @@ public class ConferenceController {
 
     // GET /conferences/{id}
     @GetMapping("/{id}")
-//     public String conferenceDetails(@PathVariable("id") Long id, Model model, Authentication authentication,Principal principal) {
-//         model.addAttribute("conference",
-//                 conferenceService.getConference(id));
-        
-//         model.addAttribute("sessions", sessionService.getSessionsByConference(id));  
-//         System.out.println(sessionService.getSessionsByConference(id).size());
 
-//         boolean isRegistered = false;
-//         Long registrationId = null;
-
-//         if (authentication != null && authentication.isAuthenticated()) {
-//             String email = authentication.getName();
-//             try {
-//                 var opt = registrationService.getRegistrationForUserAndConference(email, id);
-//                 if (opt.isPresent()) {
-//                     isRegistered = true;
-//                     registrationId = opt.get().getId();
-//                 }
-//             } catch (RuntimeException e) {
-//                 // ignore, leave isRegistered false
-//             }
-//         }
-//         System.out.println("This is the principle"+principal.getName());
-// // 3. Conference registration status
-  
-//     Set<Long> registeredSessionIds = Set.of();
-
-//     if (auth != null && auth.isAuthenticated()) {
-//         String email = auth.getName();
-
-//         isRegistered = registrationService
-//                 .isRegisteredForConference(email, id);
-
-//         if (isRegistered) {
-//             registeredSessionIds =
-//                 sessionRegistrationService
-//                     .getRegisteredSessionIds(email, id);
-//         }
-//     }
-
-//     model.addAttribute("isRegistered", isRegistered);
-//     model.addAttribute("registeredSessionIds", registeredSessionIds);
-//         model.addAttribute("isRegistered", isRegistered);
-//         model.addAttribute("registrationId", registrationId);
-
-//         return "user/conference-detail";
-//     }
     public String conferenceDetail(
         @PathVariable Long id,
         Authentication auth,
