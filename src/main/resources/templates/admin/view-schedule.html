@@ -18,106 +18,59 @@
             <div class="col-md-3">
                 <div class="card shadow-sm text-center">
                     <div class="card-body">
-                        <h6 class="text-muted">Total Users</h6>
-                        <h3 th:text="${stats.totalUsers}">0</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <h6 class="text-muted">Conferences</h6>
-                        <h3 th:text="${stats.totalConferences}">0</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <h6 class="text-muted">Sessions</h6>
-                        <h3 th:text="${stats.totalSessions}">0</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm text-center">
-                    <div class="card-body">
-                        <h6 class="text-muted">Registrations</h6>
-                        <h3 th:text="${stats.totalRegistrations}">0</h3>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- MANAGEMENT ACTIONS -->
-        <div class="row g-4 mb-5">
-
-            <div class="col-md-3">
-                <a href="/admin/conferences"
-                   class="card h-100 shadow-sm text-decoration-none text-dark">
-                    <div class="card-body text-center">
-                        <h5>📅 Conferences</h5>
-                        <p class="text-muted small">
-                            Create & manage conferences
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-3">
-                <a href="/admin/sessions"
-                   class="card h-100 shadow-sm text-decoration-none text-dark">
-                    <div class="card-body text-center">
-                        <h5>🗓️ Sessions</h5>
-                        <p class="text-muted small">
-                            Manage conference sessions
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-3">
-                <a href="/admin/users"
-                   class="card h-100 shadow-sm text-decoration-none text-dark">
-                    <div class="card-body text-center">
-                        <h5>👥 Users</h5>
-                        <p class="text-muted small">
-                            Assign roles & manage users
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-            <div class="col-md-3">
-                <a href="/admin/registrations"
-                   class="card h-100 shadow-sm text-decoration-none text-dark">
-                    <div class="card-body text-center">
-                        <h5>📋 Registrations</h5>
-                        <p class="text-muted small">
-                            View participant registrations
-                        </p>
-                    </div>
-                </a>
-            </div>
-
-        </div>
-
-        <!-- RECENT ACTIVITY -->
-        <div class="mb-5">
-            <h4 class="fw-bold mb-3">Recent Registrations</h4>
-
-            <div class="card shadow-sm">
-                <ul class="list-group list-group-flush"
-                    th:if="${!#lists.isEmpty(recentRegistrations)}">
-
-                    <li class="list-group-item"
-                        th:each="reg : ${recentRegistrations}">
-                        <strong th:text="${reg.user.email}">
-                            user@email.com
+                        <div th:replace="~{layout/main :: layout(~{::section})}">
+                        <section>
+                            <nav class="navbar navbar-dark bg-dark fixed-top">
+                                <div class="container-fluid">
+                                    <span class="navbar-brand">Conference Admin</span>
+                                    <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+                                </div>
+                            </nav>
+                            <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+                            <section class="admin-header">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-8 mx-auto text-center">
+                                            <h1 class="display-5 fw-bold mb-3">View Schedule</h1>
+                                            <p class="lead mb-0">See the full conference schedule</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <section class="py-5">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card shadow-sm">
+                                                <div class="card-header bg-info text-white">
+                                                    <h5 class="mb-0">Schedule</h5>
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table table-striped align-middle">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Session</th>
+                                                                <th>Room</th>
+                                                                <th>Start Time</th>
+                                                                <th>End Time</th>
+                                                                <th>Status</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="scheduleBody">
+                                                            <tr>
+                                                                <td colspan="5" class="text-center text-muted">Loading schedule...</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <script src="/js/dashboard.js"></script>
+                        </section>
+                        </div>
                         </strong>
                         registered for
                         <span th:text="${reg.session.title}">
@@ -140,6 +93,7 @@
         </div>
 
     </div>
+</div>
 
 </section>
 

@@ -95,9 +95,33 @@
                         </div>
 
                         <div class="mt-4">
-                            <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                            <a href="/my-schedule" class="btn btn-primary me-2">View Schedule</a>
                             <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
                         </div>
+                                            <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                        </div>
+                                    </div>
+                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
+                                          th:each="role : ${userRoles}"
+                                          class="badge bg-primary me-1" 
+                                          th:text="${role.name}">Role</span>
+                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                                            <h5 class="mb-3">My Conferences</h5>
+                                                            <div class="alert alert-info">
+                                                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
+                                                            </div>
+
+                                                            <div class="mt-4">
+                                                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+>>>>>>> 5ef9892 (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
+                            </div>
+>>>>>>> ee4982f (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
                     </div>
                 </div>
             </div>

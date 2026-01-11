@@ -1,105 +1,48 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<body>
-
-<style>
-    .sidebar {
-        width: 260px;
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background: #111827;
-        color: #ffffff;
-        padding: 20px 0;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .sidebar-header {
-        text-align: center;
-        margin-bottom: 25px;
-    }
-
-    .sidebar-header h4 {
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        margin: 0;
-    }
-
-    .menu-section {
-        padding: 0 16px;
-    }
-
-    .menu-title {
-        display: block;
-        font-size: 12px;
-        color: #9ca3af;
-        margin: 18px 0 10px;
-        text-transform: uppercase;
-    }
-
-    .menu-link {
-        display: block;
-        padding: 10px 14px;
-        margin-bottom: 6px;
-        border-radius: 8px;
-        text-decoration: none;
-        color: #e5e7eb;
-        transition: all 0.2s ease;
-    }
-
-    .menu-link:hover {
-        background: #1f2937;
-        color: #ffffff;
-    }
-
-    .menu-link.active {
-        background: #4f46e5;
-        color: #ffffff;
-        font-weight: 600;
-    }
-
-    .sidebar hr {
-        border: none;
-        height: 1px;
-        background: #374151;
-        margin: 15px 16px;
-    }
-</style>
 <div th:fragment="sidebar" class="sidebar">
 
     <div class="sidebar-header">
         <h4>Conference System</h4>
     </div>
+
     <div class="menu-section">
         <span class="menu-title">Admin</span>
 
-        <a href="/dashboard" class="menu-link active">
+        <a th:href="@{/admin}" class="menu-link"
+           th:classappend="${activePage == 'dashboard'} ? ' active'">
             Dashboard
         </a>
-        <a href="/admin/manage-conference" class="menu-link active">
+
+        <a th:href="@{/admin/manage-conferences}" class="menu-link"
+           th:classappend="${activePage == 'conferences'} ? ' active'">
             Manage Conferences
         </a>
-        <a href="/admin/manage-rooms" class="menu-link">
+
+        <a th:href="@{/admin/manage-rooms}" class="menu-link"
+           th:classappend="${activePage == 'rooms'} ? ' active'">
             Manage Rooms
         </a>
-        <a href="/admin/manage-sessions" class="menu-link">
+
+        <a th:href="@{/admin/manage-sessions}" class="menu-link"
+           th:classappend="${activePage == 'sessions'} ? ' active'">
             Manage Sessions
         </a>
-        <a href="/admin/manage-schedule" class="menu-link">
+
+        <a th:href="@{/admin/manage-schedule}" class="menu-link"
+           th:classappend="${activePage == 'schedule'} ? ' active'">
             Manage Schedule
         </a>
-        <a href="/admin/view-registrations" class="menu-link">
+
+        <a th:href="@{/admin/view-registeredUsers}" class="menu-link"
+           th:classappend="${activePage == 'registrations'} ? ' active'">
             View Registrations
         </a>
-        <a href="/admin/view-attendance" class="menu-link">
-            View Attendance
+
+        <a th:href="@{/admin/view-attendance}" class="d-block px-3 py-2 text-decoration-none text-secondary"
+       th:classappend="${activePage=='attendances'}?' bg-secondary text-white':''">
+        View Attendance
         </a>
     </div>
 
     <hr>
 
 </div>
-
-</body>
-</html>

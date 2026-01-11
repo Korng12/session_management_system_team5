@@ -1,36 +1,39 @@
+// No changes needed for SessionAttendance.java
 package com.team5.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "session_attendance")
 @Data
-@IdClass(SessionAttendanceId.class) 
+@IdClass(SessionAttendanceId.class)
 public class SessionAttendance {
-    
+
     @Id
-    @Column(name = "participant_id", insertable = false, updatable = false)
+    @Column(name = "participant_id")
     private Long participantId;
-    
+
     @Id
-    @Column(name = "session_id", insertable = false, updatable = false)
+    @Column(name = "session_id")
     private Long sessionId;
-    
-    // JPA Relationships
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "participant_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId("participantId")
+    @JoinColumn(name = "participant_id")
     private User participant;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId("sessionId")
+    @JoinColumn(name = "session_id")
     private Session session;
-    
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private AttendanceStatus status; // PRESENT, ABSENT
-     @Column(name = "marked_at")
+    private AttendanceStatus status; // PRESENT, ABSENT, REGISTERED
+
+    @Column(name = "marked_at")
     private LocalDateTime markedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,8 +41,9 @@ public class SessionAttendance {
     private User markedBy;
 
     public SessionAttendance() {
-    
+        this.status = AttendanceStatus.REGISTERED;
     }
+
     public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,
             AttendanceStatus status, LocalDateTime markedAt, User markedBy) {
         this.participantId = participantId;
@@ -50,6 +54,12 @@ public class SessionAttendance {
         this.markedAt = markedAt;
         this.markedBy = markedBy;
     }
-    
-    
+
+    public SessionAttendance(User participant, Session session) {
+        this.participant = participant;
+        this.session = session;
+        this.participantId = participant.getId();
+        this.sessionId = session.getId();
+        this.status = AttendanceStatus.REGISTERED;
+    }
 }

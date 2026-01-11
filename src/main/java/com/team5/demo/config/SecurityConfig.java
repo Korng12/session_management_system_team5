@@ -2,11 +2,8 @@ package com.team5.demo.config;
 
 import com.team5.demo.security.CustomUserDetailsService;
 import com.team5.demo.security.JwtFilter;
-
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.security.SecureRandom;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +21,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+
+
+
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -34,18 +34,13 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        SecureRandom secureRandom;
-        try {
-            secureRandom = SecureRandom.getInstanceStrong();
-        } catch (Exception e) {
-            secureRandom = new SecureRandom();
-        }
-        return new BCryptPasswordEncoder(12, secureRandom);
+        return new BCryptPasswordEncoder(10);
     }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -58,20 +53,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/register","/login").permitAll()
-                            // ===== Static resources =====
+                        // Public endpoints (allow site pages and auth API)
                         .requestMatchers(
+                            "/",
+                            "/public/**",
+                            "/register",
+                            "/registeration",
+                            "/login",
+                            "/about",
+                            "/register-conference",
                             "/favicon.ico",
                             "/css/**",
                             "/js/**",
                             "/images/**",
-                            "/webjars/**"
+                            "/webjars/**",
+                            "/api/auth/**"
                         ).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/chair/**").hasAuthority("ROLE_CHAIR")
@@ -83,14 +85,20 @@ public class SecurityConfig {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                         response.setContentType("application/json");
                         response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    })
+                    .accessDeniedHandler((request, response, accessDeniedException) -> {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.setContentType("application/json");
+                        response.getWriter().write("{\"error\": \"Forbidden: insufficient permissions\"}");
                     }))
                 .httpBasic(basic -> basic.disable())
-                // .formLogin(form -> form
-                //         .disable()
-                // // .loginPage("/login")
-                // // .permitAll()
-                // )
-                // .logout(logout -> logout.permitAll())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll())
+                .logout(logout -> logout.permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

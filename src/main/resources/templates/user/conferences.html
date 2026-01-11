@@ -74,13 +74,17 @@
                         </a>
 
                         <!-- REGISTER (ATTENDEE only) -->
-                        <a th:if="${!conf.endDate.isBefore(T(java.time.LocalDate).now())}"
-                           th:href="@{/conferences/{id}(id=${conf.id})}"
-                           class="btn btn-primary"
-                           sec:authorize="hasAuthority('ROLE_ATTENDEE')">
-                            View & Register
-                        </a>
-
+                        <div th:if="${registeredConferenceIds != null and registeredConferenceIds.contains(conf.id)}" sec:authorize="hasAuthority('ATTENDEE')">
+                            <form th:action="@{/conferences/{id}/cancel(id=${conf.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger">Cancel Registration</button>
+                            </form>
+                        </div>
+                        <div th:if="${registeredConferenceIds == null or !registeredConferenceIds.contains(conf.id)}" sec:authorize="hasAuthority('ATTENDEE')">
+                            <a th:href="@{/conferences/{id}/register(id=${conf.id})}"
+                               class="btn btn-primary">
+                                Register
+                            </a>
+                        </div>
                         <button th:if="${conf.endDate.isBefore(T(java.time.LocalDate).now())}"
                                 class="btn btn-secondary" disabled
                                 sec:authorize="hasAuthority('ROLE_ATTENDEE')">
