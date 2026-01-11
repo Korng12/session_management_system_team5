@@ -12,6 +12,7 @@ import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.SessionRegistration;
+import com.team5.demo.entities.SessionStatus;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.SessionAttendanceRepository;
 import com.team5.demo.repositories.SessionRegistrationRepository;
@@ -37,14 +38,57 @@ public class ChairService {
         this.attendanceRepo = attendanceRepo;
     }
 
+    /**
+     * Refresh a session's status based on current time:
+     * - before startTime  -> SCHEDULED
+     * - between start/end -> ONGOING
+     * - after endTime     -> COMPLETED
+     *
+     * Do NOT override CANCELLED.
+     *
+     * @return true if status changed, else false
+     */
+    private boolean refreshStatusFromTime(Session session) {
+        if (session.getStatus() == SessionStatus.CANCELLED) {
+            return false; // don't override cancelled sessions
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        SessionStatus newStatus;
+        if (now.isBefore(session.getStartTime())) {
+            newStatus = SessionStatus.SCHEDULED;
+        } else if (!now.isAfter(session.getEndTime())) {
+            // now >= startTime AND now <= endTime
+            newStatus = SessionStatus.ONGOING;
+        } else {
+            newStatus = SessionStatus.COMPLETED;
+        }
+
+        if (session.getStatus() != newStatus) {
+            session.setStatus(newStatus);
+            return true;
+        }
+        return false;
+    }
+
     // 1️⃣ Sessions chaired by current user
-    @Transactional(readOnly = true)
+    // NOTE: removed readOnly because we may update statuses here
     public List<Session> getChairedSessions(String email) {
 
         User chair = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return sessionRepo.findByChair(chair);
+        List<Session> sessions = sessionRepo.findByChair(chair);
+
+        // Refresh each session status based on time so UI becomes correct (ONGOING when it should)
+        for (Session s : sessions) {
+            if (refreshStatusFromTime(s)) {
+                sessionRepo.save(s);
+            }
+        }
+
+        return sessions;
     }
 
     // 2️⃣ Registered attendees for a session
@@ -80,6 +124,11 @@ public class ChairService {
 
         if (!session.getChair().getId().equals(chair.getId())) {
             throw new AccessDeniedException("Not session chair");
+        }
+
+        //  Refresh status before enforcing "ONGOING"
+        if (refreshStatusFromTime(session)) {
+            sessionRepo.save(session);
         }
 
         // Only allow marking attendance while session is ongoing
