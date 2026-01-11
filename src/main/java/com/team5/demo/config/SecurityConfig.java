@@ -85,12 +85,6 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Unauthorized\"}");
                     }))
                 .httpBasic(basic -> basic.disable())
-                // .formLogin(form -> form
-                //         .disable()
-                // // .loginPage("/login")
-                // // .permitAll()
-                // )
-                // .logout(logout -> logout.permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

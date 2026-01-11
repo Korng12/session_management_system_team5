@@ -4,7 +4,7 @@ public enum SessionStatus {
     SCHEDULED("Scheduled"),
     ONGOING("Ongoing"),
     COMPLETED("Completed"),
-    CANCELLED("Cancelled");
+    CANCELLED("Canceled");
 
     private final String displayName;
 
@@ -16,3 +16,4 @@ public enum SessionStatus {
         return displayName;
     }
 }
+

@@ -80,4 +80,11 @@ public class ConferenceService {
         return conferenceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Conference not found"));
     }
+    public List<Conference> getConferencesByTittle(String title){
+        if (title == null || title.trim().isEmpty()) {
+            return conferenceRepository.findAll();
+        }
+
+        return conferenceRepository.searchConferenceByTitle(title);
+    }
 }

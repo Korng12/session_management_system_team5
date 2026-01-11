@@ -1,5 +1,6 @@
 package com.team5.demo.controllers;
 
+import com.team5.demo.dto.UserScheduleDto;
 import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.Role;
 import com.team5.demo.entities.SessionAttendance;
@@ -8,6 +9,7 @@ import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.services.RegistrationService;
 import com.team5.demo.services.SessionAttendanceService;
+import com.team5.demo.services.ScheduleService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -46,6 +49,8 @@ public class UserController {
 
     @Autowired
     private RegistrationService registrationService;
+    @Autowired 
+    private ScheduleService scheduleService;
 
     @Autowired
     private SessionAttendanceService sessionAttendanceService;
@@ -63,9 +68,54 @@ public class UserController {
         return "public/login";
     }
 
-    @GetMapping("/register")
-    public String getRegisterPage() {
-        return "public/register";
+    @GetMapping("/home")
+    public String getHome(Authentication auth,Model model) {
+        System.out.println(
+            "this is user principle"+
+        SecurityContextHolder.getContext().getAuthentication().getDetails()
+
+        );
+        model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
+        return "user/home";
+    }
+
+
+    @GetMapping("/schedule")
+    public String mySchedule(Authentication authentication, Model model) {
+
+        String email = authentication.getName();
+
+        List<UserScheduleDto> schedule =
+                scheduleService.getUserSchedule(email);
+
+        model.addAttribute("sessions", schedule);
+
+        return "user/user-schedule";
+    }
+
+    @GetMapping("/register-conference")
+    public String getRegisterConferencePage() {
+        return "public/registration";
+    }
+
+    // @GetMapping("/conferences")
+    // public String getConferencesPage() {
+    //     return "user/conferences";
+    // }
+
+    @GetMapping("/profile")
+    public String getProfilePage(Principal principal, Model model) {
+        if (principal != null) {
+            String email = principal.getName();
+            User user = userRepository.findByEmail(email).orElse(null);
+            if (user != null) {
+                model.addAttribute("userName", user.getName());
+                model.addAttribute("userEmail", user.getEmail());
+                model.addAttribute("userCreated", user.getCreatedAt());
+                model.addAttribute("userRoles", user.getRoles());
+            }
+        }
+        return "user/profile";
     }
 
     @GetMapping("/about")
@@ -122,28 +172,6 @@ public class UserController {
 
         return "redirect:/home";
     }
-
-    /* ===================== USER PAGES ===================== */
-
-    @GetMapping("/home")
-    public String getHome() {
-        return "user/home";
-    }
-
-    @GetMapping("/profile")
-    public String getProfilePage(Principal principal, Model model) {
-        if (principal != null) {
-            userRepository.findByEmail(principal.getName())
-                    .ifPresent(user -> {
-                        model.addAttribute("userName", user.getName());
-                        model.addAttribute("userEmail", user.getEmail());
-                        model.addAttribute("userCreated", user.getCreatedAt());
-                        model.addAttribute("userRoles", user.getRoles());
-                    });
-        }
-        return "user/profile";
-    }
-
     /* ===================== MY CONFERENCES (FIXED) ===================== */
 
     @GetMapping("/my-conferences")
@@ -162,18 +190,6 @@ public class UserController {
         return "user/my-conferences";
     }
 
-    @GetMapping("/my-schedule")
-    public String mySchedule(Authentication auth, Model model) {
 
-        String email = auth.getName();
-
-        model.addAttribute(
-            "schedules",
-            sessionAttendanceService.getMySchedule(email)
-        );
-
-        return "user/user-schedule";
-
-    }
     
 }

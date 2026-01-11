@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
+import com.team5.demo.enums.RegistrationStatus;
 
 @Data
 @Entity
@@ -29,10 +30,10 @@ public class Registration {
     
     @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
-    
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status = "CONFIRMED";
-    
+    // private String status = "CONFIRMED";
+    private RegistrationStatus status;
     @PrePersist
     protected void onCreate() {
         if (registeredAt == null) {

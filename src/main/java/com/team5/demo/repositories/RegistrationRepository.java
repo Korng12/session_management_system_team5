@@ -2,6 +2,7 @@ package com.team5.demo.repositories;
 
 import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.User;
+import com.team5.demo.enums.RegistrationStatus;
 import com.team5.demo.entities.Conference;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,7 +37,14 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     
     // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
 
-    boolean existsByParticipantAndConference(User participant, Conference conference);
+    // boolean existsByParticipantAndConference(User participant, Conference conference);
+    // boolean existsByParticipantAndConference(User participant, Conference conference,RegistrationStatus status);
+    boolean existsByParticipantAndConferenceAndStatus(
+        User participant,
+        Conference conference,
+        RegistrationStatus status
+    );
+
     long countByParticipant(User participant);
 
     /* ===================== EXISTS CHECK ===================== */

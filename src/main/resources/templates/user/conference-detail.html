@@ -36,13 +36,21 @@
     <div class="container mb-5">
         <div class="d-flex gap-3">
 
+            <button id="cancelConferenceBtn"
+                    class="btn btn-danger"
+                    sec:authorize="hasAuthority('ROLE_ATTENDEE')"
+                    th:if="${isRegistered}"
+                    th:data-registration-id="${registrationId}">
+                Cancel Registration
+            </button>
+
             <button id="registerConferenceBtn"
                     class="btn btn-primary"
                     sec:authorize="hasAuthority('ROLE_ATTENDEE')"
+                    th:unless="${isRegistered}"
                     th:data-conference-id="${conference.id}">
                 Register for Conference
             </button>
-
 
             <a th:href="@{/login}"
                class="btn btn-secondary"

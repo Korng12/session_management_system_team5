@@ -1,7 +1,10 @@
 package com.team5.demo.repositories;
 
+import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.SessionAttendanceId;
+import com.team5.demo.entities.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,32 +25,32 @@ public interface SessionAttendanceRepository
 
     Optional<SessionAttendance> findByParticipantIdAndSessionId(
             Long participantId,
-            Long sessionId
-    );
+            Long sessionId);
 
     boolean existsByParticipantIdAndSessionId(
             Long participantId,
-            Long sessionId
-    );
+            Long sessionId);
 
     /* ===================== ADMIN ===================== */
 
     @Query("""
-        SELECT sa
-        FROM SessionAttendance sa
-        JOIN FETCH sa.participant
-        JOIN FETCH sa.session
-    """)
+                SELECT sa
+                FROM SessionAttendance sa
+                JOIN FETCH sa.participant
+                JOIN FETCH sa.session
+            """)
     List<SessionAttendance> findAllWithRelations();
 
     /* ===================== USER (MY SCHEDULE) ===================== */
 
     @Query("""
-        SELECT sa
-        FROM SessionAttendance sa
-        JOIN FETCH sa.session
-        JOIN FETCH sa.participant p
-        WHERE p.email = :email
-    """)
+                SELECT sa
+                FROM SessionAttendance sa
+                JOIN FETCH sa.session
+                JOIN FETCH sa.participant p
+                WHERE p.email = :email
+            """)
     List<SessionAttendance> findMySchedule(@Param("email") String email);
+
+    Optional<SessionAttendance> findByParticipantAndSession(User user, Session s);
 }

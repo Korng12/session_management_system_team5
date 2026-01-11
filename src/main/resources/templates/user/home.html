@@ -61,30 +61,56 @@
     </div>
 
     <!-- MY UPCOMING SESSIONS -->
-    <div class="mb-5" sec:authorize="hasAuthority('ROLE_ATTENDEE')">
-        <h4 class="fw-bold mb-3">My Upcoming Sessions</h4>
+    <div class="mb-5"
+     sec:authorize="hasAuthority('ROLE_ATTENDEE')">
 
-        <div class="card shadow-sm">
-            <ul class="list-group list-group-flush"
-                th:if="${!#lists.isEmpty(mySessions)}">
+    <h4 class="fw-bold mb-3">
+        <i class="bi bi-calendar-event me-2"></i>
+        My Upcoming Sessions
+    </h4>
 
-                <li class="list-group-item"
-                    th:each="s : ${mySessions}">
-                    <strong th:text="${s.title}">Session Title</strong><br>
-                    <small class="text-muted">
-                        <span th:text="${s.conference.title}"></span> ·
-                        <span th:text="${s.startTime}"></span>
-                    </small>
-                </li>
+    <div class="card shadow-sm">
 
-            </ul>
+        <ul class="list-group list-group-flush"
+            th:if="${!#lists.isEmpty(mySessions)}">
 
-            <div class="card-body text-muted"
-                 th:if="${#lists.isEmpty(mySessions)}">
-                You have not selected any sessions yet.
-            </div>
+            <li class="list-group-item d-flex justify-content-between align-items-start"
+                th:each="s : ${mySessions}">
+
+                <div>
+                    <strong th:text="${s.title}">Session Title</strong>
+
+                    <div class="small text-muted mt-1">
+                        <i class="bi bi-building me-1"></i>
+                        <span th:text="${s.conferenceTitle}">Conference</span>
+                    </div>
+
+                    <div class="small text-muted">
+                        <i class="bi bi-clock me-1"></i>
+                        <span th:text="${#temporals.format(s.startTime, 'dd MMM yyyy HH:mm')}"></span>
+                        –
+                        <span th:text="${#temporals.format(s.endTime, 'HH:mm')}"></span>
+                    </div>
+                </div>
+
+                <span class="badge bg-secondary align-self-center"
+                      th:text="${s.sessionStatus}">
+                    SCHEDULED
+                </span>
+
+            </li>
+
+        </ul>
+
+        <div class="card-body text-muted text-center"
+             th:if="${#lists.isEmpty(mySessions)}">
+            <i class="bi bi-info-circle me-1"></i>
+            You have not selected any sessions yet.
         </div>
+
     </div>
+    </div>
+
 
     <!-- CHAIR SECTION (ONLY IF USER IS CHAIR) -->
     <div sec:authorize="hasAuthority('CHAIR')">
