@@ -278,10 +278,6 @@ public class AdminController {
 
 
 
-    
-
-
-
     // Delete button 
     @GetMapping("/conferences/delete/{id}")
     public String deleteConference(@PathVariable("id") Long id,

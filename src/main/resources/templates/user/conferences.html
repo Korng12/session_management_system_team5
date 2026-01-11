@@ -59,6 +59,10 @@
                             –
                             <span th:text="${conf.endDate}"></span>
                         </p>
+
+                        <div th:if="${conf.endDate.isBefore(T(java.time.LocalDate).now())}">
+                            <span class="badge bg-secondary">Completed</span>
+                        </div>
                     </div>
 
                     <div class="card-footer bg-transparent border-0 d-grid gap-2">
@@ -70,12 +74,18 @@
                         </a>
 
                         <!-- REGISTER (ATTENDEE only) -->
-                        <a th:href="@{/conferences/{id}/register(id=${conf.id})}"
+                        <a th:if="${!conf.endDate.isBefore(T(java.time.LocalDate).now())}"
+                           th:href="@{/conferences/{id}(id=${conf.id})}"
                            class="btn btn-primary"
-                           sec:authorize="hasAuthority('ATTENDEE')">
-                            Register
+                           sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                            View & Register
                         </a>
-                        
+
+                        <button th:if="${conf.endDate.isBefore(T(java.time.LocalDate).now())}"
+                                class="btn btn-secondary" disabled
+                                sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                            Conference Completed
+                        </button>
 
                         <!-- LOGIN PROMPT (Guest only) -->
                         <a th:href="@{/login}"

@@ -82,9 +82,26 @@ public class ChairService {
             throw new AccessDeniedException("Not session chair");
         }
 
-        SessionAttendance attendance =
-            attendanceRepo.findByParticipantIdAndSessionId(participantId, sessionId)
-                .orElseGet(() -> new SessionAttendance(
+        // Only allow marking attendance while session is ongoing
+        if (session.getStatus() != com.team5.demo.entities.SessionStatus.ONGOING) {
+            throw new IllegalStateException("Attendance can only be marked when session is ongoing");
+        }
+
+        var existing = attendanceRepo.findByParticipantIdAndSessionId(participantId, sessionId);
+
+        if (existing.isPresent()) {
+            SessionAttendance attendance = existing.get();
+            if (attendance.getStatus() != null) {
+                throw new IllegalStateException("Attendance already recorded for this participant");
+            }
+            // If status is null, allow marking now
+            attendance.setStatus(status);
+            attendance.setMarkedAt(LocalDateTime.now());
+            attendance.setMarkedBy(chair);
+
+            attendanceRepo.save(attendance);
+        } else {
+            SessionAttendance attendance = new SessionAttendance(
                         participantId,
                         sessionId,
                         null,
@@ -92,16 +109,13 @@ public class ChairService {
                         status,
                         LocalDateTime.now(),
                         chair
-                ));
+                );
 
-        attendance.setStatus(status);
-        attendance.setMarkedAt(LocalDateTime.now());
-        attendance.setMarkedBy(chair);
-
-        attendanceRepo.save(attendance);
+            attendanceRepo.save(attendance);
+        }
     }
     @Transactional(readOnly = true)
-public List<AttendanceDto> getAttendeesWithAttendance(Long sessionId, String chairEmail) {
+    public List<AttendanceDto> getAttendeesWithAttendance(Long sessionId, String chairEmail) {
 
     Session session = sessionRepo.findById(sessionId)
             .orElseThrow(() -> new RuntimeException("Session not found"));
@@ -136,7 +150,7 @@ public List<AttendanceDto> getAttendeesWithAttendance(Long sessionId, String cha
         );
     }).toList();
 }
-public Session getSessionForChair(Long sessionId, String email) {
+    public Session getSessionForChair(Long sessionId, String email) {
     Session session = sessionRepo.findById(sessionId)
         .orElseThrow();
 

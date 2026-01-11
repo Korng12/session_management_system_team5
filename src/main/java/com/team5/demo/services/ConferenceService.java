@@ -1,14 +1,13 @@
 package com.team5.demo.services;
 
-import com.team5.demo.entities.Conference;
-import com.team5.demo.repositories.ConferenceRepository;
-
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.team5.demo.entities.Conference;
+import com.team5.demo.repositories.ConferenceRepository;
 
 
 // @RequiredArgsConstructor
@@ -21,9 +20,9 @@ public class ConferenceService {
         this.conferenceRepository = conferenceRepository;
     }
 
-    public List<Conference> getAllConferences() {
-        return conferenceRepository.findAll();
-    }
+    // public List<Conference> getAllConferences() {
+    //     return conferenceRepository.findAll();
+    // }
 
     public Conference getById(Long id) {
         return conferenceRepository.findById(id)
@@ -74,6 +73,14 @@ public class ConferenceService {
     }
 
     /**
+     * Return all conferences (used for listing where completed ones should be visible)
+     */
+    @Transactional(readOnly = true)
+    public List<Conference> getAllConferences() {
+        return conferenceRepository.findAll();
+    }
+
+    /**
      * Get conference by id (used for detail page)
      */
     public Conference getConference(Long id) {
@@ -87,4 +94,5 @@ public class ConferenceService {
 
         return conferenceRepository.searchConferenceByTitle(title);
     }
+    
 }

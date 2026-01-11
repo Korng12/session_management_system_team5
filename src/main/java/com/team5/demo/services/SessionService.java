@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalDateTime;
@@ -550,5 +551,13 @@ public class SessionService {
             return false;
         }
         return session.getStartTime().isAfter(LocalDateTime.now());
+    }
+
+    @Transactional(readOnly = true)
+    public Integer getRoomCapacity(Long sessionId) {
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new RuntimeException("Session not found"));
+
+        return session.getRoom().getCapacity();
     }
 }

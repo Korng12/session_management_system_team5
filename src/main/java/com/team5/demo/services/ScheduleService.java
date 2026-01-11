@@ -63,7 +63,7 @@ public class ScheduleService {
 
         }).toList();
     }
-        public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
+    public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));

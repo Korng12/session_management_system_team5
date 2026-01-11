@@ -7,6 +7,7 @@ import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
+import com.team5.demo.services.ChairService;
 import com.team5.demo.services.RegistrationService;
 import com.team5.demo.services.SessionAttendanceService;
 import com.team5.demo.services.ScheduleService;
@@ -21,7 +22,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
@@ -68,6 +68,10 @@ public class UserController {
         return "public/login";
     }
 
+    @Autowired
+    private ChairService chairService;
+
+
     @GetMapping("/home")
     public String getHome(Authentication auth,Model model) {
         System.out.println(
@@ -76,11 +80,22 @@ public class UserController {
 
         );
         model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
+
+        // Include chaired sessions for users with the chair role
+        boolean isChair = auth.getAuthorities().stream()
+            .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
+
+        if (isChair) {
+            model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
+        } else {
+            model.addAttribute("chairedSessions", java.util.Collections.emptyList());
+        }
+
         return "user/home";
     }
 
 
-    @GetMapping("/schedule")
+    @GetMapping("/schedule-attendance")
     public String mySchedule(Authentication authentication, Model model) {
 
         String email = authentication.getName();
@@ -97,11 +112,7 @@ public class UserController {
     public String getRegisterConferencePage() {
         return "public/registration";
     }
-
-    // @GetMapping("/conferences")
-    // public String getConferencesPage() {
-    //     return "user/conferences";
-    // }
+    
 
     @GetMapping("/profile")
     public String getProfilePage(Principal principal, Model model) {
@@ -132,11 +143,11 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
+            @RequestParam("firstName") String firstName,
+            @RequestParam("lastName") String lastName,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam("confirmPassword") String confirmPassword,
             HttpServletRequest request,
             Model model) {
 

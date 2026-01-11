@@ -23,7 +23,7 @@ public interface ConferenceRepository extends JpaRepository<Conference, Long> {
     List<Conference> findByStartDateAfter(LocalDate date);
 
     List<Conference> findByEndDateBefore(LocalDate date);
-
+    
     // === UPCOMING / ONGOING CONFERENCES ===
     @Query("""
         SELECT c FROM Conference c

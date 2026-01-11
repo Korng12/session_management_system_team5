@@ -36,9 +36,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     long countByConference(Conference conference);
     
     // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
-
     // boolean existsByParticipantAndConference(User participant, Conference conference);
-    // boolean existsByParticipantAndConference(User participant, Conference conference,RegistrationStatus status);
     boolean existsByParticipantAndConferenceAndStatus(
         User participant,
         Conference conference,
@@ -46,6 +44,9 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     );
 
     long countByParticipant(User participant);
+    
+    // List<Registration> findByStatus(String status);
+    List<Registration> findByStatus(RegistrationStatus status);
 
     /* ===================== EXISTS CHECK ===================== */
 
@@ -93,6 +94,10 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     AND r.status = 'CONFIRMED'
         """)
         List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+
+    List<Registration> findByParticipant_EmailContainingIgnoreCase(String keyword);
+
+    List<Registration> findByParticipant_Email(String email);
 
 
 

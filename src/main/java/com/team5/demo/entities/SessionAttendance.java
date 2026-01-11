@@ -25,9 +25,9 @@ public class SessionAttendance {
     private User participant;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("sessionId")
-    @JoinColumn(name = "session_id")
-    private Session session;    
+    @JoinColumn(name = "session_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Session session;
+    
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private AttendanceStatus status; // PRESENT, ABSENT
@@ -37,8 +37,8 @@ public class SessionAttendance {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by")
     private User markedBy;
-  
-      public SessionAttendance() {
+
+    public SessionAttendance() {
     
     }
     public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,

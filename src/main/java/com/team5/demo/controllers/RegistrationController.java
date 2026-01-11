@@ -72,6 +72,8 @@ public class RegistrationController {
         try {
             registrationService.cancelRegistration(registrationId);
             return ResponseEntity.ok("Registration cancelled successfully");
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
