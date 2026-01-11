@@ -175,6 +175,10 @@ public class UserController {
                 model.addAttribute("userEmail", user.getEmail());
                 model.addAttribute("userCreated", user.getCreatedAt());
                 model.addAttribute("userRoles", user.getRoles());
+                
+                // Fetch user's registered conferences
+                var registrations = registrationService.getMyConferences(email);
+                model.addAttribute("registrations", registrations);
             }
         }
         return "user/profile";

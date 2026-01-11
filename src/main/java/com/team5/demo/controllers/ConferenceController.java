@@ -122,6 +122,7 @@ public class ConferenceController {
     // 3. Conference registration status
     boolean isRegistered = false;
     Set<Long> registeredSessionIds = Set.of();
+    Long registrationId = null;
 
     if (auth != null && auth.isAuthenticated()) {
         String email = auth.getName();
@@ -133,11 +134,18 @@ public class ConferenceController {
             registeredSessionIds =
                 sessionRegistrationService
                     .getRegisteredSessionIds(email, id);
+
+            // Retrieve the registration entity so we can expose its ID to the template
+            var opt = registrationService.getRegistrationForUserAndConference(email, id);
+            if (opt.isPresent()) {
+                registrationId = opt.get().getId();
+            }
         }
     }
 
     model.addAttribute("isRegistered", isRegistered);
     model.addAttribute("registeredSessionIds", registeredSessionIds);
+    model.addAttribute("registrationId", registrationId);
 
     return "user/conference-detail";
 }
