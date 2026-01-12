@@ -40,8 +40,7 @@ public class SessionAttendance {
     @JoinColumn(name = "marked_by")
     private User markedBy;
 
-    public SessionAttendance() {
-        this.status = AttendanceStatus.REGISTERED;
+    protected SessionAttendance() {
     }
 
     public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,
@@ -55,11 +54,11 @@ public class SessionAttendance {
         this.markedBy = markedBy;
     }
 
-    public SessionAttendance(User participant, Session session) {
-        this.participant = participant;
-        this.session = session;
-        this.participantId = participant.getId();
-        this.sessionId = session.getId();
-        this.status = AttendanceStatus.REGISTERED;
-    }
+    // public SessionAttendance(User participant, Session session) {
+    //     this.participant = participant;
+    //     this.session = session;
+    //     this.participantId = participant.getId();
+    //     this.sessionId = session.getId();
+    //     this.status = AttendanceStatus.ABSENT;
+    // }
 }

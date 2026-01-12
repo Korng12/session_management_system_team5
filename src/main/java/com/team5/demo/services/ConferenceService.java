@@ -2,9 +2,10 @@ package com.team5.demo.services;
 
 import com.team5.demo.entities.Conference;
 import com.team5.demo.repositories.ConferenceRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 

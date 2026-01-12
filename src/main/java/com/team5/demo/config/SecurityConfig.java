@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -30,6 +31,7 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
     @Autowired
+    @Lazy
     private JwtFilter jwtFilter;
 
     @Bean
@@ -54,7 +56,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
@@ -92,13 +94,13 @@ public class SecurityConfig {
                         response.getWriter().write("{\"error\": \"Forbidden: insufficient permissions\"}");
                     }))
                 .httpBasic(basic -> basic.disable())
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .failureUrl("/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout.permitAll())
+                // .formLogin(form -> form
+                //         .loginPage("/login")
+                //         .loginProcessingUrl("/login")
+                //         .defaultSuccessUrl("/home", true)
+                //         .failureUrl("/login?error=true")
+                //         .permitAll())
+                // .logout(logout -> logout.permitAll())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

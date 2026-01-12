@@ -45,6 +45,8 @@ import com.team5.demo.repositories.RoomRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.entities.Room;
 import com.team5.demo.entities.Session;
+import com.team5.demo.entities.User;
+import com.team5.demo.entities.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -97,8 +99,8 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
-  
 
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private RegistrationService registrationService;
@@ -118,7 +120,7 @@ public class AdminController {
         model.addAttribute("totalConferences", conferenceService.countAll());
         return "admin/dashboard";
     }
-    }
+    
 
 
     /* ===================== MANAGE ROOMS ===================== */
@@ -266,7 +268,11 @@ public class AdminController {
 
     return "admin/manage-conferences";
     }
-
+    
+    public String getMethodName(@RequestParam String param) {
+        return new String();
+    }
+    
 
 
     
@@ -315,16 +321,21 @@ public class AdminController {
      */
     @GetMapping("/api/conferences")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ConferenceDTO>> getAllConferences() {
+        public ResponseEntity<List<ConferenceDTO>> getAllConferences() {
         try {
+            java.time.LocalDate today = java.time.LocalDate.now();
             List<ConferenceDTO> conferences = conferenceRepository.findAll()
-                    .stream()
-                    .map(conference -> new ConferenceDTO(
-                            conference.getId(),
-                            conference.getTitle(),
-                            conference.getDescription()
-                    ))
-                    .collect(Collectors.toList());
+                .stream()
+                // Only conferences that are not outdated (no endDate or endDate >= today)
+                .filter(conf -> conf.getEndDate() == null || !conf.getEndDate().isBefore(today))
+                .map(conference -> new ConferenceDTO(
+                    conference.getId(),
+                    conference.getTitle(),
+                    conference.getDescription(),
+                    conference.getStartDate(),
+                    conference.getEndDate()
+                ))
+                .collect(Collectors.toList());
             return ResponseEntity.ok(conferences);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -481,8 +492,11 @@ public class AdminController {
                             user.getEmail()
                     ))
                     .collect(Collectors.toList());
+            System.out.println("Found " + chairs.size() + " chair users: " + chairs);
             return ResponseEntity.ok(chairs);
         } catch (Exception e) {
+            System.err.println("Error fetching chair users: " + e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -845,19 +859,17 @@ public class AdminController {
                 attendance.put("sessionTitle", session.getTitle());
                 attendance.put("roomName", session.getRoom() != null ? session.getRoom().getName() : "N/A");
                 attendance.put("roomCapacity", session.getRoom() != null ? session.getRoom().getCapacity() : 0);
-
+                
+                // Get attendance count
+                long attendanceCount = sessionAttendanceService.getAttendanceCountBySession(session.getId());
+                attendance.put("attendanceCount", attendanceCount);
+                
+                return attendance;
+            }).collect(Collectors.toList());
+            
             return ResponseEntity.ok(attendanceList);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-    /**
-     * Render attendance page
-     * GET /admin/view-attendance
-     */
-    @GetMapping("/view-attendance")
-    public String viewAttendance() {
-        return "admin/view-attendance";
-    }
-
+}

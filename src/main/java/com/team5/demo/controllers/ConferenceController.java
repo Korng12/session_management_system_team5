@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.team5.demo.entities.Conference;
 import com.team5.demo.services.ConferenceService;
 import com.team5.demo.services.SessionRegistrationService;
 import com.team5.demo.services.SessionService;
@@ -37,18 +36,30 @@ public class ConferenceController {
     // GET /conferences
     @GetMapping
     public String listConferences(Model model) {
+        System.out.println(">>> /conferences controller called");
+
+        // Show all conferences on the listing so completed ones are visible (but cannot be registered)
         var conferences = conferenceService.getAllConferences();
+        
+        System.out.println(">>> conferences size = " + conferences.size());
         model.addAttribute("conferences", conferences);
+
         return "user/conferences";
     }
+    @GetMapping("/title")
+    public String getMethodName(@RequestParam("title") String title,Model model) {
+        var conferences=conferenceService.getConferencesByTittle(title);
+        System.out.println("Size in user search conf"+conferences.size());
+        model.addAttribute("conferences",conferences);
+        return "user/conferences";
+    }
+    
 
 
     // GET /conferences/{id}
     @GetMapping("/{id}")
-
-
     public String conferenceDetail(
-        @PathVariable Long id,
+        @PathVariable("id") Long id,
         Authentication auth,
         Model model) {
 
@@ -62,3 +73,26 @@ public class ConferenceController {
     );
 
     // 3. Conference registration status
+    boolean isRegistered = false;
+    Set<Long> registeredSessionIds = Set.of();
+
+    if (auth != null && auth.isAuthenticated()) {
+        String email = auth.getName();
+
+        isRegistered = registrationService
+            .isRegisteredForConference(email, id);
+
+        if (isRegistered) {
+            registeredSessionIds =
+                sessionRegistrationService
+                    .getRegisteredSessionIds(email, id);
+        }
+    }
+
+    model.addAttribute("isRegistered", isRegistered);
+    model.addAttribute("registeredSessionIds", registeredSessionIds);
+
+    return "user/conference-detail";
+}
+ 
+}

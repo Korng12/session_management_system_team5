@@ -31,4 +31,11 @@ public class SessionAttendanceService {
     public List<SessionAttendance> getMySchedule(String email) {
         return attendanceRepository.findMySchedule(email);
     }
+
+    /* ===================== STATISTICS ===================== */
+
+    @Transactional(readOnly = true)
+    public long getAttendanceCountBySession(Long sessionId) {
+        return attendanceRepository.findBySessionId(sessionId).size();
+    }
 }

@@ -23,40 +23,86 @@ const editConferenceSelect = document.getElementById('editConferenceId');
 const assignChairSelect = document.getElementById('assignChairSelect');
 
 async function loadOptions() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     await Promise.all([
-        fetchOptions(api.users, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
+        fetchOptions(api.chairs, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
         fetchOptions(api.chairs, [assignChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
         fetchOptions(api.rooms, [roomSelect, editRoomSelect], r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
-        fetchOptions(api.conferences, [conferenceSelect, editConferenceSelect], c => ({ value: c.id, label: c.title }))
+        fetchOptions(
+            api.conferences,
+            [conferenceSelect, editConferenceSelect],
+            c => ({ value: c.id, label: c.title }),
+            c => {
+                if (!c) return false;
+                if (!c.endDate) return true; // keep if no end date
+                const end = new Date(c.endDate);
+                if (Number.isNaN(end.getTime())) return true; // keep unparseable dates
+                end.setHours(23, 59, 59, 999);
+                return end >= today;
+            }
+        )
     ]);
 }
 
-async function fetchOptions(url, selectEls, mapFn) {
-    const res = await fetch(url);
-    if (!res.ok) return;
-    const data = await res.json();
-    const targets = Array.isArray(selectEls) ? selectEls : [selectEls];
-    targets.forEach(selectEl => {
-        if (!selectEl) return;
-        selectEl.innerHTML = '<option value="" disabled selected>Select...</option>';
-        data.forEach(item => {
-            const opt = document.createElement('option');
-            const mapped = mapFn(item);
-            opt.value = mapped.value;
-            opt.textContent = mapped.label;
-            selectEl.appendChild(opt);
+async function fetchOptions(url, selectEls, mapFn, filterFn = () => true) {
+    try {
+        console.log('Fetching options from:', url);
+        const res = await fetch(url, { credentials: 'include' });
+        console.log('Response status:', res.status);
+        
+        if (!res.ok) {
+            console.error('Failed to fetch options from', url, 'Status:', res.status);
+            return;
+        }
+        
+        const data = await res.json();
+        const filtered = Array.isArray(data) ? data.filter(filterFn) : [];
+        console.log('Data received from', url, ':', data);
+        console.log('Data after filtering', url, ':', filtered);
+        
+        const targets = Array.isArray(selectEls) ? selectEls : [selectEls];
+        targets.forEach(selectEl => {
+            if (!selectEl) {
+                console.warn('Select element not found');
+                return;
+            }
+            
+            // For chair selects in create and edit forms, start with "No chair assigned" option
+            if (selectEl.id === 'chairId' || selectEl.id === 'editChairId') {
+                selectEl.innerHTML = '<option value="">No chair assigned</option>';
+            } else {
+                selectEl.innerHTML = '<option value="" disabled selected>Select...</option>';
+            }
+            
+            filtered.forEach(item => {
+                const opt = document.createElement('option');
+                const mapped = mapFn(item);
+                opt.value = mapped.value;
+                opt.textContent = mapped.label;
+                selectEl.appendChild(opt);
+            });
+            
+            console.log('Populated', selectEl.id, 'with', filtered.length, 'options');
         });
-    });
+    } catch (error) {
+        console.error('Error fetching options from', url, ':', error);
+    }
 }
 
 async function loadSessions() {
-    sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
+    console.log('loadSessions called');
+    sessionsBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>';
     try {
+        console.log('Fetching sessions from:', api.sessions);
         const res = await fetch(api.sessions);
+        console.log('Response status:', res.status);
         if (!res.ok) throw new Error('Failed to load sessions');
         const sessions = await res.json();
+        console.log('Sessions loaded:', sessions.length, sessions);
         if (!sessions.length) {
-            sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No sessions yet</td></tr>';
+            sessionsBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No sessions yet</td></tr>';
             return;
         }
         sessionsBody.innerHTML = '';
@@ -121,16 +167,30 @@ function formatDateTime(val) {
     }
 }
 
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Create session button handler
+document.getElementById('createSubmitBtn')?.addEventListener('click', async () => {
     hideAlerts();
+    
+    // Validate form
+    const titleInput = document.getElementById('title');
+    const roomInput = document.getElementById('roomId');
+    const conferenceInput = document.getElementById('conferenceId');
+    const startInput = document.getElementById('startTime');
+    const endInput = document.getElementById('endTime');
+    
+    if (!titleInput.value.trim() || !roomInput.value || !conferenceInput.value || !startInput.value || !endInput.value) {
+        showError('Please fill in all required fields');
+        return;
+    }
+    
+    const chairValue = chairSelect.value;
     const payload = {
-        title: document.getElementById('title').value.trim(),
-        chairId: parseInt(chairSelect.value, 10),
-        roomId: parseInt(roomSelect.value, 10),
-        conferenceId: parseInt(conferenceSelect.value, 10),
-        startTime: document.getElementById('startTime').value + ':00',
-        endTime: document.getElementById('endTime').value + ':00',
+        title: titleInput.value.trim(),
+        chairId: chairValue ? parseInt(chairValue, 10) : null,
+        roomId: parseInt(roomInput.value, 10),
+        conferenceId: parseInt(conferenceInput.value, 10),
+        startTime: startInput.value + ':00',
+        endTime: endInput.value + ':00',
         status: document.getElementById('status').value
     };
 
@@ -138,21 +198,30 @@ form.addEventListener('submit', async (e) => {
         const res = await fetch(api.createSession, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            showError(err.message || 'Failed to create session');
+            const errorMsg = err.message || err.errors?.[Object.keys(err.errors)[0]]?.[0] || 'Failed to create session';
+            showError(errorMsg);
             return;
         }
 
-        showSuccess('Session created');
+        showSuccess('Session created successfully');
         form.reset();
-        loadSessions();
+        const createModal = bootstrap.Modal.getInstance(document.getElementById('createSessionModal'));
+        createModal?.hide();
+        loadSessionsWithFilter();
     } catch (error) {
         showError('Network error while creating session');
     }
+});
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    document.getElementById('createSubmitBtn').click();
 });
 
 function showError(msg) {
@@ -174,43 +243,112 @@ function hideAlerts() {
 let editModal, deleteModal;
 
 function openEditModal(sessionId, title, startTime, endTime, status, chairId, roomId, conferenceId) {
-    document.getElementById('editSessionId').value = sessionId;
-    document.getElementById('editTitle').value = title;
-    document.getElementById('editStartTime').value = startTime.substring(0, 16);
-    document.getElementById('editEndTime').value = endTime.substring(0, 16);
-    document.getElementById('editStatus').value = status;
-    editChairSelect.value = chairId ? String(chairId) : '';
-    editRoomSelect.value = roomId ? String(roomId) : '';
-    editConferenceSelect.value = conferenceId ? String(conferenceId) : '';
-    document.getElementById('editError').classList.add('d-none');
-    editModal = new bootstrap.Modal(document.getElementById('editSessionModal'));
-    editModal.show();
+    try {
+        const editModalEl = document.getElementById('editSessionModal');
+        if (!editModalEl) {
+            console.error('Edit modal element not found');
+            showError('Error: Edit modal not found');
+            return;
+        }
+        
+        document.getElementById('editSessionId').value = sessionId;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editStartTime').value = startTime.substring(0, 16);
+        document.getElementById('editEndTime').value = endTime.substring(0, 16);
+        document.getElementById('editStatus').value = status;
+        
+        if (editChairSelect) {
+            editChairSelect.value = chairId ? String(chairId) : '';
+        }
+        if (editRoomSelect) {
+            editRoomSelect.value = roomId ? String(roomId) : '';
+        }
+        if (editConferenceSelect) {
+            editConferenceSelect.value = conferenceId ? String(conferenceId) : '';
+        }
+        
+        document.getElementById('editError').classList.add('d-none');
+        
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded');
+            showError('Error: Bootstrap library not loaded');
+            return;
+        }
+        
+        editModal = new bootstrap.Modal(editModalEl);
+        editModal.show();
+    } catch (error) {
+        console.error('Error opening edit modal:', error);
+        showError('Error opening edit modal: ' + error.message);
+    }
 }
 
 function openDeleteModal(sessionId, title) {
-    document.getElementById('deleteSessionTitle').textContent = title;
-    deleteModal = new bootstrap.Modal(document.getElementById('deleteSessionModal'));
-    deleteModal._sessionId = sessionId;
-    deleteModal.show();
+    try {
+        const deleteModalEl = document.getElementById('deleteSessionModal');
+        if (!deleteModalEl) {
+            console.error('Delete modal element not found');
+            showError('Error: Delete modal not found');
+            return;
+        }
+        
+        const titleElement = document.getElementById('deleteSessionTitle');
+        if (titleElement) {
+            titleElement.textContent = title;
+        }
+        
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap is not loaded');
+            showError('Error: Bootstrap library not loaded');
+            return;
+        }
+        
+        deleteModal = new bootstrap.Modal(deleteModalEl);
+        deleteModal._sessionId = sessionId;
+        deleteModal.show();
+    } catch (error) {
+        console.error('Error opening delete modal:', error);
+        showError('Error opening delete modal: ' + error.message);
+    }
 }
+
+
 
 document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
     const sessionId = document.getElementById('editSessionId').value;
+    const editError = document.getElementById('editError');
+    
+    // Validate required fields
+    const titleInput = document.getElementById('editTitle');
+    const roomInput = document.getElementById('editRoomId');
+    const conferenceInput = document.getElementById('editConferenceId');
+    const startInput = document.getElementById('editStartTime');
+    const endInput = document.getElementById('editEndTime');
+    
+    if (!titleInput.value.trim() || !roomInput.value || !conferenceInput.value || !startInput.value || !endInput.value) {
+        editError.textContent = 'Please fill in all required fields';
+        editError.classList.remove('d-none');
+        return;
+    }
+    
     const payload = {
-        title: document.getElementById('editTitle').value.trim(),
+        title: titleInput.value.trim(),
         chairId: editChairSelect.value ? Number(editChairSelect.value) : null,
-        roomId: editRoomSelect.value ? Number(editRoomSelect.value) : null,
-        conferenceId: editConferenceSelect.value ? Number(editConferenceSelect.value) : null,
-        startTime: document.getElementById('editStartTime').value + ':00',
-        endTime: document.getElementById('editEndTime').value + ':00',
+        roomId: Number(roomInput.value),
+        conferenceId: Number(conferenceInput.value),
+        startTime: startInput.value + ':00',
+        endTime: endInput.value + ':00',
         status: document.getElementById('editStatus').value
     };
+    
     try {
         const res = await fetch(`${api.createSession}/${sessionId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(payload)
         });
+        
         if (!res.ok) {
             const errJson = await res.json().catch(() => ({}));
             const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
@@ -220,26 +358,34 @@ document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
                 details = Array.isArray(first) ? first[0] : String(first);
             }
             const msg = errJson.message || details || errText || `Failed to update (status ${res.status})`;
-            document.getElementById('editError').textContent = msg;
-            document.getElementById('editError').classList.remove('d-none');
+            editError.textContent = msg;
+            editError.classList.remove('d-none');
             return;
         }
+        
         editModal.hide();
-        loadSessions();
-        showSuccess('Session updated');
+        loadSessionsWithFilter();
+        showSuccess('Session updated successfully');
     } catch (error) {
-        document.getElementById('editError').textContent = 'Network error';
-        document.getElementById('editError').classList.remove('d-none');
+        editError.textContent = 'Network error';
+        editError.classList.remove('d-none');
     }
 });
 
 document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
     const sessionId = deleteModal?._sessionId;
+    if (!sessionId) {
+        showError('Invalid session ID');
+        return;
+    }
+    
     try {
         const res = await fetch(`${api.createSession}/${sessionId}`, {
             method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
         });
+        
         if (!res.ok) {
             const errJson = await res.json().catch(() => ({}));
             const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
@@ -247,39 +393,28 @@ document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () 
             showError(msg);
             return;
         }
-        deleteModal.hide();
-        loadSessions();
-        showSuccess('Session deleted');
+        
+        // Close modal and remove backdrop
+        if (deleteModal) {
+            deleteModal.hide();
+            // Remove any lingering backdrops
+            setTimeout(() => {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => backdrop.remove());
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+            }, 100);
+        }
+        
+        loadSessionsWithFilter();
+        showSuccess('Session deleted successfully');
     } catch (error) {
         showError('Network error while deleting');
     }
 });
 
-function restoreSessionConfirm(sessionId, sessionTitle) {
-    if (confirm(`Restore session "${sessionTitle}"?`)) {
-        restoreSession(sessionId);
-    }
-}
 
-async function restoreSession(sessionId) {
-    try {
-        const res = await fetch(`${api.createSession}/${sessionId}/restore`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        if (!res.ok) {
-            const errJson = await res.json().catch(() => ({}));
-            const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
-            const msg = errJson.message || errText || `Failed to restore (status ${res.status})`;
-            showError(msg);
-            return;
-        }
-        loadSessions();
-        showSuccess('Session restored');
-    } catch (error) {
-        showError('Network error while restoring');
-    }
-}
 
 // Search and Filter functionality
 let allSessions = [];
@@ -289,6 +424,11 @@ function filterSessions() {
     const statusFilter = document.getElementById('filterStatus').value;
 
     const filtered = allSessions.filter(s => {
+        // Exclude deleted sessions
+        if (s.deleted) {
+            return false;
+        }
+        
         const matchesSearch = !searchTerm || 
             s.title.toLowerCase().includes(searchTerm) ||
             (s.chairName && s.chairName.toLowerCase().includes(searchTerm)) ||
@@ -304,7 +444,7 @@ function filterSessions() {
 
 function renderSessions(sessions) {
     if (!sessions.length) {
-        sessionsBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No sessions found</td></tr>';
+        sessionsBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">No sessions found</td></tr>';
         return;
     }
 
@@ -316,6 +456,7 @@ function renderSessions(sessions) {
             : '<span class="badge bg-success">Active</span>';
         
         tr.innerHTML = `
+            <td>${s.id || ''}</td>
             <td>${s.title || ''}</td>
             <td>${s.chairName || ''}</td>
             <td>${s.roomName || ''}</td>
@@ -326,13 +467,12 @@ function renderSessions(sessions) {
             <td>${deletedBadge}</td>
             <td class="d-flex gap-1">
                 ${!s.deleted ? '<button class="btn btn-sm btn-warning edit-btn">Edit</button>' : ''}
-                ${!s.deleted ? '<button class="btn btn-sm btn-danger delete-btn">Delete</button>' : '<button class="btn btn-sm btn-info restore-btn">Restore</button>'}
+                ${!s.deleted ? '<button class="btn btn-sm btn-danger delete-btn">Delete</button>' : ''}
             </td>
         `;
 
         const editBtn = tr.querySelector('.edit-btn');
         const deleteBtn = tr.querySelector('.delete-btn');
-        const restoreBtn = tr.querySelector('.restore-btn');
 
         if (editBtn) {
             editBtn.addEventListener('click', () => openEditModal(
@@ -351,10 +491,6 @@ function renderSessions(sessions) {
             deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
         }
 
-        if (restoreBtn) {
-            restoreBtn.addEventListener('click', () => restoreSessionConfirm(s.id, s.title || ''));
-        }
-
         sessionsBody.appendChild(tr);
     });
 }
@@ -362,14 +498,19 @@ function renderSessions(sessions) {
 // Update loadSessions to use new rendering
 const originalLoadSessions = loadSessions;
 async function loadSessionsWithFilter() {
-    sessionsBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>';
+    console.log('loadSessionsWithFilter called');
+    sessionsBody.innerHTML = '<tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>';
     try {
+        console.log('Fetching sessions from:', api.sessions);
         const res = await fetch(api.sessions);
+        console.log('Response status:', res.status);
         if (!res.ok) throw new Error('Failed to load sessions');
         allSessions = await res.json();
+        console.log('Sessions fetched:', allSessions.length, allSessions);
         filterSessions();
     } catch (e) {
-        sessionsBody.innerHTML = '<tr><td colspan="8" class="text-danger text-center">Could not load sessions</td></tr>';
+        console.error('Error loading sessions:', e);
+        sessionsBody.innerHTML = '<tr><td colspan="10" class="text-danger text-center">Could not load sessions</td></tr>';
     }
 }
 
@@ -526,14 +667,16 @@ async function removeChairFromSession(sessionId, chairName, sessionTitle) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadOptions().then(loadSessions);
+    loadOptions().then(loadSessionsWithFilter);
     
     // Add search and filter event listeners
-    document.getElementById('searchInput').addEventListener('keyup', filterSessions);
-    document.getElementById('filterStatus').addEventListener('change', filterSessions);
-    document.getElementById('resetBtn').addEventListener('click', () => {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('filterStatus').value = '';
-        filterSessions();
-    });
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    
+    if (searchInput) {
+        searchInput.addEventListener('keyup', filterSessions);
+    }
+    if (filterStatus) {
+        filterStatus.addEventListener('change', filterSessions);
+    }
 });

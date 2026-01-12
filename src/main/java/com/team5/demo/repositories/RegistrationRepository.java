@@ -28,6 +28,8 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     long countByParticipant(User participant);
     List<Registration> findByStatus(RegistrationStatus status);
     boolean existsByParticipant_IdAndConference_Id(Long participantId, Long conferenceId);
+    
+    List<Registration> findByParticipant_EmailContainingIgnoreCase(String keyword);
 
     @Query("""
         SELECT r FROM Registration r
@@ -46,20 +48,20 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
 
         // ...existing code...
 
-    @Query("""
-        SELECT r FROM Registration r
-        JOIN FETCH r.participant
-        JOIN FETCH r.conference
-        WHERE r.status = :status
-    """)
-    List<Registration> findByStatusWithRelations(@Param("status") RegistrationStatus status);
+    // @Query("""
+    //     SELECT r FROM Registration r
+    //     JOIN FETCH r.participant
+    //     JOIN FETCH r.conference
+    //     WHERE r.status = :status
+    // """)
+    // List<Registration> findByStatusWithRelations(@Param("status") RegistrationStatus status);
 
-    @Query("""
-        SELECT r FROM Registration r
-        JOIN FETCH r.participant
-        JOIN FETCH r.conference
-    """)
-    List<Registration> findAllWithRelations();
+    // @Query("""
+    //     SELECT r FROM Registration r
+    //     JOIN FETCH r.participant
+    //     JOIN FETCH r.conference
+    // """)
+    // List<Registration> findAllWithRelations();
 
     @Query("""
         SELECT r FROM Registration r
@@ -80,3 +82,4 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         AND r.status = 'CONFIRMED'
     """)
     List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+}

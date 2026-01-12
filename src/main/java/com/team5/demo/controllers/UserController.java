@@ -70,20 +70,9 @@ public class UserController {
         return "public/login";
     }
 
-    @GetMapping("/home")
-    public String getHome() {
-        return "user/home";
-    }
-
-
-    @GetMapping("/my-schedule")
-    public String mySchedule(Authentication auth, Model model) {
-        String email = auth.getName();
-        model.addAttribute(
-            "schedules",
-            sessionAttendanceService.getMySchedule(email)
-        );
-        return "user/user-schedule";
+    @GetMapping("/register")
+    public String getRegisterPage() {
+        return "public/register";
     }
 
     @GetMapping("/register-conference")
@@ -174,19 +163,6 @@ public class UserController {
         return "user/home";
     }
 
-    @GetMapping("/profile")
-    public String getProfilePage(Principal principal, Model model) {
-        if (principal != null) {
-            userRepository.findByEmail(principal.getName())
-                    .ifPresent(user -> {
-                        model.addAttribute("userName", user.getName());
-                        model.addAttribute("userEmail", user.getEmail());
-                        model.addAttribute("userCreated", user.getCreatedAt());
-                        model.addAttribute("userRoles", user.getRoles());
-                    });
-        }
-        return "user/profile";
-    }
 
     /* ===================== MY CONFERENCES (FIXED) ===================== */
 
@@ -198,7 +174,7 @@ public class UserController {
         return "user/my-conferences";
     }
 
-    @GetMapping("/my-schedule")
+    @GetMapping("/schedule-attendance")
     public String mySchedule(Authentication auth, Model model) {
 
         String email = auth.getName();

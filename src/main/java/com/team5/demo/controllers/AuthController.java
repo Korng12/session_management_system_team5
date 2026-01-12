@@ -41,26 +41,7 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // @PostMapping("/register")
-    // public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-    // if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-    // return ResponseEntity.badRequest().body("Email already exists");
-    // }
-
-    // User user = new User();
-    // user.setName(request.getName());
-    // user.setEmail(request.getEmail());
-    // user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-    // Role attendeeRole = roleRepository.findByName("ATTENDEE")
-    // .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-    // user.addRole(attendeeRole);
-
-    // userRepository.save(user);
-
-    // String token = jwtUtil.generateToken(user.getEmail());
-    // return ResponseEntity.ok(new AuthResponse(user.getEmail(), token));
-    // }
+    
     @PostMapping("/register")
     public ResponseEntity<?> register(
         @RequestBody RegisterRequest request,
@@ -94,16 +75,7 @@ public class AuthController {
     return ResponseEntity.ok().build();
 }
 
-    // @PostMapping("/login")
-    // public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-    // Authentication authentication = authenticationManager.authenticate(
-    // new UsernamePasswordAuthenticationToken(request.getEmail(),
-    // request.getPassword())
-    // );
 
-    // String token = jwtUtil.generateToken(request.getEmail());
-    // return ResponseEntity.ok(new AuthResponse(request.getEmail(), token));
-    // }
     @PostMapping("/login")
     public ResponseEntity<?> login(
             @RequestBody LoginRequest request,

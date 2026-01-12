@@ -16,140 +16,227 @@
                 width: 240px;
                 height: calc(100vh - 60px);
                 background-color: #212529;
+                padding-top: 20px;
+                overflow-y: auto;
+                z-index: 100;
+            }
+
+            .sidebar-header {
+                padding: 0 20px 20px;
+                color: #fff;
+            }
+
+            .sidebar-header h4 {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .menu-section {
+                padding: 10px 0;
+            }
+
+            .menu-title {
+                display: block;
+                padding: 10px 20px;
+                color: #6c757d;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .menu-link {
+                display: block;
+                padding: 12px 20px;
+                color: #adb5bd;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .menu-link:hover {
+                background-color: #343a40;
+                color: #fff;
+                padding-left: 25px;
+            }
+
+            .menu-link.active {
+                background-color: #4e73df;
+                color: #fff;
+                border-left: 4px solid #fff;
+            }
+
+            .content {
+                margin-left: 240px;
+                padding: 30px;
+            }
+
+            .card {
+                border-radius: 8px;
+                transition: transform 0.2s;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-card {
+                text-align: center;
+                padding: 20px;
+            }
+        </style>
+
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <div class="content">
+            <div class="container-fluid">
+                <!-- Dashboard Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Admin Dashboard</h2>
+                        <p class="text-muted">Manage your conference system</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Users</h5>
+                                <p>Add and manage system users</p>
+                                <a href="/admin/manage-users" class="btn btn-primary">Manage</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Conferences</h5>
+                                <p>Create and edit conferences</p>
                                 <a href="/admin/manage-conferences" class="btn btn-success">Manage</a>
                             </div>
                         </div>
                     </div>
 
-
-                </div>
-            </div>
-<<<<<<< HEAD
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Manage Sessions</h5>
-                    <p>Create and edit sessions</p>
-                    <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5>Manage Rooms</h5>
-                    <p>Manage available rooms</p>
-                    <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Session Statistics Widget -->
-    <div class="row g-4 mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">📊 Session Statistics</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2 text-center">
-                            <h3 class="mb-0" id="stat-total">—</h3>
-                            <small class="text-muted">Total Sessions</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <h3 class="mb-0 text-info" id="stat-scheduled">—</h3>
-                            <small class="text-muted">Scheduled</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <h3 class="mb-0 text-warning" id="stat-ongoing">—</h3>
-                            <small class="text-muted">Ongoing</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <h3 class="mb-0 text-success" id="stat-completed">—</h3>
-                            <small class="text-muted">Completed</small>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <h3 class="mb-0 text-danger" id="stat-cancelled">—</h3>
-                            <small class="text-muted">Cancelled</small>
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Sessions</h5>
+                                <p>Create and edit sessions</p>
+                                <a href="/admin/manage-sessions" class="btn btn-success">Manage</a>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="mb-2">
-                        <small class="text-muted">Scheduled</small>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-info" id="bar-scheduled" style="width: 0%">0%</div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5>Manage Rooms</h5>
+                                <p>Manage available rooms</p>
+                                <a href="/admin/manage-rooms" class="btn btn-warning">Manage</a>
+                            </div>
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Ongoing</small>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-warning" id="bar-ongoing" style="width: 0%">0%</div>
-                        </div>
-                    </div>
-                    <div class="mb-2">
-                        <small class="text-muted">Completed</small>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-success" id="bar-completed" style="width: 0%">0%</div>
-                        </div>
-                    </div>
-                    <div>
-                        <small class="text-muted">Cancelled</small>
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar bg-danger" id="bar-cancelled" style="width: 0%">0%</div>
+                            </div>
+
+                <!-- Session Statistics Widget -->
+                <div class="row g-4 mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">📊 Session Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-2 text-center">
+                                        <h3 class="mb-0" id="stat-total">—</h3>
+                                        <small class="text-muted">Total Sessions</small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h3 class="mb-0 text-info" id="stat-scheduled">—</h3>
+                                        <small class="text-muted">Scheduled</small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h3 class="mb-0 text-warning" id="stat-ongoing">—</h3>
+                                        <small class="text-muted">Ongoing</small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h3 class="mb-0 text-success" id="stat-completed">—</h3>
+                                        <small class="text-muted">Completed</small>
+                                    </div>
+                                    <div class="col-md-2 text-center">
+                                        <h3 class="mb-0 text-danger" id="stat-cancelled">—</h3>
+                                        <small class="text-muted">Cancelled</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">Scheduled</small>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-info" id="bar-scheduled" style="width: 0%">0%</div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Ongoing</small>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-warning" id="bar-ongoing" style="width: 0%">0%</div>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Completed</small>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-success" id="bar-completed" style="width: 0%">0%</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Cancelled</small>
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-danger" id="bar-cancelled" style="width: 0%">0%</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Upcoming Sessions Widget -->
-    <div class="row g-4 mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">📅 Upcoming Sessions</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle" id="upcomingSessionsTable">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Chair</th>
-                                    <th>Room</th>
-                                    <th>Start Time</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="upcoming-sessions-body">
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">Loading upcoming sessions...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-end mt-2">
-                        <a href="/admin/manage-sessions" class="btn btn-sm btn-outline-primary">View All Sessions →</a>
+                <!-- Upcoming Sessions Widget -->
+                <div class="row g-4 mt-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">📅 Upcoming Sessions</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle" id="upcomingSessionsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Chair</th>
+                                                <th>Room</th>
+                                                <th>Start Time</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="upcoming-sessions-body">
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">Loading upcoming sessions...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="text-end mt-2">
+                                    <a href="/admin/manage-sessions" class="btn btn-sm btn-outline-primary">View All Sessions →</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
 
         <script src="/js/dashboard.js"></script>
-    </div>
-</section>
-</div>
-=======
     </section>
-
 </div>
->>>>>>> f4980d0 (mege mesa branch with main )

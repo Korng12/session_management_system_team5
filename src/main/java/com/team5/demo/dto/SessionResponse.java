@@ -17,6 +17,7 @@ public class SessionResponse {
     private LocalDateTime createdAt;
     private SessionStatus status;
     private Integer version; // For optimistic locking
+    private boolean deleted;
 
     // Constructors
     public SessionResponse() {
@@ -152,5 +153,13 @@ public class SessionResponse {
     
     public void setVersion(Integer version) {
         this.version = version;
+    }
+    
+    public boolean isDeleted() {
+        return deleted;
+    }
+    
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }
