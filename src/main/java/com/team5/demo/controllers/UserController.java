@@ -112,6 +112,7 @@ public class UserController {
     public String getRegisterConferencePage() {
         return "public/registration";
     }
+
     
 
     @GetMapping("/profile")
@@ -140,49 +141,53 @@ public class UserController {
     }
 
     /* ===================== REGISTER ===================== */
-
-    @PostMapping("/register")
-    public String registerUser(
-            @RequestParam("firstName") String firstName,
-            @RequestParam("lastName") String lastName,
-            @RequestParam("email") String email,
-            @RequestParam("password") String password,
-            @RequestParam("confirmPassword") String confirmPassword,
-            HttpServletRequest request,
-            Model model) {
-
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match");
-            return "public/register";
-        }
-
-        if (userRepository.findByEmail(email).isPresent()) {
-            model.addAttribute("error", "Email already exists");
-            return "public/register";
-        }
-
-        User user = new User();
-        user.setName(firstName + " " + lastName);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-
-        Role attendeeRole = roleRepository.findByName("ATTENDEE")
-                .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-
-        user.getRoles().add(attendeeRole);
-        userRepository.save(user);
-
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        request.getSession().setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
-
-        return "redirect:/home";
+    @GetMapping("/register")
+    public String getRegister() {
+        return "public/register";
     }
+    
+    // @PostMapping("/register")
+    // public String registerUser(
+    //         @RequestParam("firstName") String firstName,
+    //         @RequestParam("lastName") String lastName,
+    //         @RequestParam("email") String email,
+    //         @RequestParam("password") String password,
+    //         @RequestParam("confirmPassword") String confirmPassword,
+    //         HttpServletRequest request,
+    //         Model model) {
+
+    //     if (!password.equals(confirmPassword)) {
+    //         model.addAttribute("error", "Passwords do not match");
+    //         return "public/register";
+    //     }
+
+    //     if (userRepository.findByEmail(email).isPresent()) {
+    //         model.addAttribute("error", "Email already exists");
+    //         return "public/register";
+    //     }
+
+    //     User user = new User();
+    //     user.setName(firstName + " " + lastName);
+    //     user.setEmail(email);
+    //     user.setPassword(passwordEncoder.encode(password));
+
+    //     Role attendeeRole = roleRepository.findByName("ATTENDEE")
+    //             .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
+
+    //     user.getRoles().add(attendeeRole);
+    //     userRepository.save(user);
+
+    //     Authentication auth = authenticationManager.authenticate(
+    //             new UsernamePasswordAuthenticationToken(email, password));
+
+    //     SecurityContextHolder.getContext().setAuthentication(auth);
+
+    //     request.getSession().setAttribute(
+    //             HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+    //             SecurityContextHolder.getContext());
+
+    //     return "redirect:/home";
+    // }
     /* ===================== MY CONFERENCES (FIXED) ===================== */
 
     @GetMapping("/my-conferences")

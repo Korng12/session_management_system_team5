@@ -161,7 +161,7 @@ public class RegistrationService {
              return registrationRepository.findAll();
         }
 
-
+ 
         public Long getTotalRegistrations() {
              return registrationRepository.count();
         }
@@ -173,7 +173,7 @@ public class RegistrationService {
         }
 
         public List<Registration> getMyRegistrationsByEmail(String email) {
-    return registrationRepository.findByParticipant_Email(email);
+        return registrationRepository.findByParticipant_Email(email);
 }
 
 
