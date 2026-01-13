@@ -40,7 +40,7 @@ public class ScheduleService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         List<SessionRegistration> registrations = sessionRegRepo.findByParticipant(user);
-
+        
         return registrations.stream().map(reg -> {
 
             Session s = reg.getSession();

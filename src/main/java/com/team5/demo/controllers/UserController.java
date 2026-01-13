@@ -120,21 +120,54 @@ public class UserController {
         return "public/contact";
     }
 
-    /* ===================== REGISTER ===================== */
-    @GetMapping("/register")
-    public String getRegister() {
-        return "public/register";
+
+    @GetMapping("/home")
+    public String getHome(Model model, Authentication auth) {
+        String email = auth.getName();
+        var mySessions = scheduleService.getMyUpcomingSessions(email);
+        model.addAttribute("mySessions", mySessions);
+        if(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHAIR"))){
+            model.addAttribute(
+                "chairedSessions",
+                chairService.getChairedSessions(email)
+            );
+        }
+        return "user/home";
     }
+
+
+    /* ===================== MY CONFERENCES (FIXED) ===================== */
+
+    // @GetMapping("/my-conferences")
+    // public String getMyConferences(Authentication auth, Model model) {
+    //     String email = auth.getName();
+    //     var reg = registrationService.getMyConferences(email);
+    //     model.addAttribute("registrations", reg);
+    //     return "user/my-conferences";
+    // }
 
     @GetMapping("/schedule-attendance")
     public String mySchedule(Authentication auth, Model model) {
 
         String email = auth.getName();
 
-        model.addAttribute(
-            "schedules",
-            sessionAttendanceService.getMySchedule(email)
-        );
+        List<UserScheduleDto> sessions = scheduleService.getUserSchedule(email);
+        
+        // Calculate attendance statistics
+        long presentCount = sessions.stream()
+                .filter(s -> s.getAttendance() != null && s.getAttendance().name().equals("PRESENT"))
+                .count();
+        long absentCount = sessions.stream()
+                .filter(s -> s.getAttendance() != null && s.getAttendance().name().equals("ABSENT"))
+                .count();
+        long totalSessions = sessions.size();
+        long pendingCount = totalSessions - presentCount - absentCount;
+
+        model.addAttribute("sessions", sessions);
+        model.addAttribute("presentCount", presentCount);
+        model.addAttribute("absentCount", absentCount);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("totalSessions", totalSessions);
 
         return "user/user-schedule";
 
@@ -158,26 +191,26 @@ public class UserController {
         return "user/my-conferences";
     }
 
-    @GetMapping("/home")
-    public String getHome(Authentication auth,Model model) {
-        System.out.println(
-            "this is user principle"+
-        SecurityContextHolder.getContext().getAuthentication().getDetails()
+    // @GetMapping("/home")
+    // public String getHome(Authentication auth,Model model) {
+    //     System.out.println(
+    //         "this is user principle"+
+    //     SecurityContextHolder.getContext().getAuthentication().getDetails()
 
-        );
-        model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
+    //     );
+    //     model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
 
-        // Include chaired sessions for users with the chair role
-        boolean isChair = auth.getAuthorities().stream()
-            .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
+    //     // Include chaired sessions for users with the chair role
+    //     boolean isChair = auth.getAuthorities().stream()
+    //         .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
 
-        if (isChair) {
-            model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
-        } else {
-            model.addAttribute("chairedSessions", java.util.Collections.emptyList());
-        }
+    //     if (isChair) {
+    //         model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
+    //     } else {
+    //         model.addAttribute("chairedSessions", java.util.Collections.emptyList());
+    //     }
 
-        return "user/home";
-    }
+    //     return "user/home";
+    // }
 
 }

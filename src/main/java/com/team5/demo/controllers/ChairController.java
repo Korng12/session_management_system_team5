@@ -20,16 +20,6 @@ public class ChairController {
     @Autowired
     ChairService chairService;
 
-
-    @GetMapping("/chair-dashboard")
-    public String chairDashboard() {
-        return "chair/chair-dashboard";
-    }
-
-    @GetMapping("/chair-profile")
-    public String chairProfile() {
-        return "chair/chair-profile";
-    }
     @GetMapping("/chair/sessions")
     @PreAuthorize("hasAuthority('ROLE_CHAIR')")
     public String chairSessions(Authentication auth, Model model) {
@@ -38,7 +28,6 @@ public class ChairController {
             "sessions",
             chairService.getChairedSessions(auth.getName())
         );
-
         return "chair/chair-sessions";
     }
     @GetMapping("chair/sessions/{id}/attendance")

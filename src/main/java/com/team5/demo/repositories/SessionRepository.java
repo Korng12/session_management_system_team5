@@ -53,7 +53,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
     );
        // Find all sessions for a specific conference (excluding soft-deleted)
        List<Session> findByConferenceIdAndDeletedFalse(Long conferenceId);
-
+       
        // Find all sessions for a specific room (excluding soft-deleted)
        List<Session> findByRoomIdAndDeletedFalse(Long roomId);
 

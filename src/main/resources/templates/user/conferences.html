@@ -87,7 +87,7 @@
                         </div>
                         <button th:if="${conf.endDate.isBefore(T(java.time.LocalDate).now())}"
                                 class="btn btn-secondary" disabled
-                                sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                                sec:authorize="hasAuthority('ATTENDEE')">
                             Conference Completed
                         </button>
 

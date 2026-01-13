@@ -1,77 +1,38 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
-    <section class="container mt-5">
-        <h1 class="mb-4">My Schedule & Attendance</h1>
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead>
-                    <tr>
-                        <th>Session</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Session Status</th>
-                        <th>Attendance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="s : ${sessions}">
-                        <td th:text="${s.title}">Session title</td>
-                        <td th:text="${#temporals.format(s.date, 'dd MMM yyyy')}"></td>
-                        <td>
-                            <span th:text="${s.startTime}"></span>
-                            
-                            <span th:text="${s.endTime}"></span>
-                        </td>
-                        <!-- Session lifecycle -->
-                        <td>
-                            <span class="badge"
-                                th:classappend="${ 
-                                    s.sessionStatus == T(com.team5.demo.entities.SessionStatus).SCHEDULED ? ' bg-secondary' :
-                                    s.sessionStatus == T(com.team5.demo.entities.SessionStatus).ONGOING   ? ' bg-info' :
-                                                                                                    ' bg-success'
-                                }"
-                                th:text="${s.sessionStatus.displayName}">
-                            </span>
-                        </td>
-                        <!-- Attendance (only meaningful after completed) -->
-                        <td>
-                            <span th:if="${s.attendance != null}"
-                                  class="badge"
-                                  th:classappend="
-                                    ${s.attendance.name() == 'PRESENT'} ? ' bg-success' : ' bg-danger'"
-                                  th:text="${s.attendance}">
-                            </span>
-                            <span th:if="${s.attendance == null}"
-                                  class="text-muted">
-                                Not recorded
-                            </span>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(sessions)}">
-                        <td colspan="5" class="text-center text-muted">
-                            You have not registered for any sessions yet.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-</div>
-                               sa.status == 'ABSENT' ? ' bg-danger' :
-                               ' bg-secondary'}" th:text="${sa.status}">
-                                </span>
-                            </td>
-                        </tr>
+    <section class="container mt-5" style="max-width: 900px;">
+        <h1 class="mb-4">My Schedule</h1>
 
-                        <tr th:if="${#lists.isEmpty(schedules)}">
-                            <td colspan="4" class="text-center text-muted">
-                                No sessions registered
-                            </td>
-                        </tr>
-                    </tbody>
-
-
-                </table>
+        <!-- Sessions Table -->
+        <div th:if="${!#lists.isEmpty(sessions)}">
+            <div class="row mb-3 fw-bold">
+                <div class="col-md-3">Session</div>
+                <div class="col-md-2">Date</div>
+                <div class="col-md-2">Time</div>
+                <div class="col-md-2">Status</div>
+                <div class="col-md-3">Attendance</div>
             </div>
+            <div th:each="s : ${sessions}" class="row border-bottom py-3">
+                <div class="col-md-3" th:text="${s.title}">Session Title</div>
+                <div class="col-md-2" th:text="${#temporals.format(s.date, 'dd MMM')}">Date</div>
+                <div class="col-md-2" th:text="${s.startTime + ' - ' + s.endTime}">Time</div>
+                <div class="col-md-2">
+                    <span class="badge"
+                          th:classappend="${s.sessionStatus.name() == 'SCHEDULED' ? 'bg-secondary' : s.sessionStatus.name() == 'ONGOING' ? 'bg-info' : 'bg-success'}"
+                          th:text="${s.sessionStatus.displayName}">Status</span>
+                </div>
+                <div class="col-md-3">
+                    <span class="badge"
+                          th:if="${s.attendance != null}"
+                          th:classappend="${s.attendance.name() == 'PRESENT' ? 'bg-success' : 'bg-danger'}"
+                          th:text="${s.attendance}">Status</span>
+                    <span class="text-muted" th:if="${s.attendance == null}">Not Recorded</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(sessions)}" class="alert alert-info text-center">
+            <p class="mb-0">You have no registered sessions yet. <a href="/conferences">Browse conferences</a> to register.</p>
         </div>
     </section>
 </div>

@@ -71,7 +71,8 @@ public class ChairService {
                                Long participantId,
                                AttendanceStatus status,
                                String chairEmail) {
-
+        User participant = userRepo.findById(participantId)
+                .orElseThrow(() -> new RuntimeException("Participant not found"));
         Session session = sessionRepo.findById(sessionId)
                 .orElseThrow();
 
@@ -98,14 +99,11 @@ public class ChairService {
             attendance.setStatus(status);
             attendance.setMarkedAt(LocalDateTime.now());
             attendance.setMarkedBy(chair);
-
             attendanceRepo.save(attendance);
         } else {
             SessionAttendance attendance = new SessionAttendance(
-                        participantId,
-                        sessionId,
-                        null,
-                        session,
+                        participant.getId(),
+                        session.getId(),
                         status,
                         LocalDateTime.now(),
                         chair

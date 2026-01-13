@@ -73,6 +73,7 @@ public class SessionRegistrationService {
         SessionRegistration sr = new SessionRegistration();
         sr.setParticipant(user);
         sr.setSession(session);
+        sr.setRegisteredAt(java.time.LocalDateTime.now());
 
         sessionRegRepo.save(sr);
     }
@@ -92,17 +93,17 @@ public class SessionRegistrationService {
 
         sessionRegRepo.delete(reg);
     }
-@Transactional(readOnly = true)
-public Set<Long> getRegisteredSessionIds(String email, Long conferenceId) {
+    @Transactional(readOnly = true)
+    public Set<Long> getRegisteredSessionIds(String email, Long conferenceId) {
 
-    User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    return sessionRegRepo
-            .findRegisteredSessionIds(user, conferenceId)
-            .stream()
-            .collect(Collectors.toSet());
-}
+        return sessionRegRepo
+                .findRegisteredSessionIds(user, conferenceId)
+                .stream()
+                .collect(Collectors.toSet());
+    }
 
 
 }

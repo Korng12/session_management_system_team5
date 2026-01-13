@@ -25,8 +25,7 @@ public class RegistrationService {
         private final UserRepository userRepository;
         private final ConferenceRepository conferenceRepository;
 
-    @Transactional
-
+        @Transactional
         public Registration registerForConference(String email, Long conferenceId) {
 
                 User user = userRepository.findByEmail(email)

@@ -8,6 +8,7 @@ document.getElementById("registerConferenceBtn")?.addEventListener("click", asyn
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
+            credentials: "include",
             body: new URLSearchParams({
                 conferenceId: conferenceId
             })
@@ -38,7 +39,8 @@ document.getElementById("cancelConferenceBtn")?.addEventListener("click", async 
 
     try {
         const response = await fetch(`/api/registrations/${registrationId}/cancel`, {
-            method: "PUT"
+            method: "PUT",
+            credentials: "include"
         });
 
         if (!response.ok) {
