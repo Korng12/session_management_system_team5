@@ -1,8 +1,6 @@
 package com.team5.demo.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +15,6 @@ public class Session {
     @Column(nullable = false, length = 100)
     private String title;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chair_id")
     private User chair;
@@ -25,7 +22,8 @@ public class Session {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
     private Room room;
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "conference_id", nullable = false)
     private Conference conference;
 
@@ -35,22 +33,30 @@ public class Session {
     @Column(nullable = false)
     private LocalDateTime endTime;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private SessionStatus status;
-    
-    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+
+    @Column(nullable = false)
     private boolean deleted = false;
 
-    // SessionAttendance relationship
-    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(
+        mappedBy = "session",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<SessionAttendance> attendances;
+
+    /* =======================
+       Constructors
+       ======================= */
+
     public Session() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -58,7 +64,14 @@ public class Session {
         this.deleted = false;
     }
 
-    public Session(String title, User chair, Room room, Conference conference, LocalDateTime startTime, LocalDateTime endTime) {
+    public Session(
+            String title,
+            User chair,
+            Room room,
+            Conference conference,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
         this();
         this.title = title;
         this.chair = chair;
@@ -68,13 +81,21 @@ public class Session {
         this.endTime = endTime;
     }
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    /* =======================
+       Lifecycle callbacks
+       ======================= */
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    /* =======================
+       Getters & Setters
+       ======================= */
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -129,16 +150,8 @@ public class Session {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public SessionStatus getStatus() {
@@ -148,11 +161,11 @@ public class Session {
     public void setStatus(SessionStatus status) {
         this.status = status;
     }
-    
+
     public boolean isDeleted() {
         return deleted;
     }
-    
+
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
@@ -164,9 +177,7 @@ public class Session {
     public void setAttendances(List<SessionAttendance> attendances) {
         this.attendances = attendances;
     }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
     }
 }
