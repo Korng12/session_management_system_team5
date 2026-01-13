@@ -7,6 +7,7 @@ import com.team5.demo.dto.SessionDependenciesResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
 import com.team5.demo.entities.Session;
+import com.team5.demo.entities.SessionStatus;
 import com.team5.demo.entities.Conference;
 import com.team5.demo.entities.Room;
 import com.team5.demo.entities.User;
@@ -122,6 +123,25 @@ public class SessionService {
     public long countAll() {
         return sessionRepository.count();
     }
+    public SessionStatus resolveSessionStatus(Session session) {
+
+    if (session.getStatus() == SessionStatus.CANCELLED) {
+        return SessionStatus.CANCELLED;
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+
+    if (now.isBefore(session.getStartTime())) {
+        return SessionStatus.SCHEDULED;
+    }
+
+    if (now.isAfter(session.getEndTime())) {
+        return SessionStatus.COMPLETED;
+    }
+
+        return SessionStatus.ONGOING;
+    }
+
 
 
     /**

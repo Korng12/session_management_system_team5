@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "session_attendance")
-@Data
 @IdClass(SessionAttendanceId.class)
+@Data
 public class SessionAttendance {
 
     @Id
@@ -21,17 +21,24 @@ public class SessionAttendance {
     private Long sessionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("participantId")
-    @JoinColumn(name = "participant_id")
+    @JoinColumn(
+        name = "participant_id",
+        insertable = false,
+        updatable = false
+    )
     private User participant;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("sessionId")
-    @JoinColumn(name = "session_id")
+    @JoinColumn(
+        name = "session_id",
+        insertable = false,
+        updatable = false
+    )
     private Session session;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private AttendanceStatus status; // PRESENT, ABSENT, REGISTERED
+    private AttendanceStatus status;
 
     @Column(name = "marked_at")
     private LocalDateTime markedAt;
@@ -40,25 +47,19 @@ public class SessionAttendance {
     @JoinColumn(name = "marked_by")
     private User markedBy;
 
-    protected SessionAttendance() {
-    }
+    protected SessionAttendance() {}
 
-    public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,
-            AttendanceStatus status, LocalDateTime markedAt, User markedBy) {
+    public SessionAttendance(
+            Long participantId,
+            Long sessionId,
+            AttendanceStatus status,
+            LocalDateTime markedAt,
+            User markedBy
+    ) {
         this.participantId = participantId;
         this.sessionId = sessionId;
-        this.participant = participant;
-        this.session = session;
         this.status = status;
         this.markedAt = markedAt;
         this.markedBy = markedBy;
     }
-
-    // public SessionAttendance(User participant, Session session) {
-    //     this.participant = participant;
-    //     this.session = session;
-    //     this.participantId = participant.getId();
-    //     this.sessionId = session.getId();
-    //     this.status = AttendanceStatus.ABSENT;
-    // }
 }

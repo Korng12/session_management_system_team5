@@ -5,127 +5,195 @@
                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
                 padding: 60px 0;
+                margin-bottom: 40px;
             }
-            .profile-card {
-                margin-top: -50px;
-                position: relative;
-                z-index: 1;
+
+            .profile-header .avatar {
+                font-size: 80px;
+                opacity: 0.9;
+            }
+
+            .profile-header h2 {
+                font-weight: 700;
+                font-size: 2.5rem;
+                margin: 20px 0 10px;
+            }
+
+            .profile-header p {
+                font-size: 1.1rem;
+                opacity: 0.9;
+            }
+
+            .profile-section {
+                margin-bottom: 40px;
+            }
+
+            .profile-section h4 {
+                font-weight: 700;
+                color: #2c3e50;
+                border-bottom: 3px solid #667eea;
+                padding-bottom: 12px;
+                margin-bottom: 20px;
+            }
+
+            .info-group {
+                padding: 15px 0;
+            }
+
+            .info-group label {
+                font-weight: 600;
+                color: #495057;
+                margin-bottom: 5px;
+                display: block;
+                font-size: 0.9rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-group p {
+                color: #2c3e50;
+                font-size: 1.05rem;
+                margin: 0;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 10px;
+                margin-top: 30px;
+            }
+
+            .conference-table {
+                margin-top: 20px;
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 40px 20px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                color: #6c757d;
+            }
+
+            .empty-state i {
+                font-size: 48px;
+                color: #adb5bd;
+                margin-bottom: 15px;
             }
         </style>
-        <section class="profile-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <div class="avatar mb-3">
-                        <i class="bi bi-person-circle fs-1"></i>
-                    </div>
-                    <h2 th:text="${userName != null ? userName : 'Guest User'}">User Name</h2>
-                    <p class="mb-0">Conference Attendee</p>
-                </div>
-            </div>
-        </div>
-        </section>
 
-    <!-- Profile Content -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-10 mx-auto">
-                    <div class="card profile-card shadow-sm p-4">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Full Name</label>
-                                <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Email</label>
-                                <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
-                            </div>
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <div class="avatar mb-3">
+                            <i class="bi bi-person-circle"></i>
                         </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Member Since</label>
-                                <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Role</label>
-                                <span th:if="${userRoles != null && !userRoles.isEmpty()}" th:each="role : ${userRoles}" class="badge bg-primary me-1" th:text="${role.name}">Role</span>
-                                <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <h5 class="mb-3">My Conferences</h5>
-                        
-                        <div th:if="${registrations != null && !registrations.isEmpty()}">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Conference</th>
-                                            <th>Status</th>
-                                            <th>Registered At</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr th:each="reg : ${registrations}">
-                                            <td>
-                                                <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" th:text="${reg.conference.title}">Conference Title</a>
-                                            </td>
-                                            <td>
-                                                <span class="badge"
-                                                      th:classappend="${reg.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
-                                                      th:text="${reg.status.name()}">Status</span>
-                                            </td>
-                                            <td th:text="${#temporals.format(reg.registeredAt, 'dd MMM yyyy HH:mm')}">Date</td>
-                                            <td>
-                                                <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" class="btn btn-sm btn-primary">View</a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div th:if="${registrations == null || registrations.isEmpty()}" class="alert alert-info">
-                            No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
-                        </div>
-
-                        <div class="mt-4">
-                            <a href="/my-schedule" class="btn btn-primary me-2">View Schedule</a>
-                            <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
-                        </div>
-                                            <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                                        </div>
-                                    </div>
-                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
-                                          th:each="role : ${userRoles}"
-                                          class="badge bg-primary me-1" 
-                                          th:text="${role.name}">Role</span>
-                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
-                                                            <h5 class="mb-3">My Conferences</h5>
-                                                            <div class="alert alert-info">
-                                                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
-                                                            </div>
-
-                                                            <div class="mt-4">
-                                                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
-                                                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
-                            </div>
-
-                            <div class="mt-4">
-                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
-                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
->>>>>>> 5ef9892 (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
-                            </div>
->>>>>>> ee4982f (feat: Add profile endpoint, auto-login registration, security config updates, and view templates)
+                        <h2 th:text="${userName != null ? userName : 'Guest User'}">User Name</h2>
+                        <p class="mb-0">Conference Attendee</p>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+
+        <!-- Main Content -->
+        <div class="container" style="max-width: 900px; margin-bottom: 60px;">
+            <!-- Profile Information Section -->
+            <div class="profile-section">
+                <h4><i class="bi bi-person-fill me-2"></i>Profile Information</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label>Full Name</label>
+                            <p th:text="${userName != null ? userName : 'N/A'}">Name</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label>Email Address</label>
+                            <p th:text="${userEmail != null ? userEmail : 'N/A'}">Email</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label>Member Since</label>
+                            <p th:text="${userCreated != null ? #temporals.format(userCreated, 'MMM dd, yyyy') : 'N/A'}">Date</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-group">
+                            <label>User Role</label>
+                            <div>
+                                <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
+                                      th:each="role : ${userRoles}" 
+                                      class="badge bg-primary me-2" 
+                                      th:text="${role.name}">Role</span>
+                                <span th:if="${userRoles == null || userRoles.isEmpty()}" 
+                                      class="badge bg-secondary">Guest</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr style="opacity: 0.1; margin: 40px 0;">
+
+            <!-- My Conferences Section -->
+            <div class="profile-section">
+                <h4><i class="bi bi-calendar-event me-2"></i>My Conferences</h4>
+                
+                <div th:if="${registrations != null && !registrations.isEmpty()}" class="conference-table">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Conference</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th width="120">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="reg : ${registrations}">
+                                    <td>
+                                        <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" 
+                                           class="text-decoration-none fw-500"
+                                           th:text="${reg.conference.title}">Conference Title</a>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${reg.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-warning'}"
+                                              th:text="${reg.status.name()}">Status</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(reg.registeredAt, 'dd MMM yyyy')}">Date</td>
+                                    <td>
+                                        <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" 
+                                           class="btn btn-sm btn-primary">View</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div th:if="${registrations == null || registrations.isEmpty()}" class="empty-state">
+                    <i class="bi bi-calendar-x"></i>
+                    <p class="mb-0">No conference registrations yet.</p>
+                    <a href="/conferences" class="btn btn-primary btn-sm mt-3">Browse Conferences</a>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/user/my-schedule" class="btn btn-primary">
+                    <i class="bi bi-calendar-check me-2"></i>View My Schedule
+                </a>
+                <a href="/conferences" class="btn btn-outline-primary">
+                    <i class="bi bi-search me-2"></i>Browse Conferences
+                </a>
+            </div>
+        </div>
     </section>
 </div>

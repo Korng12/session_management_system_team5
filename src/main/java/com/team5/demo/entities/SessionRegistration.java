@@ -1,6 +1,7 @@
 package com.team5.demo.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +38,7 @@ public class SessionRegistration {
 
     @Column(name = "registered_at", nullable = false)
     private LocalDateTime registeredAt;
-
+    
     // constructors
     public SessionRegistration() {}
 

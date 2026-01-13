@@ -111,55 +111,18 @@ public class UserController {
         return "public/contact";
     }
 
-    /* ===================== REGISTER ===================== */
-
-    @PostMapping("/register")
-    public String registerUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            HttpServletRequest request,
-            Model model) {
-
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Passwords do not match");
-            return "public/register";
-        }
-
-        if (userRepository.findByEmail(email).isPresent()) {
-            model.addAttribute("error", "Email already exists");
-            return "public/register";
-        }
-
-        User user = new User();
-        user.setName(firstName + " " + lastName);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-
-        Role attendeeRole = roleRepository.findByName("ATTENDEE")
-                .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-
-        user.getRoles().add(attendeeRole);
-        userRepository.save(user);
-
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
-
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        request.getSession().setAttribute(
-                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                SecurityContextHolder.getContext());
-
-        return "redirect:/home";
-    }
-
-    /* ===================== USER PAGES ===================== */
 
     @GetMapping("/home")
-    public String getHome() {
+    public String getHome(Model model, Authentication auth) {
+        String email = auth.getName();
+        var mySessions = scheduleService.getMyUpcomingSessions(email);
+        model.addAttribute("mySessions", mySessions);
+        if(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHAIR"))){
+            model.addAttribute(
+                "chairedSessions",
+                chairService.getChairedSessions(email)
+            );
+        }
         return "user/home";
     }
 
@@ -179,10 +142,23 @@ public class UserController {
 
         String email = auth.getName();
 
-        model.addAttribute(
-            "schedules",
-            sessionAttendanceService.getMySchedule(email)
-        );
+        List<UserScheduleDto> sessions = scheduleService.getUserSchedule(email);
+        
+        // Calculate attendance statistics
+        long presentCount = sessions.stream()
+                .filter(s -> s.getAttendance() != null && s.getAttendance().name().equals("PRESENT"))
+                .count();
+        long absentCount = sessions.stream()
+                .filter(s -> s.getAttendance() != null && s.getAttendance().name().equals("ABSENT"))
+                .count();
+        long totalSessions = sessions.size();
+        long pendingCount = totalSessions - presentCount - absentCount;
+
+        model.addAttribute("sessions", sessions);
+        model.addAttribute("presentCount", presentCount);
+        model.addAttribute("absentCount", absentCount);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("totalSessions", totalSessions);
 
         return "user/user-schedule";
 
