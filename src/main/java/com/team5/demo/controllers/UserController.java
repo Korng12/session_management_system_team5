@@ -7,7 +7,9 @@ import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.RoleRepository;
 import com.team5.demo.repositories.UserRepository;
+import com.team5.demo.services.ChairService;
 import com.team5.demo.services.RegistrationService;
+import com.team5.demo.services.SessionAttendanceService;
 import com.team5.demo.services.ScheduleService;
 import com.team5.demo.services.SessionAttendanceService;
 
@@ -52,7 +54,13 @@ public class UserController {
     private ScheduleService scheduleService;
 
     @Autowired
-    private com.team5.demo.services.ChairService chairService;
+    private ChairService chairService;
+
+    // @Autowired
+    // private SessionAttendanceService sessionAttendanceService;
+
+
+    /* ===================== PUBLIC PAGES ===================== */
 
     @Autowired
     private SessionAttendanceService sessionAttendanceService;
@@ -70,15 +78,16 @@ public class UserController {
         return "public/login";
     }
 
-    @GetMapping("/register")
-    public String getRegisterPage() {
-        return "public/register";
-    }
+    // @GetMapping("/register")
+    // public String getRegisterPage() {
+    //     return "public/register";
+    // }
 
     @GetMapping("/register-conference")
     public String getRegisterConferencePage() {
         return "public/registration";
     }
+
     
 
     @GetMapping("/profile")
@@ -129,13 +138,13 @@ public class UserController {
 
     /* ===================== MY CONFERENCES (FIXED) ===================== */
 
-    @GetMapping("/my-conferences")
-    public String getMyConferences(Authentication auth, Model model) {
-        String email = auth.getName();
-        var reg = registrationService.getMyConferences(email);
-        model.addAttribute("registrations", reg);
-        return "user/my-conferences";
-    }
+    // @GetMapping("/my-conferences")
+    // public String getMyConferences(Authentication auth, Model model) {
+    //     String email = auth.getName();
+    //     var reg = registrationService.getMyConferences(email);
+    //     model.addAttribute("registrations", reg);
+    //     return "user/my-conferences";
+    // }
 
     @GetMapping("/schedule-attendance")
     public String mySchedule(Authentication auth, Model model) {
@@ -164,4 +173,44 @@ public class UserController {
 
     }
     
+    /* ===================== MY CONFERENCES (FIXED) ===================== */
+
+    @GetMapping("/my-conferences")
+    public String myConferences(Model model) {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = auth.getName();
+
+        List<Registration> registrations =
+                registrationService.getMyRegistrationsByEmail(email);
+
+        model.addAttribute("registrations", registrations);
+
+        return "user/my-conferences";
+    }
+
+    // @GetMapping("/home")
+    // public String getHome(Authentication auth,Model model) {
+    //     System.out.println(
+    //         "this is user principle"+
+    //     SecurityContextHolder.getContext().getAuthentication().getDetails()
+
+    //     );
+    //     model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
+
+    //     // Include chaired sessions for users with the chair role
+    //     boolean isChair = auth.getAuthorities().stream()
+    //         .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
+
+    //     if (isChair) {
+    //         model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
+    //     } else {
+    //         model.addAttribute("chairedSessions", java.util.Collections.emptyList());
+    //     }
+
+    //     return "user/home";
+    // }
+
 }

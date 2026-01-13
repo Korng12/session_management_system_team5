@@ -1,5 +1,6 @@
 package com.team5.demo.repositories;
 
+import com.team5.demo.dto.ScheduleDTO;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.SessionAttendanceId;

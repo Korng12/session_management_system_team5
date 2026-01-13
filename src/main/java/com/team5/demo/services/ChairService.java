@@ -136,7 +136,7 @@ public class ChairService {
     return participants.stream().map(user -> {
 
         AttendanceStatus status =
-            attendanceRepo.findByParticipantAndSession(user, session)
+            attendanceRepo.findByParticipantIdAndSessionId(user.getId(), session.getId())
                 .map(SessionAttendance::getStatus)
                 .orElse(null);
 

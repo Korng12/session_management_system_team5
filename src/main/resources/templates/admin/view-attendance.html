@@ -1,12 +1,15 @@
 <div th:replace="~{layout/main :: layout(~{::section})}">
     <section>
+
         <style>
             body {
                 background-color: #f8f9fa;
             }
+
             .navbar {
                 height: 60px;
             }
+
             .sidebar {
                 position: fixed;
                 top: 60px;
@@ -16,6 +19,7 @@
                 background-color: #212529;
                 padding-top: 20px;
             }
+
             .sidebar a {
                 display: block;
                 color: #adb5bd;
@@ -23,53 +27,17 @@
                 text-decoration: none;
                 font-size: 15px;
             }
+
             .sidebar a:hover,
             .sidebar a.active {
                 background-color: #343a40;
                 color: #fff;
             }
+
             .content {
                 margin-left: 240px;
                 padding: 80px 30px 30px;
             }
-            .card {
-                border-radius: 12px;
-            }
-        </style>
-        <nav class="navbar navbar-dark bg-dark fixed-top">
-            <div class="container-fluid">
-                <span class="navbar-brand">Conference Admin</span>
-                <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-            </div>
-        </nav>
-        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-        <div class="content">
-            <h2 class="mb-4">View Attendance</h2>
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Attendance</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped align-middle">
-                        <thead>
-                            <tr>
-                                <th>Session</th>
-                                <th>User</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceBody">
-                            <tr>
-                                <td colspan="3" class="text-center text-muted">Loading attendance...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <script src="/js/dashboard.js"></script>
-    </section>
-</div>
 
             .card {
                 border-radius: 12px;
@@ -115,4 +83,3 @@
     </section>
 
 </div>
->>>>>>> f4980d0 (mege mesa branch with main )

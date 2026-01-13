@@ -1,11 +1,18 @@
 package com.team5.demo.services;
 
+import com.team5.demo.entities.Conference;
+import com.team5.demo.entities.Registration;
+import com.team5.demo.entities.User;
+import com.team5.demo.repositories.ConferenceRepository;
+import com.team5.demo.repositories.RegistrationRepository;
+import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.entities.*;
 import com.team5.demo.enums.RegistrationStatus;
 import com.team5.demo.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -158,5 +165,9 @@ public class RegistrationService {
                 public List<Registration> searchByParticipant(String keyword) {
         return registrationRepository
                 .findByParticipant_EmailContainingIgnoreCase(keyword);
+        }
+
+        public List<Registration> getMyRegistrationsByEmail(String email) {
+            return registrationRepository.findMyRegistrationsByEmail(email);
         }
 }

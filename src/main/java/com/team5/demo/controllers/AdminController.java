@@ -17,10 +17,7 @@ import com.team5.demo.dto.ValidationErrorResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
 
-
-
-
-
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +62,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -122,27 +120,10 @@ public class AdminController {
     }
     
 
-
-    /* ===================== MANAGE ROOMS ===================== */
-    // Admin Dashboard
-    // @GetMapping("")
-    // public String showAdminHomepage(Model model) {
-    //     return "admin/dashboard"; 
-    // }
-
-    // Manage Users
-    @GetMapping("/manage-users")
-    public String manageUsers(Model model) {
-        return "admin/manage_users"; 
-    }
     @GetMapping("/admin/manage-schedule")
     public String manageSchedule() {
         return "admin/view-schedule";
     }
-    // @GetMapping("/manage-conferences")
-    // public String getMethodName() {
-    //     return "admin/manage-conferences";
-    // }
     
 
     // Manage Rooms
@@ -261,6 +242,7 @@ public class AdminController {
     } else {
         conferences = conferenceService.getAllConferences();
     }
+    model.addAttribute("conference", new Conference());
 
     model.addAttribute("conferences", conferences);
     model.addAttribute("keyword", keyword);
@@ -268,16 +250,8 @@ public class AdminController {
 
     return "admin/manage-conferences";
     }
+ 
     
-    public String getMethodName(@RequestParam String param) {
-        return new String();
-    }
-    
-
-
-    
-
-
 
     // Delete button 
     @GetMapping("/conferences/delete/{id}")
@@ -293,27 +267,13 @@ public class AdminController {
     }
 
 
-
-
     // Insert and Delete 
     @PostMapping("/conferences/save")
     public String saveConference(Conference conference){
         conferenceService.save(conference);
         return "redirect:/admin/manage-conferences";
     }
-    
-    
 
-
-
-    // List Registered Users (if applicable, assuming manage-users covers this)
-    // @GetMapping("/admin/view-registrations")
-    // @GetMapping("/view-registeredUsers")
-    // public String listRegisteredUsers(Model model) {
-    //     return "admin/view-registrations"; 
-    // }
-
-    // ============ SESSION CRUD OPERATIONS ============
 
     /**
      * Get all conferences for dropdown
@@ -872,4 +832,46 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    // User Crude
+    @GetMapping("/manage-users")
+public String manageUsers() {
+    return "redirect:/admin/users";
+}
+
+@GetMapping("/users")
+public String listUsers(Model model) {
+    model.addAttribute("users", userService.findAll());
+    return "admin/manage-users";
+}
+
+@PostMapping("/users/create")
+public String createUser(@RequestParam("name") String name,
+                         @RequestParam("email") String email,
+                         @RequestParam("password") String password,
+                         @RequestParam("role") String role) {
+    userService.create(name, email, password, role);
+    return "redirect:/admin/users";
+}
+
+@PostMapping("/users/{id}/update")
+public String updateUser(@PathVariable("id") Long id,
+                         @RequestParam("name") String name,
+                         @RequestParam("email") String email,
+                         @RequestParam(value="password", required=false) String password,
+                         @RequestParam("role") String role) {
+    userService.update(id, name, email, password, role);
+    return "redirect:/admin/users";
+}
+
+@DeleteMapping("/users/{id}")
+public String deleteUser(@PathVariable("id") Long id,Principal principal, RedirectAttributes ra) {
+    try {
+        userService.delete(id,principal.getName());
+        ra.addFlashAttribute("success", "User deleted");
+    } catch (Exception e) {
+        ra.addFlashAttribute("error", e.getMessage());
+    }
+    return "redirect:/admin/users";
+}
 }

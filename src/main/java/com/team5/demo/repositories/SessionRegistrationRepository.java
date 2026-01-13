@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionRegistration;
@@ -16,12 +17,15 @@ public interface SessionRegistrationRepository extends JpaRepository <SessionReg
     List<SessionRegistration> findBySession(Session session);
     Optional<SessionRegistration>  findByParticipantAndSession(User user, Session session);
        @Query("""
-        select sr.session.id
-        from SessionRegistration sr
-        where sr.participant = :user
-          and sr.session.conference.id = :conferenceId
+    select sr.session.id
+    from SessionRegistration sr
+    where sr.participant = :user
+      and sr.session.conference.id = :conferenceId
     """)
-    List<Long> findRegisteredSessionIds(User user, Long conferenceId);
+    List<Long> findRegisteredSessionIds(
+        @Param("user") User user,
+        @Param("conferenceId") Long conferenceId
+);
 
 
 } 

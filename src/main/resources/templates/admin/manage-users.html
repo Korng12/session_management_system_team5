@@ -1,0 +1,237 @@
+
+<div th:replace="~{layout/main :: layout(~{::section})}">
+  <section class="container my-5">
+    <style>
+            body {
+                background-color: #f8f9fa;
+            }
+
+            .navbar {
+                height: 60px;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 60px);
+                background-color: #212529;
+                padding-top: 20px;
+            }
+
+            .sidebar a {
+                display: block;
+                color: #adb5bd;
+                padding: 12px 20px;
+                text-decoration: none;
+                font-size: 15px;
+            }
+
+            .sidebar a:hover,
+            .sidebar a.active {
+                background-color: #343a40;
+                color: #fff;
+            }
+
+            .content {
+                margin-left: 240px;
+                padding: 80px 30px 30px;
+            }
+
+            .card {
+                border-radius: 12px;
+            }
+        </style>
+   
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold mb-0">Manage Users</h3>
+
+      <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+      <!-- Create user button -->
+      <button class="btn btn-primary" type="button"
+              data-bs-toggle="modal" data-bs-target="#createUserModal">
+        + Create User
+      </button>
+    </div>
+
+    <!-- Flash messages -->
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <!-- USERS LIST -->
+    <div class="card shadow-sm">
+      <div class="card-header fw-bold">Users</div>
+
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th style="width: 70px;">ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th style="width: 220px;">Roles</th>
+              <th style="width: 240px;" class="text-end">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr th:each="u : ${users}">
+              <td th:text="${u.id}">1</td>
+              <td th:text="${u.name}">Name</td>
+              <td th:text="${u.email}">Email</td>
+
+              <td>
+                <span th:each="r : ${u.roles}"
+                      class="badge bg-secondary me-1"
+                      th:text="${r.name}">
+                  ROLE
+                </span>
+              </td>
+
+              <td class="text-end">
+                <!-- Edit button -->
+                <button class="btn btn-sm btn-outline-primary" type="button"
+                        data-bs-toggle="modal"
+                        th:attr="data-bs-target='#editUserModal-' + ${u.id}">
+                  Edit
+                </button>
+
+                <!-- Delete button (method override -> DELETE) -->
+                <form th:action="@{/admin/users/{id}(id=${u.id})}"
+                      method="post"
+                      class="d-inline">
+                  <input type="hidden" name="_method" value="DELETE"/>
+                  <button class="btn btn-sm btn-outline-danger"
+                          type="submit"
+                          onclick="return confirm('Delete this user?')">
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+
+            <tr th:if="${#lists.isEmpty(users)}">
+              <td colspan="5" class="text-center text-muted py-4">
+                No users found.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- CREATE USER MODAL -->
+    <!-- ========================= -->
+    <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Create User</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form th:action="@{/admin/users/create}" method="post">
+            <div class="modal-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Name</label>
+                  <input class="form-control" name="name" required />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input class="form-control" name="email" type="email" required />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Password</label>
+                  <input class="form-control" name="password" type="password" required />
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Role</label>
+                  <select class="form-select" name="role" required>
+                    <option value="ATTENDEE">ATTENDEE</option>
+                    <option value="CHAIR">CHAIR</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+              <button class="btn btn-primary" type="submit">Create</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================= -->
+    <!-- EDIT USER MODALS (one per user) -->
+    <!-- ========================= -->
+    <div th:each="u : ${users}">
+      <div class="modal fade"
+           th:id="'editUserModal-' + ${u.id}"
+           tabindex="-1"
+           aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold">
+                Edit User: <span th:text="${u.name}">User</span>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form th:action="@{/admin/users/{id}/update(id=${u.id})}" method="post">
+              <div class="modal-body">
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label">Name</label>
+                    <input class="form-control" name="name" required th:value="${u.name}" />
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" name="email" type="email" required th:value="${u.email}" />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">New Password (optional)</label>
+                    <input class="form-control" name="password" type="password" />
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" name="role" required>
+                      <option value="ATTENDEE">ATTENDEE</option>
+                      <option value="CHAIR">CHAIR</option>
+                      <option value="ADMIN">ADMIN</option>
+                    </select>
+                    <div class="form-text">
+                      Note: this will replace the user’s roles with the selected role.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+</div>

@@ -41,5 +41,4 @@ INSERT INTO registrations (participant_id, conference_id, status) VALUES
 INSERT INTO session_attendance (participant_id, session_id, status) VALUES
 (2, 1, 'PRESENT'),
 (3, 1, 'PRESENT'),
-(3, 2, 'ABSENT'),
-(3, 4, 'REGISTERED');
+(3, 2, 'ABSENT')

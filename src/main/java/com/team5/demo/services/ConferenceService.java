@@ -18,28 +18,62 @@ public class ConferenceService {
         return conferenceRepository.findAll();
     }
 
+    // Manage Conference
     public Conference save(Conference conference) {
+
+        if (conference.getStartDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                "Start date cannot be in the past."
+            );
+        }
+
+        if (conference.getEndDate().isBefore(conference.getStartDate())) {
+            throw new IllegalArgumentException(
+                "End date must be after start date."
+            );
+        }
+
         return conferenceRepository.save(conference);
+    }
+
+
+    
+    public Conference getById(Long id) {
+        return conferenceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Conference not found"));
     }
 
     @Transactional
     public void delete(Long id) {
         Conference conf = conferenceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Conference not found"));
+
         if ((conf.getSessions() != null && !conf.getSessions().isEmpty()) ||
             (conf.getRegistrations() != null && !conf.getRegistrations().isEmpty())) {
             throw new RuntimeException("Cannot delete conference with related data");
         }
+
         conferenceRepository.delete(conf);
     }
 
-    public long countAll() {
-        return conferenceRepository.count();
+    
+    public Conference getConferenceById(Long id) {
+    return conferenceRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Conference not found"));
     }
 
+    // This function for sum total in admin
+    public long countAll() {
+       return conferenceRepository.count();
+    }
+
+    // search for conference 
     public List<Conference> searchByTitle(String keyword) {
         return conferenceRepository.findByTitleContainingIgnoreCase(keyword);
     }
+
+   
+ 
 
     /**
      * Get upcoming or ongoing conferences (user-facing)
@@ -66,6 +100,11 @@ public class ConferenceService {
 
     public List<Conference> getConferencesByTittle(String title) {
         return conferenceRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    public Object findAll() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
     }
 }
 

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ScheduleDTO {
+
     private Long sessionId;
     private String title;
     private String location;
@@ -12,3 +13,4 @@ public class ScheduleDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 }
+

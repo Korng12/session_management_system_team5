@@ -17,7 +17,6 @@ import com.team5.demo.repositories.SessionAttendanceRepository;
 import com.team5.demo.repositories.SessionRegistrationRepository;
 import com.team5.demo.repositories.UserRepository;
 
-
 @Service
 @Transactional(readOnly = true)
 public class ScheduleService {

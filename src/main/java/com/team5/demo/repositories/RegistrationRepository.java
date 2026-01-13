@@ -82,4 +82,6 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         AND r.status = 'CONFIRMED'
     """)
     List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+
+    // List<Registration> findByUserEmail(String email);
 }
