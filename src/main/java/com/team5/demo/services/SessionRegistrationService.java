@@ -61,6 +61,15 @@ public class SessionRegistrationService {
             throw new IllegalStateException("Already registered for session");
         }
 
+        // 🔒 Check room capacity
+        Integer roomCapacity = session.getRoom() != null ? session.getRoom().getCapacity() : null;
+        if (roomCapacity != null) {
+            long currentAttendees = sessionRegRepo.findBySession(session).size();
+            if (currentAttendees >= roomCapacity) {
+                throw new IllegalStateException("Session is at full capacity (" + roomCapacity + " attendees). Cannot register.");
+            }
+        }
+
         SessionRegistration sr = new SessionRegistration();
         sr.setParticipant(user);
         sr.setSession(session);

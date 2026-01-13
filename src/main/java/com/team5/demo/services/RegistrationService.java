@@ -95,6 +95,7 @@ public class RegistrationService {
                     throw new IllegalStateException("Cannot cancel registration for a conference that has already completed");
                 }
 
+
                 // registration.setStatus("CANCELLED");
                 registration.setStatus(RegistrationStatus.CANCELED);
                 registrationRepository.save(registration);
@@ -156,26 +157,18 @@ public class RegistrationService {
                         RegistrationStatus.CONFIRMED
                 );
         }
-
         public List<Registration> getAllRegistrations() {
              return registrationRepository.findAll();
         }
-
- 
         public Long getTotalRegistrations() {
              return registrationRepository.count();
         }
-
-
-        public List<Registration> searchByParticipant(String keyword) {
+                public List<Registration> searchByParticipant(String keyword) {
         return registrationRepository
                 .findByParticipant_EmailContainingIgnoreCase(keyword);
         }
 
         public List<Registration> getMyRegistrationsByEmail(String email) {
-        return registrationRepository.findByParticipant_Email(email);
-}
-
-
-
+            return registrationRepository.findMyRegistrationsByEmail(email);
+        }
 }

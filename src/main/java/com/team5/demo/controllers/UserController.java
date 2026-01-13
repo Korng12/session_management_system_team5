@@ -11,6 +11,7 @@ import com.team5.demo.services.ChairService;
 import com.team5.demo.services.RegistrationService;
 import com.team5.demo.services.SessionAttendanceService;
 import com.team5.demo.services.ScheduleService;
+import com.team5.demo.services.SessionAttendanceService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -53,6 +54,15 @@ public class UserController {
     private ScheduleService scheduleService;
 
     @Autowired
+    private ChairService chairService;
+
+    // @Autowired
+    // private SessionAttendanceService sessionAttendanceService;
+
+
+    /* ===================== PUBLIC PAGES ===================== */
+
+    @Autowired
     private SessionAttendanceService sessionAttendanceService;
 
 
@@ -68,9 +78,85 @@ public class UserController {
         return "public/login";
     }
 
-    @Autowired
-    private ChairService chairService;
+    // @GetMapping("/register")
+    // public String getRegisterPage() {
+    //     return "public/register";
+    // }
 
+    @GetMapping("/register-conference")
+    public String getRegisterConferencePage() {
+        return "public/registration";
+    }
+
+    
+
+    @GetMapping("/profile")
+    public String getProfilePage(Principal principal, Model model) {
+        if (principal != null) {
+            String email = principal.getName();
+            User user = userRepository.findByEmail(email).orElse(null);
+            if (user != null) {
+                model.addAttribute("userName", user.getName());
+                model.addAttribute("userEmail", user.getEmail());
+                model.addAttribute("userCreated", user.getCreatedAt());
+                model.addAttribute("userRoles", user.getRoles());
+                
+                // Fetch user's registered conferences
+                var registrations = registrationService.getMyConferences(email);
+                model.addAttribute("registrations", registrations);
+            }
+        }
+        return "user/profile";
+    // Removed duplicate getRegisterPage method from merge conflict
+    }
+
+    @GetMapping("/about")
+    public String getAboutPage() {
+        return "public/about";
+    }
+
+    @GetMapping("/contact")
+    public String getContactPage() {
+        return "public/contact";
+    }
+
+    /* ===================== REGISTER ===================== */
+    @GetMapping("/register")
+    public String getRegister() {
+        return "public/register";
+    }
+
+    @GetMapping("/schedule-attendance")
+    public String mySchedule(Authentication auth, Model model) {
+
+        String email = auth.getName();
+
+        model.addAttribute(
+            "schedules",
+            sessionAttendanceService.getMySchedule(email)
+        );
+
+        return "user/user-schedule";
+
+    }
+    
+    /* ===================== MY CONFERENCES (FIXED) ===================== */
+
+    @GetMapping("/my-conferences")
+    public String myConferences(Model model) {
+
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String email = auth.getName();
+
+        List<Registration> registrations =
+                registrationService.getMyRegistrationsByEmail(email);
+
+        model.addAttribute("registrations", registrations);
+
+        return "user/my-conferences";
+    }
 
     @GetMapping("/home")
     public String getHome(Authentication auth,Model model) {
@@ -94,118 +180,4 @@ public class UserController {
         return "user/home";
     }
 
-
-    @GetMapping("/schedule-attendance")
-    public String mySchedule(Authentication authentication, Model model) {
-
-        String email = authentication.getName();
-
-        List<UserScheduleDto> schedule =
-                scheduleService.getUserSchedule(email);
-
-        model.addAttribute("sessions", schedule);
-
-        return "user/user-schedule";
-    }
-
-    @GetMapping("/register-conference")
-    public String getRegisterConferencePage() {
-        return "public/registration";
-    }
-
-    
-
-    @GetMapping("/profile")
-    public String getProfilePage(Principal principal, Model model) {
-        if (principal != null) {
-            String email = principal.getName();
-            User user = userRepository.findByEmail(email).orElse(null);
-            if (user != null) {
-                model.addAttribute("userName", user.getName());
-                model.addAttribute("userEmail", user.getEmail());
-                model.addAttribute("userCreated", user.getCreatedAt());
-                model.addAttribute("userRoles", user.getRoles());
-            }
-        }
-        return "user/profile";
-    }
-
-    @GetMapping("/about")
-    public String getAboutPage() {
-        return "public/about";
-    }
-
-    @GetMapping("/contact")
-    public String getContactPage() {
-        return "public/contact";
-    }
-
-    /* ===================== REGISTER ===================== */
-    @GetMapping("/register")
-    public String getRegister() {
-        return "public/register";
-    }
-    
-    // @PostMapping("/register")
-    // public String registerUser(
-    //         @RequestParam("firstName") String firstName,
-    //         @RequestParam("lastName") String lastName,
-    //         @RequestParam("email") String email,
-    //         @RequestParam("password") String password,
-    //         @RequestParam("confirmPassword") String confirmPassword,
-    //         HttpServletRequest request,
-    //         Model model) {
-
-    //     if (!password.equals(confirmPassword)) {
-    //         model.addAttribute("error", "Passwords do not match");
-    //         return "public/register";
-    //     }
-
-    //     if (userRepository.findByEmail(email).isPresent()) {
-    //         model.addAttribute("error", "Email already exists");
-    //         return "public/register";
-    //     }
-
-    //     User user = new User();
-    //     user.setName(firstName + " " + lastName);
-    //     user.setEmail(email);
-    //     user.setPassword(passwordEncoder.encode(password));
-
-    //     Role attendeeRole = roleRepository.findByName("ATTENDEE")
-    //             .orElseThrow(() -> new RuntimeException("Role ATTENDEE not found"));
-
-    //     user.getRoles().add(attendeeRole);
-    //     userRepository.save(user);
-
-    //     Authentication auth = authenticationManager.authenticate(
-    //             new UsernamePasswordAuthenticationToken(email, password));
-
-    //     SecurityContextHolder.getContext().setAuthentication(auth);
-
-    //     request.getSession().setAttribute(
-    //             HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-    //             SecurityContextHolder.getContext());
-
-    //     return "redirect:/home";
-    // }
-    /* ===================== MY CONFERENCES (FIXED) ===================== */
-
-    @GetMapping("/my-conferences")
-    public String myConferences(Model model) {
-
-        Authentication auth =
-                SecurityContextHolder.getContext().getAuthentication();
-
-        String email = auth.getName();
-
-        List<Registration> registrations =
-                registrationService.getMyRegistrationsByEmail(email);
-
-        model.addAttribute("registrations", registrations);
-
-        return "user/my-conferences";
-    }
-
-
-    
 }

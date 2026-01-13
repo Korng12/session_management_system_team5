@@ -1,24 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Rooms - Conference Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<div th:replace="~{layout/main :: layout(~{::section})}">
+<section>
     <style>
-        .admin-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 50px 0;
-        }
-        .room-card {
-            transition: transform 0.2s;
+        body {
+            background-color: #f8f9fa;
         }
 
         .navbar {
             height: 60px;
         }
+
         .sidebar {
             position: fixed;
             top: 60px;
@@ -27,62 +17,124 @@
             height: calc(100vh - 60px);
             background-color: #212529;
             padding-top: 20px;
+            overflow-y: auto;
+            z-index: 100;
         }
 
-        .sidebar a {
-            display: block;
-            color: #adb5bd;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 15px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #343a40;
+        .sidebar-header {
+            padding: 0 20px 20px;
             color: #fff;
         }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .menu-section {
+            padding: 10px 0;
+        }
+
+        .menu-title {
+            display: block;
+            padding: 10px 20px;
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .menu-link {
+            display: block;
+            padding: 12px 20px;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .menu-link:hover {
+            background-color: #343a40;
+            color: #fff;
+            padding-left: 25px;
+        }
+
+        .menu-link.active {
+            background-color: #4e73df;
+            color: #fff;
+            border-left: 4px solid #fff;
+        }
+
         .content {
             margin-left: 240px;
             padding: 80px 30px 30px;
         }
+
         .card {
-            border-radius: 12px;
+            border-radius: 8px;
         }
-        .form-control:focus {
-            box-shadow: none;
-            border-color: #667eea;
+
+        .room-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .room-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
     </style>
-</head>
-<body>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-    <div class="container-fluid">
-        <span class="navbar-brand">Conference Admin</span>
-        <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-    </div>
-    </nav>
-   <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-    <section class="admin-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto text-center">
-                    <h1 class="display-5 fw-bold mb-3">Manage Rooms</h1>
-                    <p class="lead mb-0">Create, edit, and manage conference rooms</p>
+    <nav class="navbar navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand">Conference Admin</span>
+            <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </nav>
+    
+    <!-- Sidebar -->
+    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+    <div class="content">
+        <div class="container-fluid">
+            <!-- Page Header -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h2 class="mb-0">Manage Rooms</h2>
+                    <p class="text-muted">Create, edit, and manage conference rooms</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createRoomModal">
+                        <i class="bi bi-plus-circle"></i> Create New Room
+                    </button>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div class="alert alert-danger d-none" id="formError"></div>
+            <div class="alert alert-success d-none" id="formSuccess"></div>
+
+            <!-- Main Content -->
+            <div class="row" id="roomsContainer">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card room-card">
+                        <div class="card-body text-center text-muted">
+                            <p>Loading rooms...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h3 class="mb-3">Add New Room</h3>
-                    <div class="alert alert-danger d-none" id="formError"></div>
-                    <div class="alert alert-success d-none" id="formSuccess"></div>
-                    <form id="createRoomForm" class="card card-body shadow-sm">
+    <!-- Create Room Modal -->
+    <div class="modal fade" id="createRoomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger d-none" id="createError"></div>
+                    <form id="createRoomForm">
                         <div class="mb-3">
                             <label class="form-label">Room Name</label>
                             <input type="text" class="form-control" id="roomName" required maxlength="30">
@@ -91,26 +143,15 @@
                             <label class="form-label">Capacity</label>
                             <input type="number" class="form-control" id="capacity" min="1" max="1000" required>
                         </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Create Room</button>
-                        </div>
                     </form>
                 </div>
-                <div class="col-lg-8">
-                    <h3 class="mb-3">Existing Rooms</h3>
-                    <div class="row" id="roomsContainer">
-                        <div class="col-md-6 mb-4">
-                            <div class="card room-card">
-                                <div class="card-body text-center text-muted">
-                                    <p>Loading rooms...</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="createSubmitBtn">Create Room</button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- Edit Room Modal -->
     <div class="modal fade" id="editRoomModal" tabindex="-1">
@@ -161,8 +202,6 @@
         </div>
     </div>
 
-    <div th:replace="~{fragments/footer}"></div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const api = {
@@ -176,19 +215,19 @@
         const formSuccess = document.getElementById('formSuccess');
 
         async function loadRooms() {
-            roomsContainer.innerHTML = '<div class="col-md-6 mb-4"><div class="card room-card"><div class="card-body text-center text-muted"><p>Loading...</p></div></div></div>';
+            roomsContainer.innerHTML = '<div class="col-md-6 col-lg-4 mb-4"><div class="card room-card"><div class="card-body text-center text-muted"><p>Loading...</p></div></div></div>';
             try {
                 const res = await fetch(api.rooms, { credentials: 'include' });
                 if (!res.ok) throw new Error('Failed to load rooms');
                 const rooms = await res.json();
                 if (!rooms.length) {
-                    roomsContainer.innerHTML = '<div class="col-md-6 mb-4"><div class="card room-card"><div class="card-body text-center text-muted"><p>No rooms yet</p></div></div></div>';
+                    roomsContainer.innerHTML = '<div class="col-md-6 col-lg-4 mb-4"><div class="card room-card"><div class="card-body text-center text-muted"><p>No rooms yet</p></div></div></div>';
                     return;
                 }
                 roomsContainer.innerHTML = '';
                 rooms.forEach(r => {
                     const div = document.createElement('div');
-                    div.className = 'col-md-6 mb-4';
+                    div.className = 'col-md-6 col-lg-4 mb-4';
                     div.innerHTML = `
                         <div class="card room-card h-100">
                             <div class="card-header bg-primary text-white">
@@ -212,17 +251,27 @@
                     roomsContainer.appendChild(div);
                 });
             } catch (e) {
-                roomsContainer.innerHTML = '<div class="col-md-6 mb-4"><div class="card room-card"><div class="card-body text-danger text-center">Could not load rooms</div></div></div>';
+                roomsContainer.innerHTML = '<div class="col-md-6 col-lg-4 mb-4"><div class="card room-card"><div class="card-body text-danger text-center">Could not load rooms</div></div></div>';
             }
         }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideAlerts();
+        let createModal;
+        const createModalEl = document.getElementById('createRoomModal');
+        
+        document.getElementById('createSubmitBtn')?.addEventListener('click', async () => {
+            const createError = document.getElementById('createError');
+            createError.classList.add('d-none');
+            
             const payload = {
                 name: document.getElementById('roomName').value.trim(),
                 capacity: parseInt(document.getElementById('capacity').value, 10)
             };
+
+            if (!payload.name || !payload.capacity) {
+                createError.textContent = 'Please fill in all required fields';
+                createError.classList.remove('d-none');
+                return;
+            }
 
             try {
                 const res = await fetch(api.createRoom, {
@@ -234,15 +283,19 @@
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({}));
-                    showError(err.message || 'Failed to create room');
+                    createError.textContent = err.message || 'Failed to create room';
+                    createError.classList.remove('d-none');
                     return;
                 }
 
-                showSuccess('Room created');
+                createModal = createModal || bootstrap.Modal.getInstance(createModalEl) || new bootstrap.Modal(createModalEl);
+                createModal.hide();
                 form.reset();
+                showSuccess('Room created successfully');
                 loadRooms();
             } catch (error) {
-                showError('Network error while creating room');
+                createError.textContent = 'Network error while creating room';
+                createError.classList.remove('d-none');
             }
         });
 
@@ -348,5 +401,5 @@
 
         document.addEventListener('DOMContentLoaded', loadRooms);
     </script>
-</body>
-</html>
+</section>
+</div>

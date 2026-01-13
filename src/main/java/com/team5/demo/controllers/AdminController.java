@@ -17,10 +17,7 @@ import com.team5.demo.dto.ValidationErrorResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
 
-
-
-
-
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +42,8 @@ import com.team5.demo.repositories.RoomRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.entities.Room;
 import com.team5.demo.entities.Session;
+import com.team5.demo.entities.User;
+import com.team5.demo.entities.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -63,6 +62,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -97,7 +97,6 @@ public class AdminController {
 
     @Autowired
     private UserService userService;
-  
 
     @Autowired
     private UserRepository userRepository;
@@ -107,49 +106,24 @@ public class AdminController {
     private SessionAttendanceService sessionAttendanceService;
     @Autowired
     private ConferenceService conferenceService;
+    @Autowired
+    private com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
 
-    /* ===================== DASHBOARD ===================== */
-    @GetMapping
+    @GetMapping("")
     public String dashboard(Model model) {
-
-        long totalRegistrations = registrationService.getTotalRegistrations(); // ✅ get value
-
+        long totalRegistrations = registrationService.getTotalRegistrations();
         model.addAttribute("activePage", "dashboard");
         model.addAttribute("totalRegistrations", totalRegistrations);
-        model.addAttribute("totalSessions",
-                sessionService.countAll());
-
-        // model.addAttribute("totalRooms",
-        //         roomService.countAll());
-
-        model.addAttribute("totalConferences",
-                conferenceService.countAll());
-
-
+        model.addAttribute("totalSessions", sessionService.countAll());
+        model.addAttribute("totalConferences", conferenceService.countAll());
         return "admin/dashboard";
     }
+    
 
-
-    /* ===================== MANAGE ROOMS ===================== */
-    // Admin Dashboard
-    // @GetMapping("")
-    // public String showAdminHomepage(Model model) {
-    //     return "admin/dashboard"; 
-    // }
-
-    // Manage Users
-    @GetMapping("/manage-users")
-    public String manageUsers(Model model) {
-        return "admin/manage_users"; 
-    }
     @GetMapping("/admin/manage-schedule")
     public String manageSchedule() {
         return "admin/view-schedule";
     }
-    // @GetMapping("/manage-conferences")
-    // public String getMethodName() {
-    //     return "admin/manage-conferences";
-    // }
     
 
     // Manage Rooms
@@ -268,6 +242,7 @@ public class AdminController {
     } else {
         conferences = conferenceService.getAllConferences();
     }
+    model.addAttribute("conference", new Conference());
 
     model.addAttribute("conferences", conferences);
     model.addAttribute("keyword", keyword);
@@ -275,8 +250,8 @@ public class AdminController {
 
     return "admin/manage-conferences";
     }
-
-
+ 
+    
 
     // Delete button 
     @GetMapping("/conferences/delete/{id}")
@@ -292,27 +267,13 @@ public class AdminController {
     }
 
 
-
-
     // Insert and Delete 
     @PostMapping("/conferences/save")
     public String saveConference(Conference conference){
         conferenceService.save(conference);
         return "redirect:/admin/manage-conferences";
     }
-    
-    
 
-
-
-    // List Registered Users (if applicable, assuming manage-users covers this)
-    // @GetMapping("/admin/view-registrations")
-    // @GetMapping("/view-registeredUsers")
-    // public String listRegisteredUsers(Model model) {
-    //     return "admin/view-registrations"; 
-    // }
-
-    // ============ SESSION CRUD OPERATIONS ============
 
     /**
      * Get all conferences for dropdown
@@ -320,16 +281,21 @@ public class AdminController {
      */
     @GetMapping("/api/conferences")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<ConferenceDTO>> getAllConferences() {
+        public ResponseEntity<List<ConferenceDTO>> getAllConferences() {
         try {
+            java.time.LocalDate today = java.time.LocalDate.now();
             List<ConferenceDTO> conferences = conferenceRepository.findAll()
-                    .stream()
-                    .map(conference -> new ConferenceDTO(
-                            conference.getId(),
-                            conference.getTitle(),
-                            conference.getDescription()
-                    ))
-                    .collect(Collectors.toList());
+                .stream()
+                // Only conferences that are not outdated (no endDate or endDate >= today)
+                .filter(conf -> conf.getEndDate() == null || !conf.getEndDate().isBefore(today))
+                .map(conference -> new ConferenceDTO(
+                    conference.getId(),
+                    conference.getTitle(),
+                    conference.getDescription(),
+                    conference.getStartDate(),
+                    conference.getEndDate()
+                ))
+                .collect(Collectors.toList());
             return ResponseEntity.ok(conferences);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -466,6 +432,57 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    /**
+     * Get all users with CHAIR role for session chair assignment
+     * GET /admin/api/users/chairs
+     */
+    @GetMapping("/api/users/chairs")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserDTO>> getChairUsers() {
+        try {
+            List<UserDTO> chairs = userRepository.findAll()
+                    .stream()
+                    .filter(user -> user.getRoles().stream()
+                            .anyMatch(role -> role.getName().equals("CHAIR")))
+                    .map(user -> new UserDTO(
+                            user.getId(),
+                            user.getName(),
+                            user.getEmail()
+                    ))
+                    .collect(Collectors.toList());
+            System.out.println("Found " + chairs.size() + " chair users: " + chairs);
+            return ResponseEntity.ok(chairs);
+        } catch (Exception e) {
+            System.err.println("Error fetching chair users: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /**
+     * Search user by email
+     * GET /admin/api/users/search-by-email?email=
+     */
+    @GetMapping("/api/users/search-by-email")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> getUserByEmail(@RequestParam String email) {
+        return userRepository.findByEmail(email)
+                .map(u -> ResponseEntity.ok(new UserDTO(u.getId(), u.getName(), u.getEmail())))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
+
+    /**
+     * Search user by id
+     * GET /admin/api/users/search-by-id?id=
+     */
+    @GetMapping("/api/users/search-by-id")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDTO> getUserById(@RequestParam Long id) {
+        return userRepository.findById(id)
+                .map(u -> ResponseEntity.ok(new UserDTO(u.getId(), u.getName(), u.getEmail())))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
     }
 
     /**
@@ -636,7 +653,7 @@ public class AdminController {
     }
 
     /**
-     * Delete session (soft delete)
+     * Delete session (hard delete - permanently removes from database)
      * DELETE /admin/sessions/{id}
      */
     @DeleteMapping("/sessions/{id}")
@@ -786,4 +803,75 @@ public class AdminController {
                 .body(new TimeConflictResponse(false, e.getMessage(), "CHAIR"));
         }
     }
+
+    /**
+     * Get attendance data with room capacity info
+     * GET /admin/api/attendance
+     */
+    @GetMapping("/api/attendance")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<Map<String, Object>>> getAttendanceData() {
+        try {
+            List<Session> sessions = sessionRepository.findAll();
+            List<Map<String, Object>> attendanceList = sessions.stream().map(session -> {
+                Map<String, Object> attendance = new HashMap<>();
+                attendance.put("sessionId", session.getId());
+                attendance.put("sessionTitle", session.getTitle());
+                attendance.put("roomName", session.getRoom() != null ? session.getRoom().getName() : "N/A");
+                attendance.put("roomCapacity", session.getRoom() != null ? session.getRoom().getCapacity() : 0);
+                
+                // Get attendance count
+                long attendanceCount = sessionAttendanceService.getAttendanceCountBySession(session.getId());
+                attendance.put("attendanceCount", attendanceCount);
+                
+                return attendance;
+            }).collect(Collectors.toList());
+            
+            return ResponseEntity.ok(attendanceList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // User Crude
+    @GetMapping("/manage-users")
+public String manageUsers() {
+    return "redirect:/admin/users";
+}
+
+@GetMapping("/users")
+public String listUsers(Model model) {
+    model.addAttribute("users", userService.findAll());
+    return "admin/manage-users";
+}
+
+@PostMapping("/users/create")
+public String createUser(@RequestParam("name") String name,
+                         @RequestParam("email") String email,
+                         @RequestParam("password") String password,
+                         @RequestParam("role") String role) {
+    userService.create(name, email, password, role);
+    return "redirect:/admin/users";
+}
+
+@PostMapping("/users/{id}/update")
+public String updateUser(@PathVariable("id") Long id,
+                         @RequestParam("name") String name,
+                         @RequestParam("email") String email,
+                         @RequestParam(value="password", required=false) String password,
+                         @RequestParam("role") String role) {
+    userService.update(id, name, email, password, role);
+    return "redirect:/admin/users";
+}
+
+@DeleteMapping("/users/{id}")
+public String deleteUser(@PathVariable("id") Long id,Principal principal, RedirectAttributes ra) {
+    try {
+        userService.delete(id,principal.getName());
+        ra.addFlashAttribute("success", "User deleted");
+    } catch (Exception e) {
+        ra.addFlashAttribute("error", e.getMessage());
+    }
+    return "redirect:/admin/users";
+}
 }

@@ -17,45 +17,19 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
 
     /* ===================== BASIC QUERIES ===================== */
 
-    Optional<Registration> findByParticipantAndConference(
-            User participant,
-            Conference conference
-    );
+    Optional<Registration> findByParticipantAndConference(User participant, Conference conference);
 
     List<Registration> findByParticipant(User participant);
-
-    List<Registration> findByParticipantAndStatus(
-            User participant,
-            String status
-    );
-
+    List<Registration> findByParticipantAndStatus(User participant, RegistrationStatus status);
     List<Registration> findByConference(Conference conference);
-
-    /* ===================== COUNTS ===================== */
-
+    List<Registration> findByConferenceAndStatus(Conference conference, RegistrationStatus status);
     long countByConference(Conference conference);
-    
-    // boolean existsByParticipantIdAndConferenceId(Long userId, Long conferenceId);
-    // boolean existsByParticipantAndConference(User participant, Conference conference);
-    boolean existsByParticipantAndConferenceAndStatus(
-        User participant,
-        Conference conference,
-        RegistrationStatus status
-    );
-
+    boolean existsByParticipantAndConferenceAndStatus(User participant, Conference conference, RegistrationStatus status);
     long countByParticipant(User participant);
-    
-    // List<Registration> findByStatus(String status);
     List<Registration> findByStatus(RegistrationStatus status);
-
-    /* ===================== EXISTS CHECK ===================== */
-
-    boolean existsByParticipant_IdAndConference_Id(
-            Long participantId,
-            Long conferenceId
-    );
-
-    /* ===================== ADMIN QUERIES ===================== */
+    boolean existsByParticipant_IdAndConference_Id(Long participantId, Long conferenceId);
+    
+    List<Registration> findByParticipant_EmailContainingIgnoreCase(String keyword);
 
     @Query("""
         SELECT r FROM Registration r
@@ -63,7 +37,7 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         JOIN FETCH r.conference
         WHERE r.status = :status
     """)
-    List<Registration> findByStatusWithRelations(@Param("status") String status);
+    List<Registration> findByStatusWithRelations(@Param("status") RegistrationStatus status);
 
     @Query("""
         SELECT r FROM Registration r
@@ -71,6 +45,23 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
         JOIN FETCH r.conference
     """)
     List<Registration> findAllWithRelations();
+
+        // ...existing code...
+
+    // @Query("""
+    //     SELECT r FROM Registration r
+    //     JOIN FETCH r.participant
+    //     JOIN FETCH r.conference
+    //     WHERE r.status = :status
+    // """)
+    // List<Registration> findByStatusWithRelations(@Param("status") RegistrationStatus status);
+
+    // @Query("""
+    //     SELECT r FROM Registration r
+    //     JOIN FETCH r.participant
+    //     JOIN FETCH r.conference
+    // """)
+    // List<Registration> findAllWithRelations();
 
     @Query("""
         SELECT r FROM Registration r
@@ -82,23 +73,15 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
             OR LOWER(p.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
           )
     """)
-    List<Registration> searchConfirmedByParticipant(
-            @Param("keyword") String keyword
-    );
+    List<Registration> searchConfirmedByParticipant(@Param("keyword") String keyword);
 
-    // This query for User
     @Query("""
-    SELECT r FROM Registration r
-    JOIN FETCH r.conference
-    WHERE r.participant.email = :email
-    AND r.status = 'CONFIRMED'
-        """)
-        List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
+        SELECT r FROM Registration r
+        JOIN FETCH r.conference
+        WHERE r.participant.email = :email
+        AND r.status = 'CONFIRMED'
+    """)
+    List<Registration> findMyRegistrationsByEmail(@Param("email") String email);
 
-    List<Registration> findByParticipant_EmailContainingIgnoreCase(String keyword);
-
-    List<Registration> findByParticipant_Email(String email);
-
-
-
+    // List<Registration> findByUserEmail(String email);
 }

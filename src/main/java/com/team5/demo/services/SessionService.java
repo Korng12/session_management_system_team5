@@ -138,7 +138,7 @@ public class SessionService {
      * Get all sessions
      */
     public List<SessionResponse> getAllSessions() {
-        return sessionRepository.findByDeletedFalse()
+        return sessionRepository.findAll()
                 .stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -304,6 +304,7 @@ public class SessionService {
         response.setChairId(session.getChair() != null ? session.getChair().getId() : null);
         response.setRoomId(session.getRoom() != null ? session.getRoom().getId() : null);
         response.setConferenceId(session.getConference() != null ? session.getConference().getId() : null);
+        response.setDeleted(session.isDeleted());
 
         return response;
     }

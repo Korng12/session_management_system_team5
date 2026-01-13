@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.team5.demo.entities.Conference;
@@ -94,6 +96,31 @@ public class ConferenceController {
     model.addAttribute("registeredSessionIds", registeredSessionIds);
 
     return "user/conference-detail";
-}
- 
+   }
+
+   @PostMapping("/admin/conferences/save")
+    public String saveConference(
+            @ModelAttribute("conference") Conference conference,
+            Model model) {
+
+        try {
+            conferenceService.save(conference);
+            return "redirect:/admin/conferences";
+
+        } catch (IllegalArgumentException e) {
+
+            // REQUIRED for Thymeleaf
+            model.addAttribute("conference", conference);
+            model.addAttribute("errorMessage", e.getMessage());
+
+            // REQUIRED list again
+            model.addAttribute("conferences",
+                    conferenceService.findAll());
+
+            return "admin/manage-conferences";
+        }
+    }
+
+
+
 }

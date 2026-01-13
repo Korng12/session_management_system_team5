@@ -1,88 +1,180 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Sessions - Conference Management</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
+<div th:replace="~{layout/main :: layout(~{::section})}">
+    <section>
+        <style>
+            body {
+                background-color: #f8f9fa;
+            }
 
-        .navbar {
-            height: 60px;
-        }
-        .sidebar {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            width: 240px;
-            height: calc(100vh - 60px);
-            background-color: #212529;
-            padding-top: 20px;
-        }
+            .navbar {
+                height: 60px;
+            }
 
-        .sidebar a {
-            display: block;
-            color: #adb5bd;
-            padding: 12px 20px;
-            text-decoration: none;
-            font-size: 15px;
-        }
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 240px;
+                height: calc(100vh - 60px);
+                background-color: #212529;
+                padding-top: 20px;
+                overflow-y: auto;
+                z-index: 100;
+            }
 
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #343a40;
-            color: #fff;
-        }
-        .content {
-            margin-left: 240px;
-            padding: 80px 30px 30px;
-        }
-        .card {
-            border-radius: 12px;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-dark bg-dark fixed-top">
-        <div class="container-fluid">
-            <span class="navbar-brand">Conference Admin</span>
-            <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
-        </div>
-    </nav>
+            .sidebar-header {
+                padding: 0 20px 20px;
+                color: #fff;
+            }
 
-    <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+            .sidebar-header h4 {
+                margin: 0;
+                font-size: 1.1rem;
+            }
 
-    <div class="content">
-        <section class="admin-header mb-4">
+            .menu-section {
+                padding: 10px 0;
+            }
+
+            .menu-title {
+                display: block;
+                padding: 10px 20px;
+                color: #6c757d;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .menu-link {
+                display: block;
+                padding: 12px 20px;
+                color: #adb5bd;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .menu-link:hover {
+                background-color: #343a40;
+                color: #fff;
+                padding-left: 25px;
+            }
+
+            .menu-link.active {
+                background-color: #4e73df;
+                color: #fff;
+                border-left: 4px solid #fff;
+            }
+
+            .content {
+                margin-left: 240px;
+                padding: 30px;
+            }
+
+            .card {
+                border-radius: 8px;
+            }
+
+            .modal-backdrop {
+                z-index: 1040 !important;
+            }
+
+            .modal {
+                z-index: 1050 !important;
+            }
+
+            .modal-dialog {
+                z-index: 1060 !important;
+            }
+        </style>
+
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <div class="content">
             <div class="container-fluid">
+                <!-- Page Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h2 class="mb-0">Manage Sessions</h2>
+                        <p class="text-muted">Create, edit, and manage conference sessions</p>
+                    </div>
+                </div>
+
+                <!-- Action Buttons and Filters -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createSessionModal">
+                            <i class="bi bi-plus-circle"></i> Create New Session
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search sessions..." onkeyup="filterSessions()">
+                    </div>
+                    <div class="col-md-3">
+                        <select id="filterStatus" class="form-select" onchange="filterSessions()">
+                            <option value="">All Statuses</option>
+                            <option value="SCHEDULED">Scheduled</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sessions Table -->
                 <div class="row">
-                    <div class="col-lg-10 mx-auto text-center">
-                        <h1 class="display-5 fw-bold mb-3">Manage Sessions</h1>
-                        <p class="lead mb-0">Create, edit, delete, and register for conference sessions</p>
+                    <div class="col-12">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Title</th>
+                                                <th>Chair</th>
+                                                <th>Room</th>
+                                                <th>Conference</th>
+                                                <th>Start</th>
+                                                <th>End</th>
+                                                <th>Status</th>
+                                                <th>Deleted</th>
+                                                <th style="width: 200px;">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="sessions-body">
+                                            <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <div class="container-fluid">
-            <div class="row g-4">
-                <div class="col-lg-5">
-                    <h2 class="mb-3">Create New Session</h2>
+    <!-- Modals -->
+    <div class="modal fade" id="createSessionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
                     <div class="alert alert-danger d-none" id="formError"></div>
                     <div class="alert alert-success d-none" id="formSuccess"></div>
-                    <form id="createSessionForm" class="card card-body shadow-sm">
+                    <form id="createSessionForm">
                         <div class="mb-3">
                             <label class="form-label">Title</label>
                             <input type="text" class="form-control" id="title" required maxlength="100">
                         </div>
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label">Chair</label>
-                                <select class="form-select" id="chairId" required></select>
+                                <label class="form-label">Chair (Optional)</label>
+                                <select class="form-select" id="chairId">
+                                    <option value="">No chair assigned</option>
+                                </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Room</label>
@@ -95,11 +187,11 @@
                         </div>
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
-                                <label class="form-label">Start Time</label>
+                                <label class="form-label">Start Time (24-hour format)</label>
                                 <input type="datetime-local" class="form-control" id="startTime" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">End Time</label>
+                                <label class="form-label">End Time (24-hour format)</label>
                                 <input type="datetime-local" class="form-control" id="endTime" required>
                             </div>
                         </div>
@@ -112,37 +204,15 @@
                                 <option value="CANCELLED">Cancelled</option>
                             </select>
                         </div>
-                        <div class="d-flex justify-content-end mt-3">
-                            <button type="submit" class="btn btn-primary">Create Session</button>
-                        </div>
                     </form>
                 </div>
-
-                <div class="col-lg-7">
-                    <h2 class="mb-3">Existing Sessions</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped align-middle" id="sessionsTable">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Chair</th>
-                                    <th>Room</th>
-                                    <th>Conference</th>
-                                    <th>Start</th>
-                                    <th>End</th>
-                                    <th>Status</th>
-                                    <th style="width: 120px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sessions-body">
-                                <tr><td colspan="8" class="text-center text-muted">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="createSubmitBtn">Create</button>
                 </div>
             </div>
-      
-    </section>
+        </div>
+    </div>
 
     <!-- Edit Session Modal -->
     <div class="modal fade" id="editSessionModal" tabindex="-1">
@@ -163,14 +233,14 @@
 
                         <div class="row g-3">
                             <div class="col-md-4">
-                                <label class="form-label">Chair</label>
+                                <label class="form-label">Chair (Optional)</label>
                                 <select class="form-select" id="editChairId">
-                                    <option value="" disabled selected>Select...</option>
+                                    <option value="">No chair assigned</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Room</label>
-                                <select class="form-select" id="editRoomId">
+                                <select class="form-select" id="editRoomId" required>
                                     <option value="" disabled selected>Select...</option>
                                 </select>
                             </div>
@@ -185,11 +255,11 @@
                         <div class="row g-3 mt-1">
                             <div class="col-md-6">
                                 <label class="form-label">Start Time</label>
-                                <input type="datetime-local" class="form-control" id="editStartTime" required>
+                                <input type="datetime-local" class="form-control" id="editStartTime" required step="60">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">End Time</label>
-                                <input type="datetime-local" class="form-control" id="editEndTime" required>
+                                <input type="datetime-local" class="form-control" id="editEndTime" required step="60">
                             </div>
                         </div>
                         <div class="mt-3">
@@ -221,6 +291,7 @@
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to delete <strong id="deleteSessionTitle"></strong>?</p>
+                    <p class="text-muted small">This is a soft delete. You can restore it later.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -230,252 +301,77 @@
         </div>
     </div>
 
-    <div th:replace="~{fragments/footer}"></div>
+    <!-- Assign Chair Modal -->
+    <div class="modal fade" id="assignChairModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Assign Chair to Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger d-none" id="assignChairError"></div>
+                    <div class="alert alert-warning d-none" id="chairConflictWarning">
+                        <strong>🚫 Cannot Assign!</strong> This chair has overlapping sessions during this time and cannot be assigned. <a href="#" id="viewConflictDetailsLink" class="alert-link">View details</a>
+                    </div>
+                    <div class="alert alert-info mb-3">
+                        <strong>Session:</strong> <span id="assignSessionTitle"></span><br>
+                        <strong>Time:</strong> <span id="assignSessionTime"></span>
+                    </div>
+                    <form id="assignChairForm">
+                        <input type="hidden" id="assignSessionId">
+                        <div class="mb-3">
+                            <label class="form-label">Select Chair</label>
+                            <select class="form-select" id="assignChairSelect" required>
+                                <option value="" disabled selected>Select a chair...</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignChairBtn" title="Select a chair without scheduling conflicts">Assign Chair</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const api = {
-            sessions: '/admin/api/sessions',
-            createSession: '/admin/sessions',
-            users: '/admin/api/users',
-            rooms: '/admin/api/rooms',
-            conferences: '/admin/api/conferences'
-        };
+    <!-- Chair Conflict Details Modal -->
+    <div class="modal fade" id="chairConflictDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Chair Schedule Conflicts</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Chair:</strong> <span id="conflictChairName"></span></p>
+                    <p><strong>Selected Session Time:</strong> <span id="conflictSessionTime"></span></p>
+                    <p class="text-muted mt-3">This chair has the following sessions during the selected time:</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Session Title</th>
+                                    <th>Room</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="conflictSessionsList"></tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <small>You can still assign this chair, but they will have overlapping sessions. Consider selecting a different chair or adjusting the session time.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const form = document.getElementById('createSessionForm');
-        const sessionsBody = document.getElementById('sessions-body');
-        const formError = document.getElementById('formError');
-        const formSuccess = document.getElementById('formSuccess');
-
-        const chairSelect = document.getElementById('chairId');
-        const roomSelect = document.getElementById('roomId');
-        const conferenceSelect = document.getElementById('conferenceId');
-
-        const editChairSelect = document.getElementById('editChairId');
-        const editRoomSelect = document.getElementById('editRoomId');
-        const editConferenceSelect = document.getElementById('editConferenceId');
-
-        async function loadOptions() {
-            await Promise.all([
-                fetchOptions(api.users, [chairSelect, editChairSelect], u => ({ value: u.id, label: `${u.name || 'User'} (${u.email})` })),
-                fetchOptions(api.rooms, [roomSelect, editRoomSelect], r => ({ value: r.id, label: `${r.name} (cap ${r.capacity})` })),
-                fetchOptions(api.conferences, [conferenceSelect, editConferenceSelect], c => ({ value: c.id, label: c.title }))
-            ]);
-        }
-
-        async function fetchOptions(url, selectEls, mapFn) {
-            const res = await fetch(url);
-            if (!res.ok) return;
-            const data = await res.json();
-            const targets = Array.isArray(selectEls) ? selectEls : [selectEls];
-            targets.forEach(selectEl => {
-                if (!selectEl) return;
-                selectEl.innerHTML = '<option value="" disabled selected>Select...</option>';
-                data.forEach(item => {
-                    const opt = document.createElement('option');
-                    const mapped = mapFn(item);
-                    opt.value = mapped.value;
-                    opt.textContent = mapped.label;
-                    selectEl.appendChild(opt);
-                });
-            });
-        }
-
-        async function loadSessions() {
-            sessionsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>';
-            try {
-                const res = await fetch(api.sessions);
-                if (!res.ok) throw new Error('Failed to load sessions');
-                const sessions = await res.json();
-                if (!sessions.length) {
-                    sessionsBody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No sessions yet</td></tr>';
-                    return;
-                }
-                sessionsBody.innerHTML = '';
-                sessions.forEach(s => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${s.title || ''}</td>
-                        <td>${s.chairName || ''}</td>
-                        <td>${s.roomName || ''}</td>
-                        <td>${s.conferenceName || ''}</td>
-                        <td>${formatDateTime(s.startTime)}</td>
-                        <td>${formatDateTime(s.endTime)}</td>
-                        <td><span class="badge bg-secondary">${s.status || 'N/A'}</span></td>
-                        <td class="d-flex gap-1">
-                            <button class="btn btn-sm btn-warning">Edit</button>
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </td>
-                    `;
-
-                    const [editBtn, deleteBtn] = tr.querySelectorAll('button');
-                    editBtn.addEventListener('click', () => openEditModal(
-                        s.id,
-                        s.title || '',
-                        s.startTime,
-                        s.endTime,
-                        s.status || '',
-                        s.chairId || null,
-                        s.roomId || null,
-                        s.conferenceId || null
-                    ));
-                    deleteBtn.addEventListener('click', () => openDeleteModal(s.id, s.title || ''));
-
-                    sessionsBody.appendChild(tr);
-                });
-
-            } catch (e) {
-                sessionsBody.innerHTML = '<tr><td colspan="7" class="text-danger text-center">Could not load sessions</td></tr>';
-            }
-        }
-
-        function formatDateTime(val) {
-            if (!val) return '';
-            try {
-                return new Date(val).toLocaleString();
-            } catch (e) {
-                return val;
-            }
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            hideAlerts();
-            const payload = {
-                title: document.getElementById('title').value.trim(),
-                chairId: parseInt(chairSelect.value, 10),
-                roomId: parseInt(roomSelect.value, 10),
-                conferenceId: parseInt(conferenceSelect.value, 10),
-                startTime: document.getElementById('startTime').value,
-                endTime: document.getElementById('endTime').value,
-                status: document.getElementById('status').value
-            };
-
-            try {
-                const res = await fetch(api.createSession, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({}));
-                    showError(err.message || 'Failed to create session');
-                    return;
-                }
-
-                showSuccess('Session created');
-                form.reset();
-                loadSessions();
-            } catch (error) {
-                showError('Network error while creating session');
-            }
-        });
-
-        function showError(msg) {
-            formError.textContent = msg;
-            formError.classList.remove('d-none');
-        }
-
-        function showSuccess(msg) {
-            formSuccess.textContent = msg;
-            formSuccess.classList.remove('d-none');
-            setTimeout(() => formSuccess.classList.add('d-none'), 2500);
-        }
-
-        function hideAlerts() {
-            formError.classList.add('d-none');
-            formSuccess.classList.add('d-none');
-        }
-
-        let editModal, deleteModal;
-
-        function openEditModal(sessionId, title, startTime, endTime, status, chairId, roomId, conferenceId) {
-            document.getElementById('editSessionId').value = sessionId;
-            document.getElementById('editTitle').value = title;
-            document.getElementById('editStartTime').value = startTime.substring(0, 16);
-            document.getElementById('editEndTime').value = endTime.substring(0, 16);
-            document.getElementById('editStatus').value = status;
-            editChairSelect.value = chairId ? String(chairId) : '';
-            editRoomSelect.value = roomId ? String(roomId) : '';
-            editConferenceSelect.value = conferenceId ? String(conferenceId) : '';
-            document.getElementById('editError').classList.add('d-none');
-            editModal = new bootstrap.Modal(document.getElementById('editSessionModal'));
-            editModal.show();
-        }
-
-        function openDeleteModal(sessionId, title) {
-            document.getElementById('deleteSessionTitle').textContent = title;
-            deleteModal = new bootstrap.Modal(document.getElementById('deleteSessionModal'));
-            deleteModal._sessionId = sessionId; // store explicitly to avoid dataset issues
-            deleteModal.show();
-        }
-
-        document.getElementById('saveEditBtn')?.addEventListener('click', async () => {
-            const sessionId = document.getElementById('editSessionId').value;
-            const payload = {
-                title: document.getElementById('editTitle').value.trim(),
-                chairId: editChairSelect.value ? Number(editChairSelect.value) : null,
-                roomId: editRoomSelect.value ? Number(editRoomSelect.value) : null,
-                conferenceId: editConferenceSelect.value ? Number(editConferenceSelect.value) : null,
-                startTime: document.getElementById('editStartTime').value,
-                endTime: document.getElementById('editEndTime').value,
-                status: document.getElementById('editStatus').value
-            };
-            try {
-                const res = await fetch(`${api.createSession}/${sessionId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!res.ok) {
-                    const errJson = await res.json().catch(() => ({}));
-                    const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
-                    let details = '';
-                    if (errJson.errors && typeof errJson.errors === 'object') {
-                        const first = Object.values(errJson.errors)[0];
-                        details = Array.isArray(first) ? first[0] : String(first);
-                    }
-                    const msg = errJson.message || details || errText || `Failed to update (status ${res.status})`;
-                    document.getElementById('editError').textContent = msg;
-                    document.getElementById('editError').classList.remove('d-none');
-                    return;
-                }
-                editModal.hide();
-                loadSessions();
-                showSuccess('Session updated');
-            } catch (error) {
-                document.getElementById('editError').textContent = 'Network error';
-                document.getElementById('editError').classList.remove('d-none');
-            }
-        });
-
-        document.getElementById('confirmDeleteBtn')?.addEventListener('click', async () => {
-            const sessionId = deleteModal?._sessionId;
-            try {
-                const res = await fetch(`${api.createSession}/${sessionId}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                if (!res.ok) {
-                    const errJson = await res.json().catch(() => ({}));
-                    const errText = !Object.keys(errJson).length ? await res.text().catch(() => '') : '';
-                    const msg = errJson.message || errText || `Failed to delete (status ${res.status})`;
-                    showError(msg);
-                    return;
-                }
-                deleteModal.hide();
-                loadSessions();
-                showSuccess('Session deleted');
-            } catch (error) {
-                showError('Network error while deleting');
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOptions().then(loadSessions);
-        });
-
-    </script>
-</body>
-</html>
+    <script th:src="@{/js/manage-sessions.js}"></script>
+    </section>
+</div>

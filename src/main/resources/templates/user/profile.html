@@ -58,7 +58,39 @@
                         <hr class="my-4">
 
                         <h5 class="mb-3">My Conferences</h5>
-                        <div class="alert alert-info">
+                        
+                        <div th:if="${registrations != null && !registrations.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Conference</th>
+                                            <th>Status</th>
+                                            <th>Registered At</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="reg : ${registrations}">
+                                            <td>
+                                                <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" th:text="${reg.conference.title}">Conference Title</a>
+                                            </td>
+                                            <td>
+                                                <span class="badge"
+                                                      th:classappend="${reg.status.name() == 'CONFIRMED' ? 'bg-success' : 'bg-danger'}"
+                                                      th:text="${reg.status.name()}">Status</span>
+                                            </td>
+                                            <td th:text="${#temporals.format(reg.registeredAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                                            <td>
+                                                <a th:href="@{/conferences/{id}(id=${reg.conference.id})}" class="btn btn-sm btn-primary">View</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div th:if="${registrations == null || registrations.isEmpty()}" class="alert alert-info">
                             No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
                         </div>
 
@@ -66,6 +98,28 @@
                             <a href="/my-schedule" class="btn btn-primary me-2">View Schedule</a>
                             <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
                         </div>
+                                            <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                        </div>
+                                    </div>
+                                    <span th:if="${userRoles != null && !userRoles.isEmpty()}" 
+                                          th:each="role : ${userRoles}"
+                                          class="badge bg-primary me-1" 
+                                          th:text="${role.name}">Role</span>
+                                    <span th:if="${userRoles == null || userRoles.isEmpty()}" class="badge bg-secondary">Guest</span>
+                                                            <h5 class="mb-3">My Conferences</h5>
+                                                            <div class="alert alert-info">
+                                                                No conference registrations yet. <a href="/conferences" class="alert-link">Browse conferences</a>
+                                                            </div>
+
+                                                            <div class="mt-4">
+                                                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="/schedule" class="btn btn-primary me-2">View Schedule</a>
+                                <a href="/conferences" class="btn btn-outline-primary">Browse Conferences</a>
+                            </div>
                     </div>
                 </div>
             </div>

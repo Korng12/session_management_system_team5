@@ -1,3 +1,4 @@
+// No changes needed for SessionAttendance.java
 package com.team5.demo.entities;
 
 import jakarta.persistence.*;
@@ -25,22 +26,23 @@ public class SessionAttendance {
     private User participant;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @MapsId("sessionId")
+    @JoinColumn(name = "session_id")
     private Session session;
-    
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private AttendanceStatus status; // PRESENT, ABSENT
-     @Column(name = "marked_at")
+    private AttendanceStatus status; // PRESENT, ABSENT, REGISTERED
+
+    @Column(name = "marked_at")
     private LocalDateTime markedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "marked_by")
     private User markedBy;
 
-    public SessionAttendance() {
-    
+    protected SessionAttendance() {
     }
+
     public SessionAttendance(Long participantId, Long sessionId, User participant, Session session,
             AttendanceStatus status, LocalDateTime markedAt, User markedBy) {
         this.participantId = participantId;
@@ -51,6 +53,12 @@ public class SessionAttendance {
         this.markedAt = markedAt;
         this.markedBy = markedBy;
     }
-    
-    
+
+    // public SessionAttendance(User participant, Session session) {
+    //     this.participant = participant;
+    //     this.session = session;
+    //     this.participantId = participant.getId();
+    //     this.sessionId = session.getId();
+    //     this.status = AttendanceStatus.ABSENT;
+    // }
 }

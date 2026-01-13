@@ -31,6 +31,11 @@ document.getElementById("registerConferenceBtn")?.addEventListener("click", asyn
 document.getElementById("cancelConferenceBtn")?.addEventListener("click", async function () {
     const registrationId = this.dataset.registrationId;
 
+    if (!registrationId) {
+        alert("Cancel failed: missing registration id");
+        return;
+    }
+
     try {
         const response = await fetch(`/api/registrations/${registrationId}/cancel`, {
             method: "PUT"

@@ -32,7 +32,6 @@ public class Registration {
     private LocalDateTime registeredAt;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    // private String status = "CONFIRMED";
     private RegistrationStatus status;
     @PrePersist
     protected void onCreate() {
@@ -42,43 +41,3 @@ public class Registration {
     }
 }
 
-
-// // Participant (User)
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "participant_id", nullable = false)
-    // private User participant;
-
-    // //  Conference
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "conference_id", nullable = false)
-    // private Conference conference;
-
-    // @Column(name = "registered_at", nullable = false)
-    // private LocalDateTime registeredAt;
-
-    // @Column(length = 20, nullable = false)
-    // private String status; // PENDING, CONFIRMED, CANCELLED
-
-    // /* ===================== CONSTRUCTORS ===================== */
-
-    // public Registration() {
-    //     this.registeredAt = LocalDateTime.now();
-    //     this.status = "PENDING";
-    // }
-
-    // public Registration(User participant, Conference conference) {
-    //     this();
-    //     this.participant = participant;
-    //     this.conference = conference;
-    // }
-
-    // public Registration(User participant, Conference conference, String status) {
-    //     this(participant, conference);
-    //     this.status = status;
-    // }
-
-
-    // public boolean isCancelled() {
-    //     return "CANCELLED".equalsIgnoreCase(status);
-    // }
-    

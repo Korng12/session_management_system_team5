@@ -21,40 +21,26 @@ public interface SessionAttendanceRepository
     /* ===================== BASIC QUERIES ===================== */
 
     List<SessionAttendance> findBySessionId(Long sessionId);
-
+    List<SessionAttendance> findByParticipant(User user);
     List<SessionAttendance> findByParticipantId(Long participantId);
-
-    Optional<SessionAttendance> findByParticipantIdAndSessionId(
-            Long participantId,
-            Long sessionId);
-
-    boolean existsByParticipantIdAndSessionId(
-            Long participantId,
-            Long sessionId);
-
-    /* ===================== ADMIN ===================== */
+    Optional<SessionAttendance> findByParticipantIdAndSessionId(Long participantId, Long sessionId);
+    Optional<SessionAttendance> findByParticipantAndSession(User participant, Session session);
+    boolean existsByParticipantIdAndSessionId(Long participantId, Long sessionId);
 
     @Query("""
-                SELECT sa
-                FROM SessionAttendance sa
-                JOIN FETCH sa.participant
-                JOIN FETCH sa.session
-            """)
+        SELECT sa
+        FROM SessionAttendance sa
+        JOIN FETCH sa.participant
+        JOIN FETCH sa.session
+    """)
     List<SessionAttendance> findAllWithRelations();
 
-    /* ===================== USER (MY SCHEDULE) ===================== */
-
     @Query("""
-                SELECT sa
-                FROM SessionAttendance sa
-                JOIN FETCH sa.session
-                JOIN FETCH sa.participant p
-                WHERE p.email = :email
-            """)
+        SELECT sa
+        FROM SessionAttendance sa
+        JOIN FETCH sa.session
+        JOIN FETCH sa.participant p
+        WHERE p.email = :email
+    """)
     List<SessionAttendance> findMySchedule(@Param("email") String email);
-
-    Optional<SessionAttendance> findByParticipantAndSession(User user, Session s);
-
-    
-
 }
