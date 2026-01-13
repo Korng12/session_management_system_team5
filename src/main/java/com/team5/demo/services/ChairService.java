@@ -12,6 +12,7 @@ import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.SessionRegistration;
+import com.team5.demo.entities.SessionStatus;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.SessionAttendanceRepository;
 import com.team5.demo.repositories.SessionRegistrationRepository;
@@ -38,14 +39,38 @@ public class ChairService {
     }
 
     // 1️⃣ Sessions chaired by current user
-    @Transactional(readOnly = true)
-    public List<Session> getChairedSessions(String email) {
+@Transactional
+public List<Session> getChairedSessions(String email) {
 
-        User chair = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User chair = userRepo.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return sessionRepo.findByChair(chair);
+    List<Session> sessions = sessionRepo.findByChair(chair);
+    LocalDateTime now = LocalDateTime.now();
+
+    for (Session session : sessions) {
+
+        if (session.getStatus() == SessionStatus.CANCELLED) continue;
+
+        SessionStatus newStatus;
+
+        if (now.isBefore(session.getStartTime())) {
+            newStatus = SessionStatus.SCHEDULED;
+        } else if (now.isAfter(session.getEndTime())) {
+            newStatus = SessionStatus.COMPLETED;
+        } else {
+            newStatus = SessionStatus.ONGOING;
+        }
+
+        if (session.getStatus() != newStatus) {
+            session.setStatus(newStatus);
+            sessionRepo.save(session); // 🔑 THIS is what makes UI update
+        }
     }
+
+    return sessions;
+}
+
 
     // 2️⃣ Registered attendees for a session
     @Transactional(readOnly = true)
@@ -149,17 +174,15 @@ public class ChairService {
     }).toList();
 }
     public Session getSessionForChair(Long sessionId, String email) {
-    Session session = sessionRepo.findById(sessionId)
-        .orElseThrow();
+        Session session = sessionRepo.findById(sessionId)
+            .orElseThrow();
 
-    User chair = userRepo.findByEmail(email).orElseThrow();
+        User chair = userRepo.findByEmail(email).orElseThrow();
 
-    if (!session.getChair().getId().equals(chair.getId())) {
-        throw new AccessDeniedException("Not your session");
+        if (!session.getChair().getId().equals(chair.getId())) {
+            throw new AccessDeniedException("Not your session");
+        }
+
+        return session;
     }
-
-    return session;
-}
-
-
 }

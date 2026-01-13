@@ -18,38 +18,69 @@
                 height: calc(100vh - 60px);
                 background-color: #212529;
                 padding-top: 20px;
+                overflow-y: auto;
+                z-index: 100;
             }
 
-            .sidebar a {
+            .sidebar-header {
+                padding: 0 20px 20px;
+                color: #fff;
+            }
+
+            .sidebar-header h4 {
+                margin: 0;
+                font-size: 1.1rem;
+            }
+
+            .menu-section {
+                padding: 10px 0;
+            }
+
+            .menu-title {
                 display: block;
-                color: #adb5bd;
-                padding: 12px 20px;
-                text-decoration: none;
-                font-size: 15px;
+                padding: 10px 20px;
+                color: #6c757d;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-transform: uppercase;
             }
 
-            .sidebar a:hover,
-            .sidebar a.active {
+            .menu-link {
+                display: block;
+                padding: 12px 20px;
+                color: #adb5bd;
+                text-decoration: none;
+                transition: all 0.3s;
+            }
+
+            .menu-link:hover {
                 background-color: #343a40;
                 color: #fff;
+                padding-left: 25px;
+            }
+
+            .menu-link.active {
+                background-color: #4e73df;
+                color: #fff;
+                border-left: 4px solid #fff;
             }
 
             .content {
                 margin-left: 240px;
-                padding: 80px 30px 30px;
+                padding: 30px;
             }
 
             .card {
-                border-radius: 12px;
+                border-radius: 8px;
             }
         </style>
 
-        <nav class="navbar navbar-dark bg-dark fixed-top">
+        <!-- <nav class="navbar navbar-dark bg-dark fixed-top">
             <div class="container-fluid">
                 <span class="navbar-brand">Conference Admin</span>
                 <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
             </div>
-        </nav>
+        </nav> -->
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
         <div class="container mt-5">
