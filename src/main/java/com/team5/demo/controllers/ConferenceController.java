@@ -70,7 +70,7 @@ public class ConferenceController {
         @PathVariable("id") Long id,
         Authentication auth,
         Model model) {
-
+            
     // 1. Conference data
     model.addAttribute("conference", conferenceService.getConference(id));
     List<SessionResponse> sessions = sessionService.getSessionsByConference(id);

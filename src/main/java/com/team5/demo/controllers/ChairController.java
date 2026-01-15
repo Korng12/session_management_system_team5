@@ -20,16 +20,34 @@ public class ChairController {
     @Autowired
     ChairService chairService;
 
-    @GetMapping("/chair/sessions")
-    @PreAuthorize("hasAuthority('ROLE_CHAIR')")
-    public String chairSessions(Authentication auth, Model model) {
+    // @GetMapping("/chair/sessions")
+    // @PreAuthorize("hasAuthority('ROLE_CHAIR')")
+    // public String chairSessions(Authentication auth, Model model) {
 
-        model.addAttribute(
-            "sessions",
-            chairService.getChairedSessions(auth.getName())
-        );
-        return "chair/chair-sessions";
-    }
+    //     model.addAttribute(
+    //         "sessions",
+    //         chairService.getChairedSessions(auth.getName())
+    //     );
+    //     return "chair/chair-sessions";
+    // }
+ @GetMapping("/chair/sessions")
+@PreAuthorize("hasAuthority('ROLE_CHAIR')")
+public String chairSessions(
+        @RequestParam(value = "title", required = false) String title,
+        Authentication auth,
+        Model model) {
+
+    model.addAttribute(
+        "sessions",
+        chairService.searchChairedSessions(auth.getName(), title)
+    );
+
+    // keep the search text in the input box
+    model.addAttribute("title", title);
+
+    return "chair/chair-sessions";
+}
+
     @GetMapping("chair/sessions/{id}/attendance")
     public String manageAttendance(
             @PathVariable("id") Long sessionId,

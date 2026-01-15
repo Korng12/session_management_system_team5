@@ -64,28 +64,7 @@ public class ScheduleService {
 
         }).toList();
     }
-    // public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
 
-    //     User user = userRepo.findByEmail(email)
-    //             .orElseThrow(() -> new RuntimeException("User not found"));
-
-    //     return sessionRegRepo.findByParticipant(user)
-    //             .stream()
-    //             .map(reg -> {
-
-    //                 Session s = reg.getSession();
-
-    //                 return new MyUpcomingSessionDto(
-    //                         s.getId(),
-    //                         s.getTitle(),
-    //                         s.getConference().getTitle(),
-    //                         s.getStartTime(),
-    //                         s.getEndTime(),
-    //                         s.getStatus()
-    //                 );
-    //             })
-    //             .toList();
-    // }
         public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
 
         User user = userRepo.findByEmail(email)

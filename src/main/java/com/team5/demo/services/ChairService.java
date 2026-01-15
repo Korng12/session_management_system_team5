@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.team5.demo.dto.AttendanceDto;
 import com.team5.demo.dto.MyUpcomingSessionDto;
+import com.team5.demo.dto.chair.SessionViewDTO;
 import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
@@ -40,38 +41,56 @@ public class ChairService {
     }
 
     // 1️⃣ Sessions chaired by current user
-    @Transactional
-    public List<Session> getChairedSessions(String email) {
+    // @Transactional
+    // public List<SessionViewDTO> getChairedSessions(String email) {
+
+    //     User chair = userRepo.findByEmail(email)
+    //             .orElseThrow(() -> new RuntimeException("User not found"));
+
+    //     List<Session> sessions = sessionRepo.findByChair(chair);
+    //     LocalDateTime now = LocalDateTime.now();
+
+    //     for (Session session : sessions) {
+
+    //         if (session.getStatus() == SessionStatus.CANCELLED) continue;
+
+    //         SessionStatus newStatus;
+
+    //         if (now.isBefore(session.getStartTime())) {
+    //             newStatus = SessionStatus.SCHEDULED;
+    //         } else if (now.isAfter(session.getEndTime())) {
+    //             newStatus = SessionStatus.COMPLETED;
+    //         } else {
+    //             newStatus = SessionStatus.ONGOING;
+    //         }
+
+    //         if (session.getStatus() != newStatus) {
+    //             session.setStatus(newStatus);
+    //             sessionRepo.save(session); // 🔑 THIS is what makes UI update
+    //         }
+    //     }
+
+    //     return sessions;
+    // }
+    @Transactional(readOnly = true)
+    public List<SessionViewDTO> getChairedSessions(String email) {
 
         User chair = userRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow();
 
-        List<Session> sessions = sessionRepo.findByChair(chair);
         LocalDateTime now = LocalDateTime.now();
 
-        for (Session session : sessions) {
-
-            if (session.getStatus() == SessionStatus.CANCELLED) continue;
-
-            SessionStatus newStatus;
-
-            if (now.isBefore(session.getStartTime())) {
-                newStatus = SessionStatus.SCHEDULED;
-            } else if (now.isAfter(session.getEndTime())) {
-                newStatus = SessionStatus.COMPLETED;
-            } else {
-                newStatus = SessionStatus.ONGOING;
-            }
-
-            if (session.getStatus() != newStatus) {
-                session.setStatus(newStatus);
-                sessionRepo.save(session); // 🔑 THIS is what makes UI update
-            }
-        }
-
-        return sessions;
+        return sessionRepo.findByChair(chair)
+                .stream()
+                .map(s -> new SessionViewDTO(
+                        s.getId(),
+                        s.getTitle(),
+                        effectiveStatus(s, now),
+                        s.getStartTime(),
+                        s.getEndTime()
+                ))
+                .toList();
     }
-
 
     // 2️⃣ Registered attendees for a session
     @Transactional(readOnly = true)
@@ -110,9 +129,13 @@ public class ChairService {
         }
 
         // Only allow marking attendance while session is ongoing
-        if (session.getStatus() != com.team5.demo.entities.SessionStatus.ONGOING) {
+        SessionStatus statusNow =
+        effectiveStatus(session, LocalDateTime.now());
+
+        if (statusNow != SessionStatus.ONGOING) {
             throw new IllegalStateException("Attendance can only be marked when session is ongoing");
         }
+
 
         var existing = attendanceRepo.findByParticipantIdAndSessionId(participantId, sessionId);
 
@@ -191,19 +214,62 @@ public class ChairService {
     User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
+   LocalDateTime now = LocalDateTime.now();
+
     return sessionRegRepo.findByParticipant(user)
             .stream()
             .map(SessionRegistration::getSession)
-            .filter(s -> s.getStatus() == SessionStatus.ONGOING) // 🔑 KEY LINE
+            .filter(s -> effectiveStatus(s, now) == SessionStatus.ONGOING)
             .map(s -> new MyUpcomingSessionDto(
                     s.getId(),
                     s.getTitle(),
                     s.getConference().getTitle(),
                     s.getStartTime(),
                     s.getEndTime(),
-                    s.getStatus()
+                    SessionStatus.ONGOING
             ))
             .toList();
+
 }
+    
+    private SessionStatus effectiveStatus(Session session, LocalDateTime now) {
+    if (session.getStatus() == SessionStatus.CANCELLED) {
+        return SessionStatus.CANCELLED;
+    }
+
+    if (now.isBefore(session.getStartTime())) {
+        return SessionStatus.SCHEDULED;
+    }
+
+    if (now.isAfter(session.getEndTime())) {
+        return SessionStatus.COMPLETED;
+    }
+
+    return SessionStatus.ONGOING;
+}
+    @Transactional(readOnly = true)
+    public List<SessionViewDTO> searchChairedSessions(String email, String title) {
+
+        User chair = userRepo.findByEmail(email)
+                .orElseThrow();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        return sessionRepo.findByChair(chair)
+            .stream()
+            .filter(s ->
+                title == null ||
+                title.trim().isEmpty() ||
+                s.getTitle().toLowerCase().contains(title.toLowerCase())
+            )
+            .map(s -> new SessionViewDTO(
+                s.getId(),
+                s.getTitle(),
+                effectiveStatus(s, now),
+                s.getStartTime(),
+                s.getEndTime()
+            ))
+            .toList();
+    }
 
 }
