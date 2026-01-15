@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.team5.demo.dto.AttendanceDto;
+import com.team5.demo.dto.MyUpcomingSessionDto;
 import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
@@ -185,4 +186,24 @@ public class ChairService {
 
         return session;
     }
+    public List<MyUpcomingSessionDto> getMyOngoingSessions(String email) {
+
+    User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return sessionRegRepo.findByParticipant(user)
+            .stream()
+            .map(SessionRegistration::getSession)
+            .filter(s -> s.getStatus() == SessionStatus.ONGOING) // 🔑 KEY LINE
+            .map(s -> new MyUpcomingSessionDto(
+                    s.getId(),
+                    s.getTitle(),
+                    s.getConference().getTitle(),
+                    s.getStartTime(),
+                    s.getEndTime(),
+                    s.getStatus()
+            ))
+            .toList();
+}
+
 }

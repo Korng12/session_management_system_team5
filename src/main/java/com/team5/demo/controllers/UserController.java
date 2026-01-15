@@ -117,7 +117,7 @@ public class UserController {
         if(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHAIR"))){
             model.addAttribute(
                 "chairedSessions",
-                chairService.getChairedSessions(email)
+                chairService.getMyOngoingSessions(email)
             );
         }
         return "user/home";

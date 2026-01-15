@@ -128,21 +128,21 @@ public class SessionService {
     }
     public SessionStatus resolveSessionStatus(Session session) {
 
-    if (session.getStatus() == SessionStatus.CANCELLED) {
-        return SessionStatus.CANCELLED;
-    }
+        if (session.getStatus() == SessionStatus.CANCELLED) {
+            return SessionStatus.CANCELLED;
+        }
 
-    LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
-    if (now.isBefore(session.getStartTime())) {
-        return SessionStatus.SCHEDULED;
-    }
+        if (now.isBefore(session.getStartTime())) {
+            return SessionStatus.SCHEDULED;
+        }
 
-    if (now.isAfter(session.getEndTime())) {
-        return SessionStatus.COMPLETED;
-    }
+        if (now.isAfter(session.getEndTime())) {
+            return SessionStatus.COMPLETED;
+        }
 
-        return SessionStatus.ONGOING;
+            return SessionStatus.ONGOING;
     }
 
 

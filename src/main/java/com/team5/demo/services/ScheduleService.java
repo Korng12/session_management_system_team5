@@ -1,5 +1,6 @@
 package com.team5.demo.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -63,27 +64,49 @@ public class ScheduleService {
 
         }).toList();
     }
-    public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
+    // public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
+
+    //     User user = userRepo.findByEmail(email)
+    //             .orElseThrow(() -> new RuntimeException("User not found"));
+
+    //     return sessionRegRepo.findByParticipant(user)
+    //             .stream()
+    //             .map(reg -> {
+
+    //                 Session s = reg.getSession();
+
+    //                 return new MyUpcomingSessionDto(
+    //                         s.getId(),
+    //                         s.getTitle(),
+    //                         s.getConference().getTitle(),
+    //                         s.getStartTime(),
+    //                         s.getEndTime(),
+    //                         s.getStatus()
+    //                 );
+    //             })
+    //             .toList();
+    // }
+        public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        LocalDateTime now = LocalDateTime.now();
+
         return sessionRegRepo.findByParticipant(user)
                 .stream()
-                .map(reg -> {
-
-                    Session s = reg.getSession();
-
-                    return new MyUpcomingSessionDto(
-                            s.getId(),
-                            s.getTitle(),
-                            s.getConference().getTitle(),
-                            s.getStartTime(),
-                            s.getEndTime(),
-                            s.getStatus()
-                    );
-                })
+                .map(SessionRegistration::getSession)
+                .filter(s -> s.getStartTime().isAfter(now)) // 🔑 KEY LINE
+                .map(s -> new MyUpcomingSessionDto(
+                        s.getId(),
+                        s.getTitle(),
+                        s.getConference().getTitle(),
+                        s.getStartTime(),
+                        s.getEndTime(),
+                        s.getStatus()
+                ))
                 .toList();
     }
+
     
 }
