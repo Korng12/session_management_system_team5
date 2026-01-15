@@ -165,22 +165,35 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
-          <form th:action="@{/admin/users/create}" method="post">
+          <form th:action="@{/admin/users/create}" th:object="${user}" method="post">
             <div class="modal-body">
               <div class="row g-3">
                 <div class="col-md-6">
                   <label class="form-label">Name</label>
-                  <input class="form-control" name="name" required />
+                  <input class="form-control" name="name"  />
+                </div>
+                <div class="col-md-6">
+                  <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+
+                </div>
+                <div class="col-md-6">
+                  <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Email Error</div>
                 </div>
 
                 <div class="col-md-6">
                   <label class="form-label">Email</label>
-                  <input class="form-control" name="email" type="email" required />
+                  <input class="form-control" name="email"   />
+                </div>
+                <div class="col-md-6">
+                  <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</div>
                 </div>
 
                 <div class="col-md-6">
                   <label class="form-label">Password</label>
                   <input class="form-control" name="password" type="password" required />
+                </div>
+                <div class="col-md-6">
+                  <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">Role Error</div>
                 </div>
 
                 <div class="col-md-6">

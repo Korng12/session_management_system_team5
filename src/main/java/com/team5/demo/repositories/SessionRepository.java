@@ -29,7 +29,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
        LEFT JOIN FETCH s.room
        WHERE s.conference.id = :conferenceId
        """)
-       List<Session> findWithRoomByConference(Long conferenceId);
+       List<Session> findWithRoomByConference(@Param("conferenceId") Long conferenceId);
 
 
     // ✅ Simple derived query

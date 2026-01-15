@@ -10,6 +10,7 @@ import com.team5.demo.services.SessionAttendanceService;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import lombok.RequiredArgsConstructor;
 import com.team5.demo.dto.CreateSessionRequest;
+import com.team5.demo.dto.CreateUserDTO;
 import com.team5.demo.dto.SessionResponse;
 import com.team5.demo.dto.UpdateSessionStatusRequest;
 import com.team5.demo.dto.SessionDependenciesResponse;
@@ -273,33 +274,34 @@ public class AdminController {
     //     conferenceService.save(conference);
     //     return "redirect:/admin/manage-conferences";
     // }
- @PostMapping("/conferences/save")
-public String saveConference(
-        @Valid @ModelAttribute("conference") ConferenceDTO dto,
-        BindingResult result,
-        Model model
-) {
+    @PostMapping("/conferences/save")
+    public String saveConference(
+            @Valid @ModelAttribute("conference") ConferenceDTO dto,
+            BindingResult result,
+            Model model
+    ) 
+    {
 
-    // SIMPLE cross-field validation
-    if (!result.hasErrors()
-        && dto.getEndDate().isBefore(dto.getStartDate())) {
-        result.reject(
-            "date.order",
-            "End date must be after start date"
-        );
+        // SIMPLE cross-field validation
+        if (!result.hasErrors()
+            && dto.getEndDate().isBefore(dto.getStartDate())) {
+            result.reject(
+                "date.order",
+                "End date must be after start date"
+            );
+        }
+
+        if (result.hasErrors()) {
+            model.addAttribute("conferences",
+                    conferenceService.getAllConferences());
+                    model.addAttribute("showModal", true);
+
+            return "admin/manage-conferences";
+        }
+
+        conferenceService.saveFromDto(dto);
+        return "redirect:/admin/conferences";
     }
-
-    if (result.hasErrors()) {
-        model.addAttribute("conferences",
-                conferenceService.getAllConferences());
-                model.addAttribute("showModal", true);
-
-        return "admin/manage-conferences";
-    }
-
-    conferenceService.saveFromDto(dto);
-    return "redirect:/admin/conferences";
-}
 
     
 
@@ -864,24 +866,34 @@ public String saveConference(
 
     // User Crude
     @GetMapping("/manage-users")
-public String manageUsers() {
-    return "redirect:/admin/users";
-}
+    public String manageUsers() {
+        return "redirect:/admin/users";
+    }
 
-@GetMapping("/users")
-public String listUsers(Model model) {
-    model.addAttribute("users", userService.findAll());
-    return "admin/manage-users";
-}
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+        model.addAttribute("users", userService.findAll());
+        model.addAttribute("user", new CreateUserDTO());
+        return "admin/manage-users";
+    }
 
-@PostMapping("/users/create")
-public String createUser(@RequestParam("name") String name,
-                         @RequestParam("email") String email,
-                         @RequestParam("password") String password,
-                         @RequestParam("role") String role) {
-    userService.create(name, email, password, role);
-    return "redirect:/admin/users";
-}
+    // @PostMapping("/users/create")
+    // public String createUser(@RequestParam("name") String name,
+    //                         @RequestParam("email") String email,
+    //                         @RequestParam("password") String password,
+    //                         @RequestParam("role") String role) {
+    //     userService.create(name, email, password, role);
+    //     return "redirect:/admin/users";
+    // }
+     @PostMapping("/users/create")
+    public String createUser(@ModelAttribute("user") @Valid CreateUserDTO userDTO , BindingResult result,Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("users", userService.findAll());
+            return "admin/manage-users";
+        }
+        userService.create(userDTO.getName(), userDTO.getEmail(), userDTO.getPassword(), userDTO.getRole());
+        return "redirect:/admin/users";
+    }
 
 @PostMapping("/users/{id}/update")
 public String updateUser(@PathVariable("id") Long id,
