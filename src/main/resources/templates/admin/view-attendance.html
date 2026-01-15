@@ -65,9 +65,14 @@
                 </thead>
                 <tbody>
                     <tr th:each="a : ${attendances}">
+                        <td class="text-center" th:text="${a.session.getTitle()}"></td>
+
                         <td class="text-center" th:text="${a.session.id}"></td>
                         <td class="text-center" th:text="${a.participant.id}"></td>
                         <td class="text-center" th:text="${a.status}"></td>
+                        <td class="text-center" th:text="${a.participant.getName()}"></td>
+                        <td th:text="${a.markedBy?.name} ?: 'Not marked'"></td>
+
                     </tr>
 
                     <tr th:if="${attendances == null or #lists.isEmpty(attendances)}">

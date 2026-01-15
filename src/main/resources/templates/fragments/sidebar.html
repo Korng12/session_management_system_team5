@@ -31,19 +31,19 @@
             Manage Users
         </a>
 
-        <a th:href="@{/admin/manage-schedule}" class="menu-link"
+        <a th:href="@{/admin/view-sessions-registrations-}" class="menu-link"
            th:classappend="${activePage == 'schedule'} ? ' active'">
-            Manage Schedule
+            View Sesion Registrations
         </a>
 
-        <a th:href="@{/admin/view-registeredUsers}" class="menu-link"
+        <a th:href="@{/admin/view-registrations}" class="menu-link"
            th:classappend="${activePage == 'registrations'} ? ' active'">
-            View Registrations
+            View Conference Registrations
         </a>
 
         <a th:href="@{/admin/view-attendance}" class="d-block px-3 py-2 text-decoration-none text-secondary"
        th:classappend="${activePage=='attendances'}?' bg-secondary text-white':''">
-        View Attendance
+        View Session Attendance
         </a>
     </div>
 

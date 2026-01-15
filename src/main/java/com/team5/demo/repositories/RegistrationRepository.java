@@ -64,14 +64,14 @@ public interface RegistrationRepository extends JpaRepository<Registration, Long
     // List<Registration> findAllWithRelations();
 
     @Query("""
-        SELECT r FROM Registration r
-        JOIN FETCH r.participant p
-        JOIN FETCH r.conference c
-        WHERE r.status = 'CONFIRMED'
-          AND (
-               LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
-            OR LOWER(p.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
-          )
+        SELECT r
+        FROM Registration r
+        LEFT JOIN r.participant p
+        LEFT JOIN r.conference c
+        WHERE
+            LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(p.email) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
     """)
     List<Registration> searchConfirmedByParticipant(@Param("keyword") String keyword);
 

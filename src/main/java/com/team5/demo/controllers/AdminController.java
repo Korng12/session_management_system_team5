@@ -170,7 +170,7 @@ public class AdminController {
     }
 
     /* ===================== MANAGE REGISTRATIONS (search and clear) ===================== */
-    @GetMapping("/manage-registrations")
+    @GetMapping("/view-registrations")
     public String manageRegistrations(
             @RequestParam(value = "keyword", required = false) String keyword,
             Model model) {
@@ -196,23 +196,23 @@ public class AdminController {
 
 
     /* ===================== OLD URL REDIRECT ===================== */
-    @GetMapping("/view-registeredUsers")
-    public String viewRegistrations(Model model) {
+    // @GetMapping("/view-registrations")
+    // public String viewRegistrations(Model model) {
 
-        // For table
-        List<Registration> registrations =
-                registrationService.getAllRegistrations();
+    //     // For table
+    //     List<Registration> registrations =
+    //             registrationService.getAllRegistrations();
 
-        // For summary
-        long totalRegistrations =
-                registrationService.getTotalRegistrations();
+    //     // For summary
+    //     long totalRegistrations =
+    //             registrationService.getTotalRegistrations();
 
-        model.addAttribute("registrations", registrations);       // ✅ LIST
-        model.addAttribute("totalRegistrations", totalRegistrations); // ✅ LONG
-        model.addAttribute("activePage", "registrations");
+    //     model.addAttribute("registrations", registrations);       // ✅ LIST
+    //     model.addAttribute("totalRegistrations", totalRegistrations); // ✅ LONG
+    //     model.addAttribute("activePage", "registrations");
 
-        return "admin/view-registrations";
-    }
+    //     return "admin/view-registrations";
+    // }
 
 
 

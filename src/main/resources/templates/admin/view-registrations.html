@@ -46,12 +46,11 @@
         <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
     </div>
         </nav> -->
-   <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
         <div class="container mt-5">
             <h1>View Registrations</h1>
             <form method="get"
-              th:action="@{/admin/manage-registrations}"
+              th:action="@{/admin/view-registrations}"
               class="row g-2 mb-3">
 
             <div class="col-md-4">
@@ -66,7 +65,7 @@
                 <button type="submit" class="btn btn-primary">
                      Search
                 </button>
-                <a th:href="@{/admin/manage-registrations}"
+                <a th:href="@{/admin/view-registrations}"
                    class="btn btn-danger ms-2">
                     Clear
                 </a>
@@ -85,7 +84,9 @@
                 <tbody>
                     <tr th:each="reg : ${registrations}">
                         <td class="text-center" th:text="${reg.id}"></td>
-
+                        <td class="text-center" th:text="${reg.conference != null ? reg.conference.getTitle() : 'N/A'}">
+                            Name
+                        </td>
                         <td class="text-center" th:text="${reg.participant != null ? reg.participant.name : 'N/A'}">
                             Name
                         </td>

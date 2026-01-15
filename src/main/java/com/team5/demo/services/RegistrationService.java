@@ -174,7 +174,7 @@ public class RegistrationService {
         }
         public List<Registration> searchByParticipant(String keyword) {
         return registrationRepository
-                .findByParticipant_EmailContainingIgnoreCase(keyword);
+                .searchConfirmedByParticipant(keyword);
         }
 
         public List<Registration> getMyRegistrationsByEmail(String email) {
