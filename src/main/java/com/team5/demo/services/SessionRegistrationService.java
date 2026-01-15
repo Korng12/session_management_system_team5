@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.team5.demo.dto.SessionRegistrationViewDTO;
 import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionRegistration;
@@ -105,10 +106,33 @@ public class SessionRegistrationService {
                 .stream()
                 .collect(Collectors.toSet());
     }
+    
     // public List<SessionRegistration> attendeesInSession(Long sessionId) {
     //     Session session = sessionRepo.findById(sessionId)
     //             .orElseThrow(() -> new RuntimeException("Session not found")); 
     //         return sessionRegRepo.findBySession_Id(sessionId);
     // }            
+    public List<SessionRegistrationViewDTO> getAllSessionRegistrations() {
+        return sessionRegRepo.findAll().stream()
+               .map(reg -> new SessionRegistrationViewDTO(
+                reg.getId(),
+                reg.getParticipant() != null ? reg.getParticipant().getName() : "N/A",
+                reg.getSession() != null ? reg.getSession().getTitle() : "N/A",
+                reg.getSession().getStatus(),
+                reg.getRegisteredAt()
+        ))
 
+        .collect(Collectors.toList());
+    }
+    public List<SessionRegistrationViewDTO> getSessionRegistrationByKeyword(String keyword){
+        return sessionRegRepo.findSessionRegistrationByKeyword(keyword).stream()
+               .map(reg -> new SessionRegistrationViewDTO(
+                reg.getId(),
+                reg.getParticipant() != null ? reg.getParticipant().getName() : "N/A",
+                reg.getSession() != null ? reg.getSession().getTitle() : "N/A",
+                reg.getSession().getStatus(),
+                reg.getRegisteredAt()
+        ))
+        .collect(Collectors.toList());
+    }
 }

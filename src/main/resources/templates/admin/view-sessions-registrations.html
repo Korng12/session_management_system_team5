@@ -48,16 +48,16 @@
         </nav> -->
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
         <div class="container mt-5">
-            <h1>View Conference Registrations</h1>
+            <h1>View Session Registrations</h1>
             <form method="get"
-              th:action="@{/admin/view-registrations}"
+              th:action="@{/admin/view-sessions-registrations}"
               class="row g-2 mb-3">
 
             <div class="col-md-4">
                 <input type="text"
                        name="keyword"
                        class="form-control"
-                       placeholder="Search by name or email or conference"
+                       placeholder="Search by name or email or session"
                        th:value="${keyword}">
             </div>
 
@@ -65,7 +65,7 @@
                 <button type="submit" class="btn btn-primary">
                      Search
                 </button>
-                <a th:href="@{/admin/view-registrations}"
+                <a th:href="@{/admin/view-session-registrations}"
                    class="btn btn-danger ms-2">
                     Clear
                 </a>
@@ -75,24 +75,29 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th class="text-center">User ID</th>
-                        <th class="text-center">Name</th>
-                        <th class="text-center">Email</th>
+                        <th class="text-center">Registration ID</th>
+                        <th class="text-center">Session Title</th>
+                        <th class="text-center">User name</th>
+                        <th class="text-center">Session Status</th>
                         <th class="text-center">Registration Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="reg : ${registrations}">
-                        <td class="text-center" th:text="${reg.id}"></td>
-                        <td class="text-center" th:text="${reg.conference != null ? reg.conference.getTitle() : 'N/A'}">
-                            Name
+                        <td class="text-center" th:text="${reg.registrationId}"></td>
+                        <td class="text-center" th:text="${reg.sessionTitle != null ? reg.sessionTitle : 'N/A'}">
+                            Session Title
                         </td>
-                        <td class="text-center" th:text="${reg.participant != null ? reg.participant.name : 'N/A'}">
-                            Name
+                        <td class="text-center" th:text="${reg.participantName != null ? reg.participantName : 'N/A'}">
+                            User Name
                         </td>
 
-                        <td class="text-center" th:text="${reg.participant != null ? reg.participant.email : 'N/A'}">
+                        <!-- <td class="text-center" th:text="${reg.participant != null ? reg.participant.email : 'N/A'}">
                             Email
+                        </td> -->
+
+                        <td class="text-center" th:text="${reg.sessionStatus != null ? reg.sessionStatus : 'N/A'}">
+                            Status
                         </td>
 
                         <td class="text-center" th:text="${#temporals.format(reg.registeredAt, 'yyyy-MM-dd HH:mm')}">

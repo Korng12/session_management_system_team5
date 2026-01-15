@@ -14,6 +14,7 @@ import com.team5.demo.dto.CreateUserDTO;
 import com.team5.demo.dto.SessionResponse;
 import com.team5.demo.dto.UpdateSessionStatusRequest;
 import com.team5.demo.dto.SessionDependenciesResponse;
+import com.team5.demo.dto.SessionRegistrationViewDTO;
 import com.team5.demo.dto.ValidationErrorResponse;
 import com.team5.demo.dto.RoomAvailabilityResponse;
 import com.team5.demo.dto.TimeConflictResponse;
@@ -43,6 +44,7 @@ import com.team5.demo.repositories.RoomRepository;
 import com.team5.demo.repositories.UserRepository;
 import com.team5.demo.entities.Room;
 import com.team5.demo.entities.Session;
+import com.team5.demo.entities.SessionRegistration;
 import com.team5.demo.entities.User;
 import com.team5.demo.entities.Role;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,6 +111,8 @@ public class AdminController {
     private ConferenceService conferenceService;
     @Autowired
     private com.team5.demo.repositories.SessionRegistrationRepository sessionRegistrationRepository;
+    @Autowired
+    private com.team5.demo.services.SessionRegistrationService sessionRegistrationService;
 
     @GetMapping("")
     public String dashboard(Model model) {
@@ -163,11 +167,11 @@ public class AdminController {
     }
 
     // Manage Schedule
-    @GetMapping("/schedule")
-    public String manageSchedule(Model model) {
-        model.addAttribute("activePage", "schedule");
-        return "admin/view-schedule";
-    }
+    // @GetMapping("/schedule")
+    // public String manageSchedule(Model model) {
+    //     model.addAttribute("activePage", "schedule");
+    //     return "admin/view-schedule";
+    // }
 
     /* ===================== MANAGE REGISTRATIONS (search and clear) ===================== */
     @GetMapping("/view-registrations")
@@ -196,23 +200,30 @@ public class AdminController {
 
 
     /* ===================== OLD URL REDIRECT ===================== */
-    // @GetMapping("/view-registrations")
-    // public String viewRegistrations(Model model) {
+    @GetMapping("/view-sessions-registrations")
+    public String viewSessionRegistrations(@RequestParam(value = "keyword", required = false) String keyword, Model model) {
 
-    //     // For table
-    //     List<Registration> registrations =
-    //             registrationService.getAllRegistrations();
+        // For table
+        List<SessionRegistrationViewDTO> sessionRegistrations;
+        if(keyword != null && !keyword.trim().isEmpty()) {
+            sessionRegistrations = 
+                sessionRegistrationService.getSessionRegistrationByKeyword(keyword);
+        }else{
+            sessionRegistrations = 
+                sessionRegistrationService.getAllSessionRegistrations();
+        }
+                
 
-    //     // For summary
-    //     long totalRegistrations =
-    //             registrationService.getTotalRegistrations();
+        // For summary
+        long totalRegistrations =
+                registrationService.getTotalRegistrations();
 
-    //     model.addAttribute("registrations", registrations);       // ✅ LIST
-    //     model.addAttribute("totalRegistrations", totalRegistrations); // ✅ LONG
-    //     model.addAttribute("activePage", "registrations");
+        model.addAttribute("registrations", sessionRegistrations);       // ✅ LIST
+        // model.addAttribute("totalRegistrations", totalRegistrations); // ✅ LONG
+        // model.addAttribute("activePage", "registrations");
 
-    //     return "admin/view-registrations";
-    // }
+        return "admin/view-sessions-registrations";
+    }
 
 
 
@@ -236,20 +247,20 @@ public class AdminController {
             @RequestParam(value = "keyword", required = false) String keyword,
         Model model) {
 
-    List<Conference> conferences;
+        List<Conference> conferences;
 
-    if (keyword != null && !keyword.trim().isEmpty()) {
-        conferences = conferenceService.searchByTitle(keyword);
-    } else {
-        conferences = conferenceService.getAllConferences();
-    }
-    model.addAttribute("conference", new Conference());
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            conferences = conferenceService.searchByTitle(keyword);
+        } else {
+            conferences = conferenceService.getAllConferences();
+        }
+        model.addAttribute("conference", new Conference());
 
-    model.addAttribute("conferences", conferences);
-    model.addAttribute("keyword", keyword);
-    model.addAttribute("activePage", "conferences");
+        model.addAttribute("conferences", conferences);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("activePage", "conferences");
 
-    return "admin/manage-conferences";
+        return "admin/manage-conferences";
     }
  
     
@@ -895,24 +906,24 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-@PostMapping("/users/{id}/update")
-public String updateUser(@PathVariable("id") Long id,
-                         @RequestParam("name") String name,
-                         @RequestParam("email") String email,
-                         @RequestParam(value="password", required=false) String password,
-                         @RequestParam("role") String role) {
-    userService.update(id, name, email, password, role);
-    return "redirect:/admin/users";
-}
-
-@DeleteMapping("/users/{id}")
-public String deleteUser(@PathVariable("id") Long id,Principal principal, RedirectAttributes ra) {
-    try {
-        userService.delete(id,principal.getName());
-        ra.addFlashAttribute("success", "User deleted");
-    } catch (Exception e) {
-        ra.addFlashAttribute("error", e.getMessage());
+    @PostMapping("/users/{id}/update")
+    public String updateUser(@PathVariable("id") Long id,
+                            @RequestParam("name") String name,
+                            @RequestParam("email") String email,
+                            @RequestParam(value="password", required=false) String password,
+                            @RequestParam("role") String role) {
+        userService.update(id, name, email, password, role);
+        return "redirect:/admin/users";
     }
-    return "redirect:/admin/users";
-}
+
+    @DeleteMapping("/users/{id}")
+    public String deleteUser(@PathVariable("id") Long id,Principal principal, RedirectAttributes ra) {
+        try {
+            userService.delete(id,principal.getName());
+            ra.addFlashAttribute("success", "User deleted");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/users";
+    }
 }

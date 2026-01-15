@@ -28,5 +28,12 @@ public interface SessionRegistrationRepository extends JpaRepository <SessionReg
     );
     List<SessionRegistration> findBySession_Id(Long sessionId);
     long countBySessionId(Long sessionId);
-
+    @Query("""
+        SELECT sr FROM SessionRegistration sr
+        JOIN sr.participant p
+        JOIN sr.session s
+        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+           OR LOWER(s.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    List<SessionRegistration> findSessionRegistrationByKeyword(@Param("keyword") String keyword);
 } 

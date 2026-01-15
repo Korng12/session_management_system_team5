@@ -45,8 +45,6 @@ public class RegistrationController {
         return ResponseEntity.ok(reg);
     }
 
-
-    
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserRegistrations(@PathVariable("userId") Long userId) {
         try {
