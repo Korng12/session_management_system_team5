@@ -17,15 +17,16 @@ public interface SessionRegistrationRepository extends JpaRepository <SessionReg
     List<SessionRegistration> findBySession(Session session);
     Optional<SessionRegistration>  findByParticipantAndSession(User user, Session session);
        @Query("""
-    select sr.session.id
-    from SessionRegistration sr
-    where sr.participant = :user
-      and sr.session.conference.id = :conferenceId
+      select sr.session.id
+      from SessionRegistration sr
+      where sr.participant = :user
+        and sr.session.conference.id = :conferenceId
     """)
     List<Long> findRegisteredSessionIds(
         @Param("user") User user,
         @Param("conferenceId") Long conferenceId
-);
-
+    );
+    List<SessionRegistration> findBySession_Id(Long sessionId);
+    long countBySessionId(Long sessionId);
 
 } 

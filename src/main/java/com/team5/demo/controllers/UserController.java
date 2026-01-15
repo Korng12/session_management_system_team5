@@ -78,18 +78,6 @@ public class UserController {
         return "public/login";
     }
 
-    // @GetMapping("/register")
-    // public String getRegisterPage() {
-    //     return "public/register";
-    // }
-
-    @GetMapping("/register-conference")
-    public String getRegisterConferencePage() {
-        return "public/registration";
-    }
-
-    
-
     @GetMapping("/profile")
     public String getProfilePage(Principal principal, Model model) {
         if (principal != null) {
@@ -191,26 +179,5 @@ public class UserController {
         return "user/my-conferences";
     }
 
-    // @GetMapping("/home")
-    // public String getHome(Authentication auth,Model model) {
-    //     System.out.println(
-    //         "this is user principle"+
-    //     SecurityContextHolder.getContext().getAuthentication().getDetails()
-
-    //     );
-    //     model.addAttribute("mySessions",scheduleService.getMyUpcomingSessions(auth.getName()));
-
-    //     // Include chaired sessions for users with the chair role
-    //     boolean isChair = auth.getAuthorities().stream()
-    //         .anyMatch(a -> "ROLE_CHAIR".equals(a.getAuthority()));
-
-    //     if (isChair) {
-    //         model.addAttribute("chairedSessions", chairService.getChairedSessions(auth.getName()));
-    //     } else {
-    //         model.addAttribute("chairedSessions", java.util.Collections.emptyList());
-    //     }
-
-    //     return "user/home";
-    // }
 
 }

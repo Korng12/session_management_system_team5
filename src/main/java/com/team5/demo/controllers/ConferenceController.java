@@ -1,7 +1,11 @@
 package com.team5.demo.controllers;
 
 import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.team5.demo.dto.SessionResponse;
 import com.team5.demo.entities.Conference;
 import com.team5.demo.services.ConferenceService;
 import com.team5.demo.services.SessionRegistrationService;
@@ -68,11 +73,26 @@ public class ConferenceController {
 
     // 1. Conference data
     model.addAttribute("conference", conferenceService.getConference(id));
+    List<SessionResponse> sessions = sessionService.getSessionsByConference(id);
+    List<String> rooms = sessions.stream()
+    .map(SessionResponse::getRoomName)
+    .filter(Objects::nonNull)
+    .distinct()
+    .toList();
+    Map<String, List<SessionResponse>> sessionsByRoom =
+    sessions.stream()
+        .filter(s -> s.getRoomName() != null)
+        .collect(Collectors.groupingBy(SessionResponse::getRoomName));
+    
+    model.addAttribute("sessionsByRoom", sessionsByRoom);
+
+
+    model.addAttribute("rooms", rooms);
 
     // 2. Sessions
     model.addAttribute(
         "sessions",
-        sessionService.getSessionsByConference(id)
+        sessions
     );
 
     // 3. Conference registration status
@@ -84,8 +104,10 @@ public class ConferenceController {
 
         isRegistered = registrationService
             .isRegisteredForConference(email, id);
-
+        // var conference = conferenceService.getConference(id);
+        
         if (isRegistered) {
+            model.addAttribute("registrationId",registrationService.getRegistrationForUserAndConference(email, id).get().getId());
             registeredSessionIds =
                 sessionRegistrationService
                     .getRegisteredSessionIds(email, id);
@@ -98,28 +120,28 @@ public class ConferenceController {
     return "user/conference-detail";
    }
 
-   @PostMapping("/admin/conferences/save")
-    public String saveConference(
-            @ModelAttribute("conference") Conference conference,
-            Model model) {
+//    @PostMapping("/admin/conferences/save")
+//     public String saveConference(
+//             @ModelAttribute("conference") Conference conference,
+//             Model model) {
 
-        try {
-            conferenceService.save(conference);
-            return "redirect:/admin/conferences";
+//         try {
+//             conferenceService.save(conference);
+//             return "redirect:/admin/conferences";
 
-        } catch (IllegalArgumentException e) {
+//         } catch (IllegalArgumentException e) {
 
-            // REQUIRED for Thymeleaf
-            model.addAttribute("conference", conference);
-            model.addAttribute("errorMessage", e.getMessage());
+//             // REQUIRED for Thymeleaf
+//             model.addAttribute("conference", conference);
+//             model.addAttribute("errorMessage", e.getMessage());
 
-            // REQUIRED list again
-            model.addAttribute("conferences",
-                    conferenceService.findAll());
+//             // REQUIRED list again
+//             model.addAttribute("conferences",
+//                     conferenceService.findAll());
 
-            return "admin/manage-conferences";
-        }
-    }
+//             return "admin/manage-conferences";
+//         }
+//     }
 
 
 

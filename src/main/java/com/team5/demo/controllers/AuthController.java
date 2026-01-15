@@ -124,7 +124,7 @@ public class AuthController {
                 : 60L * 60 * 1000; // 1 hour
 
         String token = jwtUtil.generateToken(request.getEmail(), jwtExpiryMillis);
-
+        
         // Cookie expiration depends on rememberMe
         int cookieAge = request.isRememberMe()
                 ? 1* 24 * 60 * 60// 7 days

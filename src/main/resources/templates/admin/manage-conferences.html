@@ -167,7 +167,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
 
-                    <form th:action="@{/admin/conferences/save}" method="post">
+                    <!-- <form th:action="@{/admin/conferences/save}" method="post">
 
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalTitle">Add Conference</h5>
@@ -204,15 +204,61 @@
                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
                         </div>
 
-                    </form>
+                    </form> -->
 
-                    
+                    <form th:action="@{/admin/conferences/save}"
+      th:object="${conference}"
+      method="post">
+
+    <input type="hidden" th:field="*{id}">
+
+    <input type="text" th:field="*{title}" class="form-control">
+    <div class="text-danger" th:errors="*{title}"></div>
+
+    <textarea th:field="*{description}" class="form-control"></textarea>
+    <div class="text-danger" th:errors="*{description}"></div>
+
+    <input type="date" th:field="*{startDate}" class="form-control">
+    <div class="text-danger" th:errors="*{startDate}"></div>
+
+    <input type="date" th:field="*{endDate}" class="form-control">
+    <div class="text-danger" th:errors="*{endDate}"></div>
+
+    <!-- GLOBAL errors -->
+    <div class="text-danger"
+         th:if="${#fields.hasGlobalErrors()}"
+         th:each="e : ${#fields.globalErrors()}"
+         th:text="${e}">
+    </div>
+
+    <!-- ✅ SAVE BUTTON (THIS IS REQUIRED) -->
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">
+            Save
+        </button>
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+            Cancel
+        </button>
+    </div>
+
+</form>
+
                 </div>
             </div>
         </div>
+<script th:if="${showModal}">
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalEl = document.getElementById('conferenceModal');
+        if (modalEl) {
+            new bootstrap.Modal(modalEl).show();
+        }
+    });
+</script>
+
 
         <!-- Javscript -->
         <script>
+            
             function openAddModal() {
                 document.getElementById('modalTitle').innerText = 'Add Conference';
                 document.getElementById('confId').value = '';

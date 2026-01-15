@@ -268,11 +268,40 @@ public class AdminController {
 
 
     // Insert and Delete 
-    @PostMapping("/conferences/save")
-    public String saveConference(Conference conference){
-        conferenceService.save(conference);
-        return "redirect:/admin/manage-conferences";
+    // @PostMapping("/conferences/save")
+    // public String saveConference(Conference conference){
+    //     conferenceService.save(conference);
+    //     return "redirect:/admin/manage-conferences";
+    // }
+ @PostMapping("/conferences/save")
+public String saveConference(
+        @Valid @ModelAttribute("conference") ConferenceDTO dto,
+        BindingResult result,
+        Model model
+) {
+
+    // SIMPLE cross-field validation
+    if (!result.hasErrors()
+        && dto.getEndDate().isBefore(dto.getStartDate())) {
+        result.reject(
+            "date.order",
+            "End date must be after start date"
+        );
     }
+
+    if (result.hasErrors()) {
+        model.addAttribute("conferences",
+                conferenceService.getAllConferences());
+                model.addAttribute("showModal", true);
+
+        return "admin/manage-conferences";
+    }
+
+    conferenceService.saveFromDto(dto);
+    return "redirect:/admin/conferences";
+}
+
+    
 
 
     /**

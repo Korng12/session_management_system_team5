@@ -39,37 +39,37 @@ public class ChairService {
     }
 
     // 1️⃣ Sessions chaired by current user
-@Transactional
-public List<Session> getChairedSessions(String email) {
+    @Transactional
+    public List<Session> getChairedSessions(String email) {
 
-    User chair = userRepo.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User chair = userRepo.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    List<Session> sessions = sessionRepo.findByChair(chair);
-    LocalDateTime now = LocalDateTime.now();
+        List<Session> sessions = sessionRepo.findByChair(chair);
+        LocalDateTime now = LocalDateTime.now();
 
-    for (Session session : sessions) {
+        for (Session session : sessions) {
 
-        if (session.getStatus() == SessionStatus.CANCELLED) continue;
+            if (session.getStatus() == SessionStatus.CANCELLED) continue;
 
-        SessionStatus newStatus;
+            SessionStatus newStatus;
 
-        if (now.isBefore(session.getStartTime())) {
-            newStatus = SessionStatus.SCHEDULED;
-        } else if (now.isAfter(session.getEndTime())) {
-            newStatus = SessionStatus.COMPLETED;
-        } else {
-            newStatus = SessionStatus.ONGOING;
+            if (now.isBefore(session.getStartTime())) {
+                newStatus = SessionStatus.SCHEDULED;
+            } else if (now.isAfter(session.getEndTime())) {
+                newStatus = SessionStatus.COMPLETED;
+            } else {
+                newStatus = SessionStatus.ONGOING;
+            }
+
+            if (session.getStatus() != newStatus) {
+                session.setStatus(newStatus);
+                sessionRepo.save(session); // 🔑 THIS is what makes UI update
+            }
         }
 
-        if (session.getStatus() != newStatus) {
-            session.setStatus(newStatus);
-            sessionRepo.save(session); // 🔑 THIS is what makes UI update
-        }
+        return sessions;
     }
-
-    return sessions;
-}
 
 
     // 2️⃣ Registered attendees for a session

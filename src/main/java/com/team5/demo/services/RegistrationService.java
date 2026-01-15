@@ -5,10 +5,9 @@ import com.team5.demo.entities.Registration;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.ConferenceRepository;
 import com.team5.demo.repositories.RegistrationRepository;
+import com.team5.demo.repositories.SessionRegistrationRepository;
 import com.team5.demo.repositories.UserRepository;
-import com.team5.demo.entities.*;
 import com.team5.demo.enums.RegistrationStatus;
-import com.team5.demo.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +23,7 @@ public class RegistrationService {
         private final RegistrationRepository registrationRepository;
         private final UserRepository userRepository;
         private final ConferenceRepository conferenceRepository;
+        private final SessionRegistrationRepository sessionRegistrationRepository;
 
         @Transactional
         public Registration registerForConference(String email, Long conferenceId) {
@@ -56,7 +56,7 @@ public class RegistrationService {
                 reg.setConference(conf);
                 reg.setRegisteredAt(LocalDateTime.now());
                 //     reg.setStatus("CONFIRMED");
-                        reg.setStatus(RegistrationStatus.CONFIRMED);
+                reg.setStatus(RegistrationStatus.CONFIRMED);
 
                 return registrationRepository.save(reg);
         }
@@ -92,6 +92,16 @@ public class RegistrationService {
                 Conference conf = registration.getConference();
                 if (conf.getEndDate() != null && !conf.getEndDate().isAfter(java.time.LocalDate.now())) {
                     throw new IllegalStateException("Cannot cancel registration for a conference that has already completed");
+                }
+                // Disallow cancelling conference registration if user has session registrations in this conference
+                var registeredSessionIds = sessionRegistrationRepository.findRegisteredSessionIds(
+                        registration.getParticipant(),
+                        conf.getId()
+                );
+                if (!registeredSessionIds.isEmpty()) {
+                    throw new IllegalStateException(
+                            "Cannot cancel conference registration while registered for sessions in this conference"
+                    );
                 }
 
 
@@ -162,7 +172,7 @@ public class RegistrationService {
         public Long getTotalRegistrations() {
              return registrationRepository.count();
         }
-                public List<Registration> searchByParticipant(String keyword) {
+        public List<Registration> searchByParticipant(String keyword) {
         return registrationRepository
                 .findByParticipant_EmailContainingIgnoreCase(keyword);
         }

@@ -11,7 +11,9 @@ public class SessionResponse {
     private String conferenceName;
     private Long chairId;
     private Long roomId;
+    private Integer roomCapacity;
     private Long conferenceId;
+    private Integer totalRegistered;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalDateTime createdAt;
@@ -82,7 +84,18 @@ public class SessionResponse {
     public void setRoomName(String roomName) {
         this.roomName = roomName;
     }
-
+    public void setRoomCapacity(Integer roomCapacity) {
+        this.roomCapacity = roomCapacity;
+    }
+    public Integer getRoomCapacity() {
+        return roomCapacity;
+    }
+    public Integer getTotalRegistered(){
+        return totalRegistered;
+    }
+    public void setTotalRegistered(Integer totalRegistered){
+        this.totalRegistered = totalRegistered;
+    }   
     public String getConferenceName() {
         return conferenceName;
     }

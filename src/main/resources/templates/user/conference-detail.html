@@ -105,7 +105,12 @@
                             <strong>Room:</strong>
                             <span th:text="${sess.roomName}">TBA</span>
                         </p>
-
+                            <p>Total Registered:</p>
+                            <span th:text="${sess.totalRegistered ?: 0}">0</span>
+                            <p class="small text-muted mb-1">
+                            <strong>Room Capacity:</strong>
+                            <span th:text="${sess.roomCapacity}">TBA</span>
+                        </p>
                         <p class="small text-muted">
                             <strong>Chair:</strong>
                             <span th:text="${sess.chairName}">TBA</span>
@@ -147,8 +152,6 @@
                 </span>
 
             </div>
-
-
 
                 </div>
             </div>

@@ -1,10 +1,21 @@
 package com.team5.demo.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ConferenceDTO {
+
     private Long id;
+    @NotBlank(message = "Title cannot be blank")
     private String title;
+    @NotBlank(message = "Description cannot be blank")
     private String description;
+    @NotNull(message="Start date is required")
+    @FutureOrPresent(message = "Start date must be in the present or future")   
+
     private java.time.LocalDate startDate;
+    @NotNull(message="End datea is required")
     private java.time.LocalDate endDate;
 
     // Constructors

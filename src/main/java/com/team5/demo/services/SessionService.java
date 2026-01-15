@@ -14,6 +14,7 @@ import com.team5.demo.entities.User;
 import com.team5.demo.repositories.SessionRepository;
 import com.team5.demo.repositories.ConferenceRepository;
 import com.team5.demo.repositories.RoomRepository;
+import com.team5.demo.repositories.SessionRegistrationRepository;
 import com.team5.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,8 @@ public class SessionService {
 
     @Autowired
     private ConferenceRepository conferenceRepository;
+    @Autowired
+    private SessionRegistrationRepository sessionRegistrationRepository;
 
     @Autowired
     private RoomRepository roomRepository;
@@ -147,12 +150,57 @@ public class SessionService {
     /**
      * Get all sessions for a specific conference
      */
-    public List<SessionResponse> getSessionsByConference(Long conferenceId) {
-        return sessionRepository.findByConferenceIdAndDeletedFalse(conferenceId)
-                .stream()
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
+    // public List<SessionResponse> getSessionsByConference(Long conferenceId) {
+    //     return sessionRepository.findByConferenceIdAndDeletedFalse(conferenceId)
+    //             .stream()
+    //             .map(this::convertToResponse)
+    //             .collect(Collectors.toList());
+    // }
+  public List<SessionResponse> getSessionsByConference(Long conferenceId) {
+
+    List<Session> sessions =
+        sessionRepository.findWithRoomByConference(conferenceId);
+
+    return sessions.stream()
+        .map(session -> {
+
+            SessionResponse res = toResponse(session);
+
+            long count =
+                sessionRegistrationRepository
+                    .countBySessionId(session.getId());
+
+            res.setTotalRegistered((int) count); // ✅ HERE
+
+            return res;
+        })
+        .toList();
+}
+
+
+    private SessionResponse toResponse(Session s) {
+
+        SessionResponse r = new SessionResponse();
+
+        r.setId(s.getId());
+        r.setTitle(s.getTitle());
+        r.setStartTime(s.getStartTime());
+        r.setEndTime(s.getEndTime());
+        r.setStatus(s.getStatus());
+
+        if (s.getRoom() != null) {
+            r.setRoomId(s.getRoom().getId());
+            r.setRoomName(s.getRoom().getName());
+            r.setRoomCapacity(s.getRoom().getCapacity()); // ✅ HERE
+        }
+
+        if (s.getChair() != null) {
+            r.setChairName(s.getChair().getName());
+        }
+
+        return r;
     }
+
 
     /**
      * Get all sessions

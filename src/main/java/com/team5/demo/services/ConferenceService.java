@@ -1,5 +1,6 @@
 package com.team5.demo.services;
 
+import com.team5.demo.dto.ConferenceDTO;
 import com.team5.demo.entities.Conference;
 import com.team5.demo.repositories.ConferenceRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,22 +20,34 @@ public class ConferenceService {
     }
 
     // Manage Conference
-    public Conference save(Conference conference) {
+    // public Conference save(Conference conference) {
 
-        if (conference.getStartDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException(
-                "Start date cannot be in the past."
-            );
-        }
+    //     if (conference.getStartDate().isBefore(LocalDate.now())) {
+    //         throw new IllegalArgumentException(
+    //             "Start date cannot be in the past."
+    //         );
+    //     }
 
-        if (conference.getEndDate().isBefore(conference.getStartDate())) {
-            throw new IllegalArgumentException(
-                "End date must be after start date."
-            );
-        }
+    //     if (conference.getEndDate().isBefore(conference.getStartDate())) {
+    //         throw new IllegalArgumentException(
+    //             "End date must be after start date."
+    //         );
+    //     }
 
-        return conferenceRepository.save(conference);
-    }
+    //     return conferenceRepository.save(conference);
+    // }
+    public Conference saveFromDto(ConferenceDTO dto) {
+
+    Conference conf = new Conference();
+    conf.setId(dto.getId());
+    conf.setTitle(dto.getTitle());
+    conf.setDescription(dto.getDescription());
+    conf.setStartDate(dto.getStartDate());
+    conf.setEndDate(dto.getEndDate());
+
+    return conferenceRepository.save(conf);
+}
+
 
 
     

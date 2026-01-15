@@ -17,12 +17,20 @@ import java.util.List;
 public interface SessionRepository extends JpaRepository<Session, Long> {
 
     // ✅ FIXED: LEFT JOIN FETCH (shows sessions even if room is null)
-    @Query("""
-        SELECT DISTINCT s FROM Session s
-        LEFT JOIN FETCH s.room
-        ORDER BY s.startTime
-    """)
-    List<Session> findAllWithRoom();
+       @Query("""
+              SELECT DISTINCT s FROM Session s
+              LEFT JOIN FETCH s.room
+              ORDER BY s.startTime
+       """)
+       List<Session> findAllWithRoom();
+       @Query("""
+       SELECT s
+       FROM Session s
+       LEFT JOIN FETCH s.room
+       WHERE s.conference.id = :conferenceId
+       """)
+       List<Session> findWithRoomByConference(Long conferenceId);
+
 
     // ✅ Simple derived query
     List<Session> findByRoom_Id(Long roomId);

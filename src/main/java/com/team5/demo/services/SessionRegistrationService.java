@@ -1,5 +1,6 @@
 package com.team5.demo.services;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -104,6 +105,10 @@ public class SessionRegistrationService {
                 .stream()
                 .collect(Collectors.toSet());
     }
-
+    // public List<SessionRegistration> attendeesInSession(Long sessionId) {
+    //     Session session = sessionRepo.findById(sessionId)
+    //             .orElseThrow(() -> new RuntimeException("Session not found")); 
+    //         return sessionRegRepo.findBySession_Id(sessionId);
+    // }            
 
 }
