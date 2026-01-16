@@ -13,6 +13,7 @@ import com.team5.demo.entities.AttendanceStatus;
 import com.team5.demo.entities.Session;
 import com.team5.demo.entities.SessionAttendance;
 import com.team5.demo.entities.SessionRegistration;
+import com.team5.demo.entities.SessionStatus;
 import com.team5.demo.entities.User;
 import com.team5.demo.repositories.SessionAttendanceRepository;
 import com.team5.demo.repositories.SessionRegistrationRepository;
@@ -65,27 +66,43 @@ public class ScheduleService {
         }).toList();
     }
 
-        public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
+    public List<MyUpcomingSessionDto> getMyUpcomingSessions(String email) {
 
         User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println(">>> getMyUpcomingSessions called, size = " + 
+            sessionRegRepo.findByParticipant(user).size());
 
-        LocalDateTime now = LocalDateTime.now();
+                LocalDateTime now = LocalDateTime.now();
 
-        return sessionRegRepo.findByParticipant(user)
-                .stream()
-                .map(SessionRegistration::getSession)
-                .filter(s -> s.getStartTime().isAfter(now)) // 🔑 KEY LINE
-                .map(s -> new MyUpcomingSessionDto(
-                        s.getId(),
-                        s.getTitle(),
-                        s.getConference().getTitle(),
-                        s.getStartTime(),
-                        s.getEndTime(),
-                        s.getStatus()
-                ))
-                .toList();
+                return sessionRegRepo.findByParticipant(user)
+                        .stream()
+                        .map(SessionRegistration::getSession)
+                        .filter(s -> s.getStartTime().isAfter(now)) // 🔑 KEY LINE
+                        .map(s -> new MyUpcomingSessionDto(
+                                s.getId(),
+                                s.getTitle(),
+                                s.getConference().getTitle(),
+                                s.getStartTime(),
+                                s.getEndTime(),
+                                effectiveStatus(s, now)
+                        ))
+                        .toList();
     }
 
-    
+    private SessionStatus effectiveStatus(Session session, LocalDateTime now) {
+    if (session.getStatus() == SessionStatus.CANCELLED) {
+        return SessionStatus.CANCELLED;
+    }
+
+    if (now.isBefore(session.getStartTime())) {
+        return SessionStatus.SCHEDULED;
+    }
+
+    if (now.isAfter(session.getEndTime())) {
+        return SessionStatus.COMPLETED;
+    }
+
+    return SessionStatus.ONGOING;
+}
 }

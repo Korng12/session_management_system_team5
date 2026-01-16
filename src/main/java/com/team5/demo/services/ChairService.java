@@ -214,23 +214,22 @@ public class ChairService {
     User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("User not found"));
 
-   LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now();
 
-    return sessionRegRepo.findByParticipant(user)
-            .stream()
-            .map(SessionRegistration::getSession)
-            .filter(s -> effectiveStatus(s, now) == SessionStatus.ONGOING)
-            .map(s -> new MyUpcomingSessionDto(
-                    s.getId(),
-                    s.getTitle(),
-                    s.getConference().getTitle(),
-                    s.getStartTime(),
-                    s.getEndTime(),
-                    SessionStatus.ONGOING
-            ))
-            .toList();
+        return sessionRepo.findByChair(user)
+                .stream()
+                .filter(s -> effectiveStatus(s, now) == SessionStatus.ONGOING)
+                .map(s -> new MyUpcomingSessionDto(
+                        s.getId(),
+                        s.getTitle(),
+                        s.getConference().getTitle(),
+                        s.getStartTime(),
+                        s.getEndTime(),
+                        SessionStatus.ONGOING
+                ))
+                .toList();
 
-}
+    }
     
     private SessionStatus effectiveStatus(Session session, LocalDateTime now) {
     if (session.getStatus() == SessionStatus.CANCELLED) {
@@ -271,5 +270,4 @@ public class ChairService {
             ))
             .toList();
     }
-
 }

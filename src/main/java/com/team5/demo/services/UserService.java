@@ -89,26 +89,34 @@ public class UserService {
         return userRepository.save(u);
     }
 
-public void delete(Long id, String currentUserEmail) {
-    User target = userRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+    public void delete(Long id, String currentUserEmail) {
+        User target = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-    boolean isAdmin = target.getRoles().stream()
-        .anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()));
+        boolean isAdmin = target.getRoles().stream()
+            .anyMatch(r -> "ADMIN".equalsIgnoreCase(r.getName()));
 
-    // Optional: block self delete
-    if (target.getEmail().equalsIgnoreCase(currentUserEmail)) {
-        throw new IllegalStateException("You cannot delete your own account");
-    }
-
-    // Block deleting the last admin
-    if (isAdmin) {
-        long adminCount = userRepository.countByRoles_Name("ADMIN");
-        if (adminCount <= 1) {
-            throw new IllegalStateException("You cannot delete the last admin account");
+        // Optional: block self delete
+        if (target.getEmail().equalsIgnoreCase(currentUserEmail)) {
+            throw new IllegalStateException("You cannot delete your own account");
         }
-    }
 
-    userRepository.delete(target);
-    }
+        // Block deleting the last admin
+        if (isAdmin) {
+            long adminCount = userRepository.countByRoles_Name("ADMIN");
+            if (adminCount <= 1) {
+                throw new IllegalStateException("You cannot delete the last admin account");
+            }
+        }
+
+        userRepository.delete(target);
+        }
+        public List<User> searchByNameOrEmail(String keyword) {
+            return userRepository
+                .findByNameContainingIgnoreCaseOrEmailContainingIgnoreCase(
+                    keyword, keyword
+                );
+        }
+
 }
+

@@ -113,6 +113,7 @@ public class UserController {
     public String getHome(Model model, Authentication auth) {
         String email = auth.getName();
         var mySessions = scheduleService.getMyUpcomingSessions(email);
+        
         model.addAttribute("mySessions", mySessions);
         if(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHAIR"))){
             model.addAttribute(

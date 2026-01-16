@@ -20,6 +20,7 @@ public class SessionResponse {
     private SessionStatus status;
     private Integer version; // For optimistic locking
     private boolean deleted;
+    private boolean full;
 
     // Constructors
     public SessionResponse() {
@@ -51,6 +52,14 @@ public class SessionResponse {
         this(id, title, chairName, roomName, conferenceName, startTime, endTime, createdAt, status);
         this.version = version;
     }
+    public boolean isFull() {
+    return full;
+}
+
+public void setFull(boolean full) {
+    this.full = full;
+}
+
 
     // Getters and Setters
     public Long getId() {

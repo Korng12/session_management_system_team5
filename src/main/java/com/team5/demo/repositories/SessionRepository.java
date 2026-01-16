@@ -31,7 +31,7 @@ public interface SessionRepository extends JpaRepository<Session, Long> {
        """)
        List<Session> findWithRoomByConference(@Param("conferenceId") Long conferenceId);
 
-
+    List <Session> findByConferenceId(Long conferenceId);
     // ✅ Simple derived query
     List<Session> findByRoom_Id(Long roomId);
 

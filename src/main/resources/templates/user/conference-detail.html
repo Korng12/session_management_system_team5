@@ -122,36 +122,36 @@
                         </span>
                     </div>
 
-            <div class="d-flex gap-2 align-items-center">
+                <div class="d-flex gap-2 align-items-center">
 
-                <!-- Register session -->
-                <form th:if="${isRegistered
-                            and sess.status.name() == 'SCHEDULED'
-                            and !registeredSessionIds.contains(sess.id)}"
-                    th:action="@{/sessions/{id}/register(id=${sess.id})}"
-                    method="post"
-                    class="d-inline"
-                    sec:authorize="hasAuthority('ROLE_ATTENDEE')">
+                    <!-- Register session -->
+                    <form th:if="${isRegistered
+                                and sess.status.name() == 'SCHEDULED'
+                                and !registeredSessionIds.contains(sess.id)}"
+                        th:action="@{/sessions/{id}/register(id=${sess.id})}"
+                        method="post"
+                        class="d-inline"
+                        sec:authorize="hasAuthority('ROLE_ATTENDEE')">
 
-                    <button type="submit"
-                            class="btn btn-sm btn-primary">
-                        Register Session
-                    </button>
-                </form>
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+                            Register Session
+                        </button>
+                    </form>
 
-                <!-- Already registered -->
-                <span th:if="${registeredSessionIds.contains(sess.id)}"
-                    class="badge bg-success">
-                    Registered
-                </span>
+                    <!-- Already registered -->
+                    <span th:if="${registeredSessionIds.contains(sess.id)}"
+                        class="badge bg-success">
+                        Registered
+                    </span>
 
-                <!-- Session closed -->
-                <span th:if="${sess.status.name() != 'SCHEDULED'}"
-                    class="badge bg-secondary">
-                    Registration closed
-                </span>
+                    <!-- Session closed -->
+                    <span th:if="${sess.status.name() != 'SCHEDULED'}"
+                        class="badge bg-secondary">
+                        Registration closed
+                    </span>
 
-            </div>
+                </div>
 
                 </div>
             </div>

@@ -71,51 +71,51 @@ public class ConferenceController {
         Authentication auth,
         Model model) {
             
-    // 1. Conference data
-    model.addAttribute("conference", conferenceService.getConference(id));
-    List<SessionResponse> sessions = sessionService.getSessionsByConference(id);
-    List<String> rooms = sessions.stream()
-    .map(SessionResponse::getRoomName)
-    .filter(Objects::nonNull)
-    .distinct()
-    .toList();
-    Map<String, List<SessionResponse>> sessionsByRoom =
-    sessions.stream()
-        .filter(s -> s.getRoomName() != null)
-        .collect(Collectors.groupingBy(SessionResponse::getRoomName));
-    
-    model.addAttribute("sessionsByRoom", sessionsByRoom);
-
-
-    model.addAttribute("rooms", rooms);
-
-    // 2. Sessions
-    model.addAttribute(
-        "sessions",
-        sessions
-    );
-
-    // 3. Conference registration status
-    boolean isRegistered = false;
-    Set<Long> registeredSessionIds = Set.of();
-
-    if (auth != null && auth.isAuthenticated()) {
-        String email = auth.getName();
-
-        isRegistered = registrationService
-            .isRegisteredForConference(email, id);
-        // var conference = conferenceService.getConference(id);
+        // 1. Conference data
+        model.addAttribute("conference", conferenceService.getConference(id));
+        List<SessionResponse> sessions = sessionService.getSessionsByConference(id);
+        List<String> rooms = sessions.stream()
+        .map(SessionResponse::getRoomName)
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();
+        Map<String, List<SessionResponse>> sessionsByRoom =
+        sessions.stream()
+            .filter(s -> s.getRoomName() != null)
+            .collect(Collectors.groupingBy(SessionResponse::getRoomName));
         
-        if (isRegistered) {
-            model.addAttribute("registrationId",registrationService.getRegistrationForUserAndConference(email, id).get().getId());
-            registeredSessionIds =
-                sessionRegistrationService
-                    .getRegisteredSessionIds(email, id);
-        }
-    }
+        model.addAttribute("sessionsByRoom", sessionsByRoom);
 
-    model.addAttribute("isRegistered", isRegistered);
-    model.addAttribute("registeredSessionIds", registeredSessionIds);
+
+        model.addAttribute("rooms", rooms);
+
+        // 2. Sessions
+        model.addAttribute(
+            "sessions",
+            sessions
+        );
+
+        // 3. Conference registration status
+        boolean isRegistered = false;
+        Set<Long> registeredSessionIds = Set.of();
+
+        if (auth != null && auth.isAuthenticated()) {
+            String email = auth.getName();
+
+            isRegistered = registrationService
+                .isRegisteredForConference(email, id);
+            // var conference = conferenceService.getConference(id);
+            
+            if (isRegistered) {
+                model.addAttribute("registrationId",registrationService.getRegistrationForUserAndConference(email, id).get().getId());
+                registeredSessionIds =
+                    sessionRegistrationService
+                        .getRegisteredSessionIds(email, id);
+            }
+        }
+
+        model.addAttribute("isRegistered", isRegistered);
+        model.addAttribute("registeredSessionIds", registeredSessionIds);
 
     return "user/conference-detail";
    }

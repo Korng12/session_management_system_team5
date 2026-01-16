@@ -881,12 +881,29 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    // @GetMapping("/users")
+    // public String listUsers(Model model) {
+    //     model.addAttribute("users", userService.findAll());
+    //     model.addAttribute("user", new CreateUserDTO());
+    //     return "admin/manage-users";
+    // }
     @GetMapping("/users")
-    public String listUsers(Model model) {
-        model.addAttribute("users", userService.findAll());
+    public String listUsers(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            Model model) {
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            model.addAttribute("users", userService.searchByNameOrEmail(keyword));
+        } else {
+            model.addAttribute("users", userService.findAll());
+        }
+
+        model.addAttribute("keyword", keyword); // 🔑 keep value in input
         model.addAttribute("user", new CreateUserDTO());
+
         return "admin/manage-users";
     }
+
 
     // @PostMapping("/users/create")
     // public String createUser(@RequestParam("name") String name,
@@ -896,7 +913,7 @@ public class AdminController {
     //     userService.create(name, email, password, role);
     //     return "redirect:/admin/users";
     // }
-     @PostMapping("/users/create")
+    @PostMapping("/users/create")
     public String createUser(@ModelAttribute("user") @Valid CreateUserDTO userDTO , BindingResult result,Model model) {
         if (result.hasErrors()) {
             model.addAttribute("users", userService.findAll());

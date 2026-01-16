@@ -28,6 +28,7 @@ public interface SessionRegistrationRepository extends JpaRepository <SessionReg
     );
     List<SessionRegistration> findBySession_Id(Long sessionId);
     long countBySessionId(Long sessionId);
+    long countBySession(Session session);
     @Query("""
         SELECT sr FROM SessionRegistration sr
         JOIN sr.participant p

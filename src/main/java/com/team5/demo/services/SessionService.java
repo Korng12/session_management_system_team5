@@ -156,26 +156,51 @@ public class SessionService {
     //             .map(this::convertToResponse)
     //             .collect(Collectors.toList());
     // }
-  public List<SessionResponse> getSessionsByConference(Long conferenceId) {
+//   public List<SessionResponse> getSessionsByConference(Long conferenceId) {
 
-    List<Session> sessions =
-        sessionRepository.findWithRoomByConference(conferenceId);
+//     List<Session> sessions =
+//         sessionRepository.findWithRoomByConference(conferenceId);
 
-    return sessions.stream()
-        .map(session -> {
+//     return sessions.stream()
+//         .map(session -> {
 
-            SessionResponse res = toResponse(session);
+//             SessionResponse res = toResponse(session);
 
-            long count =
-                sessionRegistrationRepository
-                    .countBySessionId(session.getId());
+//             long count =
+//                 sessionRegistrationRepository
+//                     .countBySessionId(session.getId());
 
-            res.setTotalRegistered((int) count); // ✅ HERE
+//             res.setTotalRegistered((int) count); // ✅ HERE
 
-            return res;
-        })
-        .toList();
+//             return res;
+//         })
+//         .toList();
+// }
+public List<SessionResponse> getSessionsByConference(Long conferenceId) {
+
+    List<Session> sessions = sessionRepository.findByConferenceId(conferenceId);
+
+    return sessions.stream().map(session -> {
+
+        SessionResponse res = convertToResponse(session);
+
+        int capacity =
+            session.getRoom() != null
+                ? session.getRoom().getCapacity()
+                : Integer.MAX_VALUE;
+
+        int registeredCount =
+            (int) sessionRegistrationRepository.countBySession(session);
+
+        res.setRoomCapacity(capacity);
+        res.setTotalRegistered(registeredCount);
+        res.setFull(registeredCount >= capacity);
+
+        return res;
+    }).toList();
 }
+
+
 
 
     private SessionResponse toResponse(Session s) {
